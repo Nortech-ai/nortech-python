@@ -1,5 +1,7 @@
 # nortech-python
 
+The official Python library for Nortech AI.
+
 ## Install
 
 You can install using pip:
