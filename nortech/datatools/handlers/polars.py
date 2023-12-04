@@ -33,6 +33,7 @@ def get_lazy_polars_df(search_json: str, time_window: TimeWindow) -> LazyFrame:
 
     Example
     -------
+    >>> from datetime import datetime
     >>> from nortech.datatools import get_lazy_polars_df, TimeWindow
     >>> search_json = \"""[
         {
@@ -132,6 +133,7 @@ def get_polars_df(search_json: str, time_window: TimeWindow) -> DataFrame:
 
     Example
     -------
+    >>> from datetime import datetime
     >>> from nortech.datatools import get_polars_df, TimeWindow
     >>> search_json = \"""[
         {
