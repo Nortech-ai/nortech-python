@@ -5,6 +5,8 @@ description = "The official Python library for Nortech AI"
 authors = ["Nortech AI <info@nortech.ai>"]
 license = "Apache-2.0"
 readme = "README.md"
+homepage = "https://nortech.ai/"
+repository = "https://github.com/Nortech-ai/nortech-python"
 
 [tool.poetry.dependencies]
 python = "^3.9"
