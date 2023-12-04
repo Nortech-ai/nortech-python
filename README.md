@@ -52,6 +52,8 @@ In order to get a [pandas](https://pandas.pydata.org/docs/) DataFrame use the `g
 
 ```python
 from nortech.datatools import get_df, TimeWindow
+
+
 search_json = """[
     {
         "name": "signal_1",
@@ -129,6 +131,8 @@ In order to get a [polars](https://pola-rs.github.io/polars/py-polars/html/refer
 
 ```python
 from nortech.datatools import get_polars_df, TimeWindow
+
+
 search_json = """[
     {
         "name": "signal_1",
@@ -206,6 +210,8 @@ In order to get a [polars](https://pola-rs.github.io/polars/py-polars/html/refer
 
 ```python
 from nortech.datatools import get_lazy_polars_df, TimeWindow
+
+
 search_json = """[
     {
         "name": "signal_1",
