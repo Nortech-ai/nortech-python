@@ -114,7 +114,7 @@ search_json = """[
 
 time_window = TimeWindow(
             start=datetime(2020, 1, 1),
-            end=datetime(2020, 1, 1),
+            end=datetime(2020, 1, 5),
 )
 df = get_df(search_json=search_json, time_window=time_window)
 
@@ -194,7 +194,7 @@ search_json = """[
 
 time_window = TimeWindow(
             start=datetime(2020, 1, 1),
-            end=datetime(2020, 1, 1),
+            end=datetime(2020, 1, 5),
 )
 polars_df = get_polars_df(search_json=search_json, time_window=time_window)
 
@@ -274,7 +274,7 @@ search_json = """[
 
 time_window = TimeWindow(
             start=datetime(2020, 1, 1),
-            end=datetime(2020, 1, 1),
+            end=datetime(2020, 1, 5),
 )
 lazy_polars_df = get_lazy_polars_df(search_json=search_json, time_window=time_window)
 
