@@ -51,8 +51,9 @@ To get a DataFrame with the requested signals:
 In order to get a [pandas](https://pandas.pydata.org/docs/) DataFrame use the `get_df`:
 
 ```python
-from nortech.datatools import get_df, TimeWindow
+from datetime import datetime
 
+from nortech.datatools import get_df, TimeWindow
 
 search_json = """[
     {
@@ -114,7 +115,7 @@ search_json = """[
 time_window = TimeWindow(
             start=datetime(2020, 1, 1),
             end=datetime(2020, 1, 1),
-    )
+)
 df = get_df(search_json=search_json, time_window=time_window)
 
 assert list(df.columns) == [
@@ -130,8 +131,9 @@ assert list(df.columns) == [
 In order to get a [polars](https://pola-rs.github.io/polars/py-polars/html/reference/) DataFrame use the `get_polars_df`:
 
 ```python
-from nortech.datatools import get_polars_df, TimeWindow
+from datetime import datetime
 
+from nortech.datatools import get_polars_df, TimeWindow
 
 search_json = """[
     {
@@ -193,7 +195,7 @@ search_json = """[
 time_window = TimeWindow(
             start=datetime(2020, 1, 1),
             end=datetime(2020, 1, 1),
-    )
+)
 polars_df = get_polars_df(search_json=search_json, time_window=time_window)
 
 assert polars_df.columns == [
@@ -209,8 +211,9 @@ assert polars_df.columns == [
 In order to get a [polars](https://pola-rs.github.io/polars/py-polars/html/reference/) LazyFrame use the `get_lazy_polars_df`:
 
 ```python
-from nortech.datatools import get_lazy_polars_df, TimeWindow
+from datetime import datetime
 
+from nortech.datatools import get_lazy_polars_df, TimeWindow
 
 search_json = """[
     {
@@ -272,7 +275,7 @@ search_json = """[
 time_window = TimeWindow(
             start=datetime(2020, 1, 1),
             end=datetime(2020, 1, 1),
-    )
+)
 lazy_polars_df = get_lazy_polars_df(search_json=search_json, time_window=time_window)
 
 assert lazy_polars_df.columns == [
