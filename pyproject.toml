@@ -22,6 +22,7 @@ moto = {extras = ["server"], version = "^4.2.11"}
 pytest = "^7.4.3"
 ipykernel = "^6.27.1"
 black = "^23.11.0"
+flake8 = "^6.1.0"
 
 [build-system]
 requires = ["poetry-core"]

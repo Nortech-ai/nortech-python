@@ -7,7 +7,6 @@ import boto3
 import numpy as np
 import pandas as pd
 import pytest
-from moto import mock_s3
 
 from nortech.datatools import TimeWindow, get_lazy_polars_df
 from nortech.datatools.handlers.pandas import get_df

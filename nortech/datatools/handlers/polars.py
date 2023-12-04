@@ -97,7 +97,12 @@ def get_lazy_polars_df(search_json: str, time_window: TimeWindow) -> LazyFrame:
         )
     >>> lazy_polars_df = get_lazy_polars_df(search_json=search_json, time_window=time_window)
     >>> lazy_polars_df.columns
-        ['timestamp', 'asset_1/division_1/unit_1/signal_1', 'asset_1/division_1/unit_1/signal_2', 'asset_2/division_2/unit_2/signal_3']
+        [
+            'timestamp',
+            'asset_1/division_1/unit_1/signal_1',
+            'asset_1/division_1/unit_1/signal_2',
+            'asset_2/division_2/unit_2/signal_3'
+        ]
     """
     signal_list = get_signal_list_from_search_json(search_json=search_json)
     parquet_paths = get_parquet_paths_from_search_list(signal_list=signal_list)
@@ -197,7 +202,12 @@ def get_polars_df(search_json: str, time_window: TimeWindow) -> DataFrame:
         )
     >>> polars_df = get_polars_df(search_json=search_json, time_window=time_window)
     >>> polars_df.columns
-        ['timestamp', 'asset_1/division_1/unit_1/signal_1', 'asset_1/division_1/unit_1/signal_2', 'asset_2/division_2/unit_2/signal_3']
+        [
+            'timestamp',
+            'asset_1/division_1/unit_1/signal_1',
+            'asset_1/division_1/unit_1/signal_2',
+            'asset_2/division_2/unit_2/signal_3'
+        ]
     """
     lazy_polars_df = get_lazy_polars_df(
         search_json=search_json, time_window=time_window

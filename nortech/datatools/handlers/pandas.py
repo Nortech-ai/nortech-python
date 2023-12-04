@@ -93,7 +93,12 @@ def get_df(search_json: str, time_window: TimeWindow) -> DataFrame:
         )
     >>> df = get_df(search_json=search_json, time_window=time_window)
     >>> df.columns
-        ['timestamp', 'asset_1/division_1/unit_1/signal_1', 'asset_1/division_1/unit_1/signal_2', 'asset_2/division_2/unit_2/signal_3']
+        [
+            'timestamp',
+            'asset_1/division_1/unit_1/signal_1',
+            'asset_1/division_1/unit_1/signal_2',
+            'asset_2/division_2/unit_2/signal_3'
+        ]
     """
     polars_df = get_polars_df(search_json=search_json, time_window=time_window)
 

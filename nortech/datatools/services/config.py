@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import Dict, List
+from typing import List
 
 from nortech.datatools.values.signals import ParquetPaths, Signal, SignalConfig
 
