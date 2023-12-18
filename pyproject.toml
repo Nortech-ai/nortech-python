@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "nortech"
-version = "0.0.1"
+version = "0.0.2"
 description = "The official Python library for Nortech AI"
 authors = ["Nortech AI <info@nortech.ai>"]
 license = "Apache-2.0"
@@ -16,13 +16,13 @@ pyarrow = "^13.0.0"
 s3fs = "2023.6.0"
 aiobotocore = "2.5.2"
 pydantic = "^2.5.2"
-moto = {extras = ["server"], version = "^4.2.11"}
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.3"
 ipykernel = "^6.27.1"
 black = "^23.11.0"
 flake8 = "^6.1.0"
+moto = {extras = ["server"], version = "^4.2.11"}
 
 [build-system]
 requires = ["poetry-core"]
