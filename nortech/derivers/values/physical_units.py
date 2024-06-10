@@ -167,3 +167,17 @@ liter_per_hour = PhysicalUnit(
     symbol=f"{unit_registry.liter / unit_registry.hour:~}",
     physicalQuantity=volumetric_flow_rate,
 )
+
+mass = PhysicalQuantity(
+    name="Mass",
+    description="Mass is a property of a physical body and a measure of its resistance to acceleration when a net force is applied. It also determines the strength of its mutual gravitational attraction to other bodies.",
+    SIUnit=str(unit_registry.kilogram),
+    SIUnitSymbol=f"{unit_registry.kilogram:~}",
+)
+
+kilogram = PhysicalUnit(
+    name=str(unit_registry.kilogram),
+    description="The kilogram is the base unit of mass in the International System of Units (SI), and is defined by taking the fixed numerical value of the Planck constant.",
+    symbol=f"{unit_registry.kilogram:~}",
+    physicalQuantity=mass,
+)
