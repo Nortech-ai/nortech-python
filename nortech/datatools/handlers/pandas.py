@@ -102,6 +102,6 @@ def get_df(search_json: str, time_window: TimeWindow) -> DataFrame:
     """
     polars_df = get_polars_df(search_json=search_json, time_window=time_window)
 
-    df = polars_df.to_pandas()
+    df = polars_df.to_pandas().set_index("timestamp")
 
     return df

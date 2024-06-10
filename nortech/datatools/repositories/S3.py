@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from os import getenv
 from typing import List, Tuple
 
@@ -95,6 +95,11 @@ def get_pyarrow_schema(columns: List[SignalConfig]) -> Schema:
         ("day", "int32"),
     ]
     for signal in columns:
+        if signal.data_type == "float":
+            signal.data_type = "double"
+        elif signal.data_type == "json":
+            signal.data_type = "string"
+
         fields.append(
             (
                 signal.column_name,
@@ -130,44 +135,59 @@ def get_lazy_polars_df_from_S3(
     InvalidTimeWindow
         Raised when the start date is after the end date.
     """
+    start = time_window.start.astimezone(timezone.utc)
+    end = time_window.end.astimezone(timezone.utc)
+
     s3_file_system = S3FileSystem(endpoint_url=getenv("AWS_ENDPOINT_URL"))
 
     lazy_dfs = None
     for location, columns in parquet_paths.items():
-        pyarrow_ds = dataset(
-            location,
-            format="parquet",
-            filesystem=s3_file_system,
-            schema=get_pyarrow_schema(columns=columns),
-            partitioning=partitioning(
-                pa.schema(
-                    [("year", pa.int32()), ("month", pa.int32()), ("day", pa.int32())]
+        try:
+            pyarrow_ds = dataset(
+                location,
+                format="parquet",
+                filesystem=s3_file_system,
+                schema=get_pyarrow_schema(columns=columns),
+                partitioning=partitioning(
+                    pa.schema(
+                        [
+                            ("year", pa.int32()),
+                            ("month", pa.int32()),
+                            ("day", pa.int32()),
+                        ]
+                    ),
+                    flavor="hive",
                 ),
-                flavor="hive",
-            ),
-            partition_base_dir=location,
-        )
-
-        lazy_df = scan_pyarrow_dataset(pyarrow_ds)
+                partition_base_dir=location,
+            )
+            lazy_df = scan_pyarrow_dataset(pyarrow_ds)
+        except FileNotFoundError:
+            lazy_df = LazyFrame(
+                {**{column.ADUS: [] for column in columns}, "timestamp": []}
+            )
 
         select_columns = get_select_columns(columns=columns)
         lazy_df_select = lazy_df.select(select_columns)
 
-        lazy_df_partition = lazy_df_select.filter(
-            generate_date_filter(time_window.start, time_window.end)
-        )
+        lazy_df_partition = lazy_df_select.filter(generate_date_filter(start, end))
 
         lazy_df_without_partition_columns = lazy_df_partition.drop(
             ["year", "month", "day"]
         )
 
-        lazy_df_window = lazy_df_without_partition_columns.with_columns(
-            from_epoch("timestamp", "ms")
-        ).filter(
-            col("timestamp").is_between(
-                lower_bound=time_window.start,
-                upper_bound=time_window.end,
-                closed="right",
+        lazy_df_window = (
+            lazy_df_without_partition_columns.with_columns(
+                from_epoch("timestamp", "ms").dt.replace_time_zone("UTC"),
+            )
+            .filter(
+                col("timestamp").is_between(
+                    lower_bound=start,
+                    upper_bound=end,
+                    closed="right",
+                )
+            )
+            .with_columns(
+                col("timestamp").dt.convert_time_zone(str(time_window.start.tzinfo))
             )
         )
 
@@ -179,4 +199,4 @@ def get_lazy_polars_df_from_S3(
     if lazy_dfs is None:
         raise NoSignalsRequestedError()
 
-    return lazy_dfs.sort("timestamp")
+    return lazy_dfs.unique("timestamp").sort("timestamp")

@@ -1,11 +1,12 @@
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import datetime
 from json import loads
 from typing import Dict, List
 
 from pydantic import BaseModel
+from tzlocal import get_localzone
 
-from nortech.datatools.values.errors import InvalidTimeWindow
+from nortech.datatools.values.errors import InvalidTimeWindow, InvalidTimeZone
 
 
 @dataclass
@@ -14,8 +15,15 @@ class TimeWindow:
     end: datetime
 
     def __post_init__(self):
-        self.start = self.start.astimezone(timezone.utc).replace(tzinfo=None)
-        self.end = self.end.astimezone(timezone.utc).replace(tzinfo=None)
+        if self.start.tzinfo is None:
+            self.start = self.start.replace(tzinfo=get_localzone())
+
+        if self.end.tzinfo is None:
+            self.end = self.end.replace(tzinfo=get_localzone())
+
+        if self.start.tzinfo != self.end.tzinfo:
+            raise InvalidTimeZone()
+
         if self.end < self.start:
             raise InvalidTimeWindow()
 
@@ -95,6 +103,14 @@ def get_signal_list_from_search_json(search_json: str) -> List[Signal]:
         A list of Signal objects.
     """
     search_list = loads(search_json)
+
+    for signal in search_list:
+        if "adunit" in signal:
+            signal["asset"] = signal["adunit"]["asset"]
+            signal["division"] = signal["adunit"]["division"]
+            signal["unit"] = signal["adunit"]["unit"]
+            del signal["adunit"]
+
     signal_list = [Signal(**signal) for signal in search_list]
 
     return signal_list

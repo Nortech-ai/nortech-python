@@ -17,7 +17,7 @@
       makeDevShell = system: let
         inherit pkgsForAllSystems;
         pkgs = pkgsForAllSystems.${system};
-        pythonPkg = pkgs.python39;
+        pythonPkg = pkgs.python310;
         pythonEnv = pythonPkg.buildEnv.override {
           extraLibs = [ pythonPkg.pkgs.pip pythonPkg.pkgs.virtualenv ];
         };
@@ -28,6 +28,7 @@
       pkgs.mkShell {
         buildInputs = [
           pythonEnv
+          pkgs.git
         ] ++ darwinPackages;
 
         shellHook = ''

@@ -16,9 +16,13 @@ Or if you are using poetry:
 poetry add nortech
 ```
 
-## S3
+## nortech.datatools
 
-### Config
+
+
+### S3
+
+#### Config
 
 Setup your environment variables with the `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` provided to you:
 
@@ -39,7 +43,7 @@ As an alternative you can use the [AWS CLI](https://aws.amazon.com/cli/):
 aws configure
 ```
 
-### Examples
+#### Examples
 
 To get a DataFrame with the requested signals:
 
@@ -48,7 +52,7 @@ To get a DataFrame with the requested signals:
 3. Select the `DataTools` exported columns and copy the resulting `search_json`.
 4. Use the `search_json` and speficy a `TimeWindow` as in the examples bellow.
 
-#### Pandas DataFrame
+##### Pandas DataFrame
 
 In order to get a [pandas](https://pandas.pydata.org/docs/) DataFrame use the `get_df`:
 
@@ -121,14 +125,13 @@ time_window = TimeWindow(
 df = get_df(search_json=search_json, time_window=time_window)
 
 assert list(df.columns) == [
-    'timestamp',
     'asset_1/division_1/unit_1/signal_1',
     'asset_1/division_1/unit_1/signal_2',
     'asset_2/division_2/unit_2/signal_3'
 ]
 ```
 
-#### Polars DataFrame
+##### Polars DataFrame
 
 In order to get a [polars](https://pola-rs.github.io/polars/py-polars/html/reference/) DataFrame use the `get_polars_df`:
 
@@ -208,7 +211,7 @@ assert polars_df.columns == [
 ]
 ```
 
-#### Polars LazyFrame
+##### Polars LazyFrame
 
 In order to get a [polars](https://pola-rs.github.io/polars/py-polars/html/reference/) LazyFrame use the `get_lazy_polars_df`:
 
