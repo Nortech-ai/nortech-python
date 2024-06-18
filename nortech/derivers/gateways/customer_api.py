@@ -1,4 +1,4 @@
-from typing import Dict, Generic
+from typing import Dict, Generic, List
 
 from pydantic import BaseModel, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -53,6 +53,21 @@ class CreateDeriverRequest(
     dryRun: bool = Field()
 
 
+class Log(BaseModel):
+    timestamp: str = Field()
+    message: str = Field()
+
+
+class DeriverLogs(BaseModel):
+    name: str = Field()
+    flow_logs: List[Log] = Field()
+    processor_logs: List[Log] = Field()
+
+
+class LogsPerPod(BaseModel):
+    pods: List[DeriverLogs] = Field()
+
+
 def create_deriver(
     customer_API: CustomerAPI,
     customer_workspace: CustomerWorkspace,
@@ -97,6 +112,14 @@ def create_deriver(
     return response.json()
 
 
+def get_logs_from_response_logs(response_logs: str) -> List[Log]:
+    return [
+        Log(timestamp=log.split(" ", 1)[0], message=log.split(" ", 1)[1])
+        for log in response_logs.split("\n")
+        if log != ""
+    ]
+
+
 def get_deriver_logs(
     customer_API: CustomerAPI,
     deriverId: int,
@@ -119,4 +142,13 @@ def get_deriver_logs(
             f"Response: {response.json()}"
         )
 
-    return response.json()["logsPerPod"]
+    return LogsPerPod(
+        pods=[
+            DeriverLogs(
+                name=pod["podName"],
+                flow_logs=get_logs_from_response_logs(pod["flowLogs"]),
+                processor_logs=get_logs_from_response_logs(pod["processorLogs"]),
+            )
+            for pod in response.json()["logsPerPod"]
+        ]
+    )
