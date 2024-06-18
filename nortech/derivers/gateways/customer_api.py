@@ -2,7 +2,7 @@ from typing import Dict, Generic
 
 from pydantic import BaseModel, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from requests import post
+from requests import get, post
 
 from nortech.derivers.values.instance import (
     Deriver,
@@ -95,3 +95,28 @@ def create_deriver(
         )
 
     return response.json()
+
+
+def get_deriver_logs(
+    customer_API: CustomerAPI,
+    deriverId: int,
+):
+    get_deriver_logs_endpoint = (
+        customer_API.URL + f"/api/v1/derivers/getDeriverLogs/{deriverId}"
+    )
+
+    response = get(
+        url=get_deriver_logs_endpoint,
+        headers={"Authorization": f"Bearer {customer_API.TOKEN}"},
+    )
+
+    try:
+        assert response.status_code == 200
+    except AssertionError:
+        raise AssertionError(
+            f"Failed to get Deriver logs. "
+            f"Status code: {response.status_code}. "
+            f"Response: {response.json()}"
+        )
+
+    return response.json()["logsPerPod"]
