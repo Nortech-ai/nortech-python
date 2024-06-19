@@ -1,5 +1,7 @@
+from datetime import datetime
 from typing import Dict, Generic, List
 
+from dateutil.parser import parse
 from pydantic import BaseModel, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from requests import get, post
@@ -54,18 +56,48 @@ class CreateDeriverRequest(
 
 
 class Log(BaseModel):
-    timestamp: str = Field()
+    timestamp: datetime = Field()
     message: str = Field()
+
+    def __str__(self):
+        return f"{self.timestamp} {self.message}"
+
+
+class LogList(BaseModel):
+    logs: List[Log] = Field()
+
+    def __str__(self) -> str:
+        str_representation = "\n".join([str(log) for log in self.logs])
+        return str_representation
 
 
 class DeriverLogs(BaseModel):
     name: str = Field()
-    flow_logs: List[Log] = Field()
-    processor_logs: List[Log] = Field()
+    flow: LogList = Field()
+    processor: LogList = Field()
+
+    def __str__(self) -> str:
+        str_representation = f"Pod: {self.name}\n"
+        str_representation += "\nFlow logs:\n"
+        for log in self.flow.logs:
+            str_representation += f"{log}\n"
+
+        str_representation += "\nProcessor logs:\n"
+        for log in self.processor.logs:
+            str_representation += f"{log}\n"
+
+        return str_representation
 
 
 class LogsPerPod(BaseModel):
     pods: List[DeriverLogs] = Field()
+
+    def __str__(self) -> str:
+        str_representation = "Pods:\n"
+        for pod in self.pods:
+            str_representation += f"{pod}\n"
+
+        return str_representation
 
 
 def create_deriver(
@@ -112,12 +144,17 @@ def create_deriver(
     return response.json()
 
 
-def get_logs_from_response_logs(response_logs: str) -> List[Log]:
-    return [
-        Log(timestamp=log.split(" ", 1)[0], message=log.split(" ", 1)[1])
+def get_logs_from_response_logs(response_logs: str) -> LogList:
+    logs = [
+        Log(
+            timestamp=parse(log.split(" ", 1)[0]),
+            message=log.split(" ", 1)[1],
+        )
         for log in response_logs.split("\n")
         if log != ""
     ]
+
+    return LogList(logs=logs)
 
 
 def get_deriver_logs(
@@ -146,8 +183,8 @@ def get_deriver_logs(
         pods=[
             DeriverLogs(
                 name=pod["podName"],
-                flow_logs=get_logs_from_response_logs(pod["flowLogs"]),
-                processor_logs=get_logs_from_response_logs(pod["processorLogs"]),
+                flow=get_logs_from_response_logs(pod["flowLogs"]),
+                processor=get_logs_from_response_logs(pod["processorLogs"]),
             )
             for pod in response.json()["logsPerPod"]
         ]

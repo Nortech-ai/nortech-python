@@ -163,7 +163,13 @@ def get_lazy_polars_df_from_S3(
             lazy_df = scan_pyarrow_dataset(pyarrow_ds)
         except FileNotFoundError:
             lazy_df = LazyFrame(
-                {**{column.ADUS: [] for column in columns}, "timestamp": []}
+                {
+                    **{column.column_name: [] for column in columns},
+                    "timestamp": [],
+                    "year": [],
+                    "month": [],
+                    "day": [],
+                }
             )
 
         select_columns = get_select_columns(columns=columns)
