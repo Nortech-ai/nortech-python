@@ -1,12 +1,15 @@
+import hashlib
 from datetime import timezone
+from enum import Enum
+from io import BytesIO
 from os import environ, getenv
 from tempfile import NamedTemporaryFile
 from typing import List
 
 from pandas import DataFrame, read_csv, to_datetime
-from polars import Datetime, col, from_pandas
+from polars import Datetime, col, from_pandas, read_parquet
 from pydantic import BaseModel, field_serializer
-from requests import post
+from requests import get, post
 
 from nortech.datatools.values.signals import (
     Signal,
@@ -28,6 +31,12 @@ class GetHotStorageSignals(BaseModel):
             .isoformat()
             .replace("+00:00", "Z"),
         }
+
+
+class Format(str, Enum):
+    PARQUET = "parquet"
+    JSON = "json"
+    CSV = "csv"
 
 
 def get_lazy_polars_df_from_customer_api(
@@ -88,3 +97,74 @@ def get_lazy_polars_df_from_customer_api(
         .unique("timestamp")
         .sort("timestamp")
     )
+
+
+def hash_signal_ADUS(signal_name: str) -> str:
+    return hashlib.sha256(signal_name.encode()).hexdigest()
+
+
+def get_lazy_polars_df_from_customer_api_historical_data(
+    signal_list: List[Signal], time_window: TimeWindow
+):
+    customer_API_URL = getenv("CUSTOMER_API_URL", "https://api.apps.nor.tech")
+    customer_API_token = environ["CUSTOMER_API_TOKEN"]
+
+    historical_data_endpoint = customer_API_URL + "/api/v1/historical-data/sync"
+
+    request_json = {
+        "signals": [
+            {
+                "rename": hash_signal_ADUS(signal.ADUS),
+                **signal.model_dump(),
+            }
+            for signal in signal_list
+        ],
+        "timeWindow": {
+            "start": str(
+                time_window.start.astimezone(timezone.utc)
+                .isoformat()
+                .replace("+00:00", "Z")
+            ),
+            "end": str(
+                time_window.end.astimezone(timezone.utc)
+                .isoformat()
+                .replace("+00:00", "Z")
+            ),
+        },
+    }
+
+    response = post(
+        url=historical_data_endpoint,
+        json=request_json,
+        headers={"Authorization": f"Bearer {customer_API_token}"},
+    )
+
+    try:
+        assert response.status_code == 200
+    except AssertionError:
+        raise AssertionError(
+            f"Failed to get historical data. "
+            f"Status code: {response.status_code}. "
+            f"Response: {response.text}"
+        )
+
+    response_json = response.json()
+
+    response = get(response_json["outputFile"])
+    response.raise_for_status()
+
+    lazy_df = (
+        read_parquet(BytesIO(response.content))
+        .rename(
+            {hash_signal_ADUS(signal.ADUS): f"{signal.ADUS}" for signal in signal_list}
+        )
+        .with_columns(
+            col("timestamp").dt.replace_time_zone("UTC"),
+        )
+        .with_columns(
+            col("timestamp").dt.convert_time_zone(str(time_window.start.tzinfo)),
+        )
+        .lazy()
+    )
+
+    return lazy_df

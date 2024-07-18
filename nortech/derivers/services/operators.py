@@ -4,6 +4,7 @@ from typing import (
     Any,
     Dict,
     Iterable,
+    List,
     Optional,
     Protocol,
     Tuple,
@@ -16,6 +17,7 @@ import pandas as pd
 from bytewax.dataflow import Stream, operator
 from bytewax.operators.windowing import EventClock, TumblingWindower, collect_window
 from pandas import DataFrame, DateOffset, DatetimeIndex
+from pydantic import BaseModel
 
 from nortech.derivers.values.schema import DeriverInputSchema, InputType
 
@@ -190,3 +192,13 @@ def resample(
     )
 
     return resampled_stream
+
+
+@operator
+def list_to_dataframe(step_id: str, up: Stream[List[BaseModel]]) -> Stream[DataFrame]:
+    def list_to_df_mapper(items: List[BaseModel]) -> DataFrame:
+        return pd.DataFrame.from_records(
+            (item.model_dump() for item in items)
+        ).set_index("timestamp")
+
+    return op.map(step_id="list_to_dataframe", up=up, mapper=list_to_df_mapper)

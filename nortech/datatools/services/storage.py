@@ -13,7 +13,7 @@ def get_hot_and_cold_time_windows(
     start = time_window.start.astimezone(timezone.utc)
     end = time_window.end.astimezone(timezone.utc)
 
-    hot_storage_delta = end - (datetime.now(tz=timezone.utc) - timedelta(hours=7))
+    hot_storage_delta = end - (datetime.now(tz=timezone.utc) - timedelta(days=1))
 
     hot_storage_start = end - hot_storage_delta
     hot_storage_end = end

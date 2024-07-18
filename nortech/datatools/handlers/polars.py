@@ -2,9 +2,8 @@ from polars import DataFrame, LazyFrame, concat, lit
 
 from nortech.datatools.repositories.customer_api import (
     get_lazy_polars_df_from_customer_api,
+    get_lazy_polars_df_from_customer_api_historical_data,
 )
-from nortech.datatools.repositories.S3 import get_lazy_polars_df_from_S3
-from nortech.datatools.services.config import get_parquet_paths_from_search_list
 from nortech.datatools.services.storage import (
     cast_hot_schema_to_cold_schema,
     get_hot_and_cold_time_windows,
@@ -113,13 +112,12 @@ def get_lazy_polars_df(search_json: str, time_window: TimeWindow) -> LazyFrame:
         ]
     """
     signal_list = get_signal_list_from_search_json(search_json=search_json)
-    parquet_paths = get_parquet_paths_from_search_list(signal_list=signal_list)
 
     time_windows = get_hot_and_cold_time_windows(time_window=time_window)
 
     if isinstance(time_windows, ColdWindow):
-        return get_lazy_polars_df_from_S3(
-            parquet_paths=parquet_paths,
+        return get_lazy_polars_df_from_customer_api_historical_data(
+            signal_list=signal_list,
             time_window=time_windows.time_window,
         )
     elif isinstance(time_windows, HotWindow):
@@ -133,8 +131,8 @@ def get_lazy_polars_df(search_json: str, time_window: TimeWindow) -> LazyFrame:
             time_window=time_windows.hot_storage_time_window,
         )
 
-        cold_lazy_polars_df = get_lazy_polars_df_from_S3(
-            parquet_paths=parquet_paths,
+        cold_lazy_polars_df = get_lazy_polars_df_from_customer_api_historical_data(
+            signal_list=signal_list,
             time_window=time_windows.cold_storage_time_window,
         )
 
