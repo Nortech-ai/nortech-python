@@ -16,7 +16,7 @@ from nortech.derivers.values.instance import (
 from nortech.derivers.values.schema import ConfigurationType, DeriverSchemaDAG
 
 session = Session()
-retries = Retry(total=5, backoff_factor=1, status_forcelist=[502, 503, 504], method_whitelist=["GET","POST"], raise_on_status=False)
+retries = Retry(total=5, backoff_factor=1, status_forcelist=[502, 503, 504], allowed_methods=["GET","POST"], raise_on_status=False)
 
 class CustomerAPI(BaseSettings):
     URL: str = Field(default="https://api.apps.nor.tech")

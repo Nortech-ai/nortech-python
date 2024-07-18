@@ -20,7 +20,7 @@ from nortech.datatools.values.signals import (
 
 customer_API_URL = getenv("CUSTOMER_API_URL", "https://api.apps.nor.tech")
 session = Session()
-retries = Retry(total=5, backoff_factor=1, status_forcelist=[502, 503, 504], method_whitelist=["GET","POST"], raise_on_status=False)
+retries = Retry(total=5, backoff_factor=1, status_forcelist=[502, 503, 504], allowed_methods=["GET","POST"], raise_on_status=False)
 session.mount(customer_API_URL, HTTPAdapter(max_retries=retries))
 
 
