@@ -4,7 +4,9 @@ from typing import Dict, Generic, List
 from dateutil.parser import parse
 from pydantic import BaseModel, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from requests import get, post
+from requests import Session
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 from nortech.derivers.values.instance import (
     Deriver,
@@ -13,12 +15,18 @@ from nortech.derivers.values.instance import (
 )
 from nortech.derivers.values.schema import ConfigurationType, DeriverSchemaDAG
 
+session = Session()
+retries = Retry(total=5, backoff_factor=1, status_forcelist=[502, 503, 504], method_whitelist=["GET","POST"], raise_on_status=False)
 
 class CustomerAPI(BaseSettings):
     URL: str = Field(default="https://api.apps.nor.tech")
     TOKEN: str = Field(default=...)
 
     model_config = SettingsConfigDict(env_prefix="CUSTOMER_API_")
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        session.mount(self.URL, HTTPAdapter(max_retries=retries))
 
 
 class CreateDeriver(
@@ -126,7 +134,7 @@ def create_deriver(
         dryRun=dry_run,
     )
 
-    response = post(
+    response = session.post(
         url=deriver_DAG_endpoint,
         json=create_deriver_request.model_dump(),
         headers={"Authorization": f"Bearer {customer_API.TOKEN}"},
@@ -165,7 +173,7 @@ def get_deriver_logs(
         customer_API.URL + f"/api/v1/derivers/getDeriverLogs/{deriverId}"
     )
 
-    response = get(
+    response = session.get(
         url=get_deriver_logs_endpoint,
         headers={"Authorization": f"Bearer {customer_API.TOKEN}"},
     )

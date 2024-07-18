@@ -9,12 +9,19 @@ from typing import List
 from pandas import DataFrame, read_csv, to_datetime
 from polars import Datetime, col, from_pandas, read_parquet
 from pydantic import BaseModel, field_serializer
-from requests import get, post
+from requests import Session
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 from nortech.datatools.values.signals import (
     Signal,
     TimeWindow,
 )
+
+customer_API_URL = getenv("CUSTOMER_API_URL", "https://api.apps.nor.tech")
+session = Session()
+retries = Retry(total=5, backoff_factor=1, status_forcelist=[502, 503, 504], method_whitelist=["GET","POST"], raise_on_status=False)
+session.mount(customer_API_URL, HTTPAdapter(max_retries=retries))
 
 
 class GetHotStorageSignals(BaseModel):
@@ -42,12 +49,11 @@ class Format(str, Enum):
 def get_lazy_polars_df_from_customer_api(
     signal_list: List[Signal], time_window: TimeWindow
 ):
-    customer_API_URL = getenv("CUSTOMER_API_URL", "https://api.apps.nor.tech")
     customer_API_token = environ["CUSTOMER_API_TOKEN"]
 
     hot_storage_endpoint = customer_API_URL + "/timescale"
 
-    response = post(
+    response = session.post(
         url=hot_storage_endpoint,
         json=GetHotStorageSignals(
             signals=signal_list,
@@ -106,7 +112,6 @@ def hash_signal_ADUS(signal_name: str) -> str:
 def get_lazy_polars_df_from_customer_api_historical_data(
     signal_list: List[Signal], time_window: TimeWindow
 ):
-    customer_API_URL = getenv("CUSTOMER_API_URL", "https://api.apps.nor.tech")
     customer_API_token = environ["CUSTOMER_API_TOKEN"]
 
     historical_data_endpoint = customer_API_URL + "/api/v1/historical-data/sync"
@@ -133,7 +138,7 @@ def get_lazy_polars_df_from_customer_api_historical_data(
         },
     }
 
-    response = post(
+    response = session.post(
         url=historical_data_endpoint,
         json=request_json,
         headers={"Authorization": f"Bearer {customer_API_token}"},
@@ -150,7 +155,7 @@ def get_lazy_polars_df_from_customer_api_historical_data(
 
     response_json = response.json()
 
-    response = get(response_json["outputFile"])
+    response = session.get(response_json["outputFile"])
     response.raise_for_status()
 
     lazy_df = (
