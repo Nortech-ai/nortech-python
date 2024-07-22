@@ -24,9 +24,7 @@ def input_schema_to_deriver_schema_inputs(
     input_schema: Type[BaseModel],
 ) -> List[DeriverSchemaInput]:
     input_fields = (
-        (field_name, field)
-        for field_name, field in input_schema.model_fields.items()
-        if field_name != "timestamp"
+        (field_name, field) for field_name, field in input_schema.model_fields.items() if field_name != "timestamp"
     )
 
     return [
@@ -42,9 +40,7 @@ def input_schema_to_deriver_schema_inputs(
             suggestedInputsFromOtherDerivers=[
                 DeriverSchemaOutputWithDAG(
                     **suggestedInputFromOtherDeriver,
-                    deriverSchemaDAG=get_deriver_schema_DAG(
-                        suggestedInputFromOtherDeriver["create_deriver_schema"]
-                    ),
+                    deriverSchemaDAG=get_deriver_schema_DAG(suggestedInputFromOtherDeriver["create_deriver_schema"]),
                 )
                 for suggestedInputFromOtherDeriver in field.json_schema_extra[  # type: ignore
                     "suggestedInputsFromOtherDerivers"
@@ -59,9 +55,7 @@ def output_schema_to_deriver_schema_outputs(
     output_schema: Type[BaseModel],
 ) -> List[DeriverSchemaOutput]:
     output_fields = (
-        (field_name, field)
-        for field_name, field in output_schema.model_fields.items()
-        if field_name != "timestamp"
+        (field_name, field) for field_name, field in output_schema.model_fields.items() if field_name != "timestamp"
     )
 
     return [
@@ -69,9 +63,7 @@ def output_schema_to_deriver_schema_outputs(
             name=field_name,
             description=field.description,  # type: ignore
             dataType=get_actual_type(field.annotation),
-            physicalQuantity=PhysicalQuantity(
-                **field.json_schema_extra["physicalQuantity"]  # type: ignore
-            )
+            physicalQuantity=PhysicalQuantity(**field.json_schema_extra["physicalQuantity"])  # type: ignore
             if field.json_schema_extra["physicalQuantity"]  # type: ignore
             else None,
         )
@@ -102,9 +94,7 @@ def get_deriver_schema_DAG(
     outputs = output_schema_to_deriver_schema_outputs(
         output_schema=deriver_schema.outputs,
     )
-    configurations = config_schema_to_config_dict(
-        config_schema=deriver_schema.configurations
-    )
+    configurations = config_schema_to_config_dict(config_schema=deriver_schema.configurations)
 
     return DeriverSchemaDAG(
         name=deriver_schema.name,
@@ -117,9 +107,7 @@ def get_deriver_schema_DAG(
 
 
 def check_create_deriver_schema_imports(
-    create_deriver_schema: Callable[
-        [], DeriverSchema[InputType, OutputType, ConfigurationType]
-    ],
+    create_deriver_schema: Callable[[], DeriverSchema[InputType, OutputType, ConfigurationType]],
 ):
     # Retrieve the source code of the function
     source_code = dedent(getsource(create_deriver_schema))

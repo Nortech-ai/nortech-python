@@ -16,7 +16,14 @@ from nortech.derivers.values.instance import (
 from nortech.derivers.values.schema import ConfigurationType, DeriverSchemaDAG
 
 session = Session()
-retries = Retry(total=5, backoff_factor=1, status_forcelist=[502, 503, 504], allowed_methods=["GET","POST"], raise_on_status=False)
+retries = Retry(
+    total=5,
+    backoff_factor=1,
+    status_forcelist=[502, 503, 504],
+    allowed_methods=["GET", "POST"],
+    raise_on_status=False,
+)
+
 
 class CustomerAPI(BaseSettings):
     URL: str = Field(default="https://api.apps.nor.tech")
@@ -29,9 +36,7 @@ class CustomerAPI(BaseSettings):
         session.mount(self.URL, HTTPAdapter(max_retries=retries))
 
 
-class CreateDeriver(
-    BaseModel, Generic[DeriverInputType, DeriverOutputType, ConfigurationType]
-):
+class CreateDeriver(BaseModel, Generic[DeriverInputType, DeriverOutputType, ConfigurationType]):
     name: str = Field()
     description: str = Field()
 
@@ -52,9 +57,7 @@ class CustomerWorkspaceExternal(BaseModel):
     workspaceName: str = Field()
 
 
-class CreateDeriverRequest(
-    BaseModel, Generic[DeriverInputType, DeriverOutputType, ConfigurationType]
-):
+class CreateDeriverRequest(BaseModel, Generic[DeriverInputType, DeriverOutputType, ConfigurationType]):
     customerWorkspace: CustomerWorkspaceExternal = Field()
 
     deriver: CreateDeriver[DeriverInputType, DeriverOutputType, ConfigurationType]
@@ -144,9 +147,7 @@ def create_deriver(
         assert response.status_code == 200
     except AssertionError:
         raise AssertionError(
-            f"Failed to create DeriverDAG. "
-            f"Status code: {response.status_code}. "
-            f"Response: {response.json()}"
+            f"Failed to create DeriverDAG. Status code: {response.status_code}. Response: {response.json()}"
         )
 
     return response.json()
@@ -169,9 +170,7 @@ def get_deriver_logs(
     customer_API: CustomerAPI,
     deriverId: int,
 ):
-    get_deriver_logs_endpoint = (
-        customer_API.URL + f"/api/v1/derivers/getDeriverLogs/{deriverId}"
-    )
+    get_deriver_logs_endpoint = customer_API.URL + f"/api/v1/derivers/getDeriverLogs/{deriverId}"
 
     response = session.get(
         url=get_deriver_logs_endpoint,
@@ -182,9 +181,7 @@ def get_deriver_logs(
         assert response.status_code == 200
     except AssertionError:
         raise AssertionError(
-            f"Failed to get Deriver logs. "
-            f"Status code: {response.status_code}. "
-            f"Response: {response.json()}"
+            f"Failed to get Deriver logs. Status code: {response.status_code}. Response: {response.json()}"
         )
 
     return LogsPerPod(

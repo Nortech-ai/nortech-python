@@ -54,12 +54,9 @@ def InputField(
     return Field(
         description=description,
         json_schema_extra={
-            "physicalQuantity": physicalQuantity.model_dump()
-            if physicalQuantity
-            else None,
+            "physicalQuantity": physicalQuantity.model_dump() if physicalQuantity else None,
             "suggestedInputsFromOtherDerivers": [
-                output.model_dump()
-                for output in map(suggested_input_to_output_schema, suggestedInputs)
+                output.model_dump() for output in map(suggested_input_to_output_schema, suggestedInputs)
             ],
         },
     )
@@ -69,7 +66,7 @@ def get_actual_type(field_annotation) -> DataTypeEnum:
     # Extract the actual type from Optional or Union hints
     if get_origin(field_annotation) in (Union, typing.Optional):
         # Assuming the first argument is the desired type and not None
-        actual_type = next(t for t in get_args(field_annotation) if t is not type(None))
+        actual_type = next(t for t in get_args(field_annotation) if not isinstance(t, type(None)))
     else:
         actual_type = field_annotation
 
@@ -91,9 +88,7 @@ def suggested_input_to_output_schema(
 
     json_schema_extra = field.json_schema_extra
     physicalQuantity = (
-        PhysicalQuantity(**json_schema_extra["physicalQuantity"])
-        if json_schema_extra["physicalQuantity"]
-        else None
+        PhysicalQuantity(**json_schema_extra["physicalQuantity"]) if json_schema_extra["physicalQuantity"] else None
     )
     create_deriver_schema = json_schema_extra["create_deriver_schema"]  # type: ignore
 
@@ -165,9 +160,7 @@ class DeriverSchema(BaseModel, Generic[InputType, OutputType, ConfigurationType]
     inputs: Type[InputType] = Field()
     outputs: Type[OutputType] = Field()
     configurations: Type[ConfigurationType] = Field()
-    transform_stream: Callable[
-        [Stream[InputType], ConfigurationType], Stream[OutputType]
-    ] = Field()
+    transform_stream: Callable[[Stream[InputType], ConfigurationType], Stream[OutputType]] = Field()
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
@@ -180,9 +173,7 @@ def OutputField(
     return Field(
         description=description,
         json_schema_extra={
-            "physicalQuantity": physicalQuantity.model_dump()
-            if physicalQuantity
-            else None,
+            "physicalQuantity": physicalQuantity.model_dump() if physicalQuantity else None,
             "create_deriver_schema": create_deriver_schema,  # type: ignore
         },
     )
@@ -199,9 +190,7 @@ class DeriverSchemaInput(BaseModel, Generic[InputType, OutputType, Configuration
 
     physicalQuantity: Optional[PhysicalQuantity] = Field()
 
-    suggestedInputsFromOtherDerivers: List["DeriverSchemaOutputWithDAG"] = Field(
-        default_factory=list
-    )
+    suggestedInputsFromOtherDerivers: List["DeriverSchemaOutputWithDAG"] = Field(default_factory=list)
 
 
 class DeriverSchemaDAG(BaseModel):

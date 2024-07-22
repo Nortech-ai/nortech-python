@@ -70,9 +70,7 @@ def visualize_deriver_schema(create_deriver_schema: Callable[[], DeriverSchema])
 flowchart LR
 """
 
-    mermaid = create_deriver_schema_DAG_mermaid(
-        mermaid=mermaid, deriver_schema_DAG=deriver_schema_DAG
-    )
+    mermaid = create_deriver_schema_DAG_mermaid(mermaid=mermaid, deriver_schema_DAG=deriver_schema_DAG)
 
     mermaid += """
 ```
@@ -112,9 +110,7 @@ end
 
 def run_deriver_locally(
     df: DataFrame,
-    deriver: Deriver[
-        InputType, OutputType, ConfigurationType, DeriverInputType, DeriverOutputType
-    ],
+    deriver: Deriver[InputType, OutputType, ConfigurationType, DeriverInputType, DeriverOutputType],
     batch_size: int = 10000,
 ):
     deriver_schema = deriver.create_deriver_schema()
@@ -143,12 +139,9 @@ def run_deriver_locally(
         for input_name, input in deriver.inputs.items():
             if (
                 input_name != "timestamp"
-                and input_model_fields[input_name].json_schema_extra["physicalQuantity"]  # type: ignore
-                is not None
+                and input_model_fields[input_name].json_schema_extra["physicalQuantity"] is not None  # type: ignore
             ):
-                SIUnit: str = input_model_fields[input_name].json_schema_extra[  # type: ignore
-                    "physicalQuantity"
-                ]["SIUnitSymbol"]
+                SIUnit: str = input_model_fields[input_name].json_schema_extra["physicalQuantity"]["SIUnitSymbol"]  # type: ignore
 
                 value = inp.__getattr__(input_name)
                 if value is not None:
@@ -161,9 +154,7 @@ def run_deriver_locally(
 
     converted_input_stream = op.map("convert_input", stream, convert_input)
 
-    transformed_stream = deriver_schema.transform_stream(
-        converted_input_stream, deriver.configurations
-    )
+    transformed_stream = deriver_schema.transform_stream(converted_input_stream, deriver.configurations)
 
     output_model_fields = dict(deriver_schema.outputs.model_fields.items())
 
@@ -171,29 +162,20 @@ def run_deriver_locally(
         for output_name, output in deriver.outputs.items():
             if (
                 output_name != "timestamp"
-                and output_model_fields[output_name].json_schema_extra[  # type: ignore
-                    "physicalQuantity"
-                ]
-                is not None
+                and output_model_fields[output_name].json_schema_extra["physicalQuantity"] is not None  # type: ignore
             ):
-                SIUnit: str = output_model_fields[output_name].json_schema_extra[  # type: ignore
-                    "physicalQuantity"
-                ]["SIUnitSymbol"]
+                SIUnit: str = output_model_fields[output_name].json_schema_extra["physicalQuantity"]["SIUnitSymbol"]  # type: ignore
 
                 value = out.__getattr__(output_name)
                 if value is not None:
                     out.__setattr__(
                         output_name,
-                        Quantity(value, SIUnit)
-                        .to(output.physicalUnit.symbol)
-                        .magnitude,
+                        Quantity(value, SIUnit).to(output.physicalUnit.symbol).magnitude,
                     )
 
         return out
 
-    converted_output_stream = op.map(
-        "convert_output", transformed_stream, convert_output
-    )
+    converted_output_stream = op.map("convert_output", transformed_stream, convert_output)
 
     output_list = []
     output_sink = TestingSink(output_list)
@@ -202,8 +184,4 @@ def run_deriver_locally(
 
     run_main(flow)
 
-    return (
-        DataFrame([output.model_dump() for output in output_list])
-        .set_index("timestamp")
-        .tz_convert(df_timezone)
-    )
+    return DataFrame([output.model_dump() for output in output_list]).set_index("timestamp").tz_convert(df_timezone)

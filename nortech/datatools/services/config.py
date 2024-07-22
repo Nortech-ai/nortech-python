@@ -14,8 +14,6 @@ def get_parquet_paths_from_search_list(signal_list: List[Signal]) -> ParquetPath
         column_name = signal.column_name
         data_type = signal.dataType
 
-        parquet_paths[location].append(
-            SignalConfig(column_name=column_name, data_type=data_type, ADUS=ADUS)
-        )
+        parquet_paths[location].append(SignalConfig(column_name=column_name, data_type=data_type, ADUS=ADUS))
 
     return parquet_paths

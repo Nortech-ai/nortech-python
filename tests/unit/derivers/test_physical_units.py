@@ -20,7 +20,7 @@ def test_get_quantity_from_input():
             InputField,
             OutputField,
         )
-        
+
         temperature = PhysicalQuantity(
             name="Temperature",
             description="Temperature is a physical quantity that quantitatively expresses the attribute of hotness or coldness.",
@@ -67,21 +67,20 @@ def test_get_quantity_from_input():
             configurations=Configurations,
             transform_stream=transform_stream,
         )
-        
+
     deriver_schema = create_test_schema()
 
-
     input_physical_quantity = get_physical_quantity(deriver_io=deriver_schema.inputs.input_signal)
-    
+
     assert input_physical_quantity == PhysicalQuantity(
         name="Temperature",
         description="Temperature is a physical quantity that quantitatively expresses the attribute of hotness or coldness.",
         SIUnit=str(unit_registry.kelvin),
         SIUnitSymbol=f"{unit_registry.kelvin:~}",
     )
-    
+
     output_physical_quantity = get_physical_quantity(deriver_io=deriver_schema.outputs.output_signal)
-    
+
     assert output_physical_quantity == PhysicalQuantity(
         name="Temperature",
         description="Temperature is a physical quantity that quantitatively expresses the attribute of hotness or coldness.",

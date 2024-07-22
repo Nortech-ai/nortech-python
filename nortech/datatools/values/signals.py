@@ -83,9 +83,7 @@ def get_column_name_from_signal(signal: Signal) -> str:
 
 
 def get_ADUS_from_signal(signal: Signal) -> str:
-    return (
-        f"{signal.asset.name}/{signal.division.name}/{signal.unit.name}/{signal.name}"
-    )
+    return f"{signal.asset.name}/{signal.division.name}/{signal.unit.name}/{signal.name}"
 
 
 def get_signal_list_from_search_json(search_json: str) -> List[Signal]:

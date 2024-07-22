@@ -89,9 +89,7 @@ class Resampler:
     upsample_function: ResampleFunction
 
 
-def smart_resample(
-    df: DataFrame, frequency: timedelta, resampler: Resampler
-) -> DataFrame:
+def smart_resample(df: DataFrame, frequency: timedelta, resampler: Resampler) -> DataFrame:
     return resampler.downsample_function(df, frequency)
     assert isinstance(df.index, DatetimeIndex)
 
@@ -120,9 +118,7 @@ def smart_resample(
 
 
 @operator
-def resample(
-    step_id: str, up: Stream[InputType], frequency: timedelta, resampler: Resampler
-):
+def resample(step_id: str, up: Stream[InputType], frequency: timedelta, resampler: Resampler):
     def ts_getter(item: InputType) -> datetime:
         return item.timestamp
 
@@ -145,9 +141,7 @@ def resample(
         windower=window_config,
     )
 
-    collected_windows_stream = unkey_all(
-        step_id="unkey_all", up=keyed_collected_windows_stream.down
-    )
+    collected_windows_stream = unkey_all(step_id="unkey_all", up=keyed_collected_windows_stream.down)
 
     windows_stream = op.map(
         step_id="remove_window_metadata",
@@ -177,9 +171,7 @@ def resample(
         item: Tuple[Any, pd.DataFrame],
     ) -> Iterable[InputType]:
         df_with_index_as_column = item[1].reset_index()
-        df_with_index_as_column = df_with_index_as_column.where(
-            pd.notnull(df_with_index_as_column), None
-        )
+        df_with_index_as_column = df_with_index_as_column.where(pd.notnull(df_with_index_as_column), None)
         return map(
             lambda model_dict: item[0](**model_dict),
             df_with_index_as_column.to_dict("records"),
@@ -197,8 +189,6 @@ def resample(
 @operator
 def list_to_dataframe(step_id: str, up: Stream[List[BaseModel]]) -> Stream[DataFrame]:
     def list_to_df_mapper(items: List[BaseModel]) -> DataFrame:
-        return pd.DataFrame.from_records(
-            (item.model_dump() for item in items)
-        ).set_index("timestamp")
+        return pd.DataFrame.from_records((item.model_dump() for item in items)).set_index("timestamp")
 
     return op.map(step_id="list_to_dataframe", up=up, mapper=list_to_df_mapper)

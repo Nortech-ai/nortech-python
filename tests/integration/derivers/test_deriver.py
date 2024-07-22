@@ -244,9 +244,7 @@ def test_deriver_run_locally():
     size = 100
     df = pd.DataFrame(
         {
-            "timestamp": pd.date_range(
-                start="2023-01-01", periods=size, freq="s", tz=timezone.utc
-            ),
+            "timestamp": pd.date_range(start="2023-01-01", periods=size, freq="s", tz=timezone.utc),
             "input_signal": [float(i) for i in range(100)],
         }
     ).set_index("timestamp")

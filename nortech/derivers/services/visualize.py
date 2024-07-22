@@ -35,9 +35,7 @@ def create_deriver_schema_subgraph(deriver_schema_DAG: DeriverSchemaDAG):
     return mermaid
 
 
-def create_deriver_schema_DAG_mermaid(
-    mermaid: str, deriver_schema_DAG: DeriverSchemaDAG
-):
+def create_deriver_schema_DAG_mermaid(mermaid: str, deriver_schema_DAG: DeriverSchemaDAG):
     for input in deriver_schema_DAG.inputs:
         if input.name != "timestamp":
             for suggestedInput in input.suggestedInputsFromOtherDerivers:

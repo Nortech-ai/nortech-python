@@ -1,8 +1,10 @@
 from polars import DataFrame, LazyFrame, concat, lit
 
-from nortech.datatools.repositories.customer_api import (
+from nortech.datatools.gateways.customer_api import (
     get_lazy_polars_df_from_customer_api,
     get_lazy_polars_df_from_customer_api_historical_data,
+    CustomerAPI,
+    CustomerAPISettings,
 )
 from nortech.datatools.services.storage import (
     cast_hot_schema_to_cold_schema,
@@ -13,6 +15,8 @@ from nortech.datatools.values.signals import (
     get_signal_list_from_search_json,
 )
 from nortech.datatools.values.windowing import ColdWindow, HotWindow
+
+customerAPI = CustomerAPI(settings=CustomerAPISettings())
 
 
 def get_lazy_polars_df(search_json: str, time_window: TimeWindow) -> LazyFrame:
@@ -117,21 +121,25 @@ def get_lazy_polars_df(search_json: str, time_window: TimeWindow) -> LazyFrame:
 
     if isinstance(time_windows, ColdWindow):
         return get_lazy_polars_df_from_customer_api_historical_data(
+            customerAPI=customerAPI,
             signal_list=signal_list,
             time_window=time_windows.time_window,
         )
     elif isinstance(time_windows, HotWindow):
         return get_lazy_polars_df_from_customer_api(
+            customerAPI=customerAPI,
             signal_list=signal_list,
             time_window=time_windows.time_window,
         )
     else:
         hot_lazy_polars_df = get_lazy_polars_df_from_customer_api(
+            customerAPI=customerAPI,
             signal_list=signal_list,
             time_window=time_windows.hot_storage_time_window,
         )
 
         cold_lazy_polars_df = get_lazy_polars_df_from_customer_api_historical_data(
+            customerAPI=customerAPI,
             signal_list=signal_list,
             time_window=time_windows.cold_storage_time_window,
         )
@@ -142,36 +150,24 @@ def get_lazy_polars_df(search_json: str, time_window: TimeWindow) -> LazyFrame:
         )
 
         # Get all unique columns from both dataframes and sort them
-        all_columns = sorted(
-            set(hot_lazy_polars_df_casted.columns).union(
-                set(cold_lazy_polars_df.columns)
-            )
-        )
+        all_columns = sorted(set(hot_lazy_polars_df_casted.columns).union(set(cold_lazy_polars_df.columns)))
 
         # Add missing columns in hot_lazy_polars_df_casted
         missing_in_hot = set(all_columns) - set(hot_lazy_polars_df_casted.columns)
         for column in missing_in_hot:
-            hot_lazy_polars_df_casted = hot_lazy_polars_df_casted.with_columns(
-                lit(None).alias(column)
-            )
+            hot_lazy_polars_df_casted = hot_lazy_polars_df_casted.with_columns(lit(None).alias(column))
 
         # Add missing columns in cold_lazy_polars_df
         missing_in_cold = set(all_columns) - set(cold_lazy_polars_df.columns)
         for column in missing_in_cold:
-            cold_lazy_polars_df = cold_lazy_polars_df.with_columns(
-                lit(None).alias(column)
-            )
+            cold_lazy_polars_df = cold_lazy_polars_df.with_columns(lit(None).alias(column))
 
         # Reorder columns to match the sorted list
         hot_lazy_polars_df_casted = hot_lazy_polars_df_casted.select(all_columns)
         cold_lazy_polars_df = cold_lazy_polars_df.select(all_columns)
 
         # Now concatenate the dataframes
-        return (
-            concat([hot_lazy_polars_df_casted, cold_lazy_polars_df])
-            .unique("timestamp")
-            .sort("timestamp")
-        )
+        return concat([hot_lazy_polars_df_casted, cold_lazy_polars_df]).unique("timestamp").sort("timestamp")
 
 
 def get_polars_df(search_json: str, time_window: TimeWindow) -> DataFrame:
@@ -270,9 +266,7 @@ def get_polars_df(search_json: str, time_window: TimeWindow) -> DataFrame:
             'asset_2/division_2/unit_2/signal_3'
         ]
     """
-    lazy_polars_df = get_lazy_polars_df(
-        search_json=search_json, time_window=time_window
-    )
+    lazy_polars_df = get_lazy_polars_df(search_json=search_json, time_window=time_window)
     polars_df = lazy_polars_df.collect()
 
     return polars_df

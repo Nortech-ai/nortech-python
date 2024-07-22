@@ -37,9 +37,7 @@ DeriverOutputType = TypeVar("DeriverOutputType", bound=DeriverOutput)
 
 class Deriver(
     BaseModel,
-    Generic[
-        InputType, OutputType, ConfigurationType, DeriverInputType, DeriverOutputType
-    ],
+    Generic[InputType, OutputType, ConfigurationType, DeriverInputType, DeriverOutputType],
 ):
     name: str = Field()
     description: str = Field()
@@ -50,9 +48,7 @@ class Deriver(
 
     start_at: datetime = Field()
 
-    create_deriver_schema: Callable[
-        [], DeriverSchema[InputType, OutputType, ConfigurationType]
-    ] = Field()
+    create_deriver_schema: Callable[[], DeriverSchema[InputType, OutputType, ConfigurationType]] = Field()
 
     @model_validator(mode="before")
     def parse_inputs_outputs(cls, values):
@@ -61,25 +57,16 @@ class Deriver(
 
         for deriver_schema_input, deriver_input in inputs.items():
             try:
-                deriver_schema_input_physical_quantity = get_physical_quantity(
-                    deriver_schema_input
-                )
+                deriver_schema_input_physical_quantity = get_physical_quantity(deriver_schema_input)
             except ValueError:
                 continue
 
-            if (
-                deriver_schema_input_physical_quantity
-                != deriver_input.physicalUnit.physicalQuantity
-            ):
+            if deriver_schema_input_physical_quantity != deriver_input.physicalUnit.physicalQuantity:
                 raise ValueError(
                     f"Physical quantity mismatch for {deriver_schema_input[0]}, physical quantity of the physical unit of the input is {deriver_schema_input_physical_quantity.name}, but the physical quantity of the input is {deriver_input.physicalUnit.physicalQuantity.name}."
                 )
 
-        parsed_inputs = {
-            str(key[0]): value
-            for key, value in inputs.items()
-            if isinstance(key, tuple) and len(key) > 0
-        }
+        parsed_inputs = {str(key[0]): value for key, value in inputs.items() if isinstance(key, tuple) and len(key) > 0}
         values["inputs"] = parsed_inputs
 
         # Parse outputs
@@ -87,24 +74,17 @@ class Deriver(
 
         for deriver_schema_ouput, deriver_output in outputs.items():
             try:
-                deriver_schema_output_physical_quantity = get_physical_quantity(
-                    deriver_schema_ouput
-                )
+                deriver_schema_output_physical_quantity = get_physical_quantity(deriver_schema_ouput)
             except ValueError:
                 continue
 
-            if (
-                deriver_schema_output_physical_quantity
-                != deriver_output.physicalUnit.physicalQuantity
-            ):
+            if deriver_schema_output_physical_quantity != deriver_output.physicalUnit.physicalQuantity:
                 raise ValueError(
                     f"Physical quantity mismatch for {deriver_schema_ouput[0]}, physical quantity of the physical unit of the output is {deriver_schema_output_physical_quantity.name}, but the physical quantity of the input is {deriver_output.physicalUnit.physicalQuantity.name}."
                 )
 
         parsed_outputs = {
-            str(key[0]): value
-            for key, value in outputs.items()
-            if isinstance(key, tuple) and len(key) > 0
+            str(key[0]): value for key, value in outputs.items() if isinstance(key, tuple) and len(key) > 0
         }
         values["outputs"] = parsed_outputs
 
