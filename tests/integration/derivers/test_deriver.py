@@ -220,7 +220,7 @@ def test_deriver_deploy():
         "data": {"message": "Deriver deployed successfully"},
     }
 
-    with patch("nortech.derivers.gateways.customer_api.post") as mock_post:
+    with patch("nortech.derivers.gateways.customer_api.session.post") as mock_post:
         mock_post.return_value.status_code = 200
         mock_post.return_value.json.return_value = mock_response_data
 
