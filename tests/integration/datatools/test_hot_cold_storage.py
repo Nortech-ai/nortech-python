@@ -11,11 +11,17 @@ import pandas.testing as pdt
 
 from nortech.datatools.handlers.pandas import get_df
 from nortech.datatools.values.signals import TimeWindow
-from nortech.datatools.gateways.customer_api import hash_signal_ADUS
+from nortech.datatools.gateways.customer_api import CustomerAPISettings, hash_signal_ADUS
 
 
 @patch("nortech.datatools.handlers.polars.get_lazy_polars_df_from_customer_api_historical_data")
-def test_get_df_hot(get_cold_storage_mock, search_json: str, signals: List[str], requests_mock):
+def test_get_df_hot(
+    get_cold_storage_mock,
+    search_json: str,
+    signals: List[str],
+    customer_api_settings: CustomerAPISettings,
+    requests_mock,
+):
     end = datetime.now(timezone.utc) + timedelta(seconds=10)
     time_window = TimeWindow(
         start=end - timedelta(days=1),
@@ -34,7 +40,7 @@ def test_get_df_hot(get_cold_storage_mock, search_json: str, signals: List[str],
     csv_content.seek(0)
 
     requests_mock.post(
-        environ["CUSTOMER_API_URL"] + "/timescale",
+        customer_api_settings.URL + "/timescale",
         content=csv_content.getvalue(),
     )
 
@@ -47,7 +53,13 @@ def test_get_df_hot(get_cold_storage_mock, search_json: str, signals: List[str],
 
 
 @patch("nortech.datatools.handlers.polars.get_lazy_polars_df_from_customer_api_historical_data")
-def test_get_df_hot_empty(get_cold_storage_mock, search_json: str, signals: List[str], requests_mock):
+def test_get_df_hot_empty(
+    get_cold_storage_mock,
+    search_json: str,
+    signals: List[str],
+    customer_api_settings: CustomerAPISettings,
+    requests_mock,
+):
     end = datetime.now(timezone.utc) + timedelta(seconds=10)
     time_window = TimeWindow(
         start=end - timedelta(days=1),
@@ -55,7 +67,7 @@ def test_get_df_hot_empty(get_cold_storage_mock, search_json: str, signals: List
     )
 
     requests_mock.post(
-        environ["CUSTOMER_API_URL"] + "/timescale",
+        customer_api_settings.URL + "/timescale",
         status_code=404,
     )
 
@@ -78,7 +90,13 @@ def test_get_df_hot_empty(get_cold_storage_mock, search_json: str, signals: List
 
 
 @patch("nortech.datatools.handlers.polars.get_lazy_polars_df_from_customer_api")
-def test_get_df_cold(get_hot_storage_mock, search_json: str, signals: List[str], requests_mock):
+def test_get_df_cold(
+    get_hot_storage_mock,
+    search_json: str,
+    signals: List[str],
+    customer_api_settings: CustomerAPISettings,
+    requests_mock,
+):
     end = datetime.now(timezone.utc) - timedelta(days=1, seconds=10)
     time_window = TimeWindow(
         start=end - timedelta(days=1),
@@ -99,7 +117,7 @@ def test_get_df_cold(get_hot_storage_mock, search_json: str, signals: List[str],
     parquet_url = "http://parquet.file"
 
     requests_mock.post(
-        environ["CUSTOMER_API_URL"] + "/api/v1/historical-data/sync",
+        customer_api_settings.URL + "/api/v1/historical-data/sync",
         json={"outputFile": parquet_url},
     )
 
@@ -120,7 +138,13 @@ def test_get_df_cold(get_hot_storage_mock, search_json: str, signals: List[str],
 
 
 @patch("nortech.datatools.handlers.polars.get_lazy_polars_df_from_customer_api")
-def test_get_df_cold_empty(get_hot_storage_mock, search_json: str, signals: List[str], requests_mock):
+def test_get_df_cold_empty(
+    get_hot_storage_mock,
+    search_json: str,
+    signals: List[str],
+    customer_api_settings: CustomerAPISettings,
+    requests_mock,
+):
     end = datetime.now(timezone.utc) - timedelta(days=1, seconds=10)
     time_window = TimeWindow(
         start=end - timedelta(days=1),
@@ -128,7 +152,7 @@ def test_get_df_cold_empty(get_hot_storage_mock, search_json: str, signals: List
     )
 
     requests_mock.post(
-        environ["CUSTOMER_API_URL"] + "/api/v1/historical-data/sync",
+        customer_api_settings.URL + "/api/v1/historical-data/sync",
         status_code=404,
     )
 
@@ -150,7 +174,9 @@ def test_get_df_cold_empty(get_hot_storage_mock, search_json: str, signals: List
     )
 
 
-def test_get_df_hot_and_cold(search_json: str, signals: List[str], requests_mock):
+def test_get_df_hot_and_cold(
+    search_json: str, signals: List[str], customer_api_settings: CustomerAPISettings, requests_mock
+):
     end = datetime.now(timezone.utc)
     start_hot = end_cold = end - timedelta(days=1, seconds=10)
     start_cold = start_hot - timedelta(days=1)
@@ -178,7 +204,7 @@ def test_get_df_hot_and_cold(search_json: str, signals: List[str], requests_mock
     csv_content.seek(0)
 
     requests_mock.post(
-        environ["CUSTOMER_API_URL"] + "/timescale",
+        customer_api_settings.URL + "/timescale",
         content=csv_content.getvalue(),
     )
 
@@ -189,7 +215,7 @@ def test_get_df_hot_and_cold(search_json: str, signals: List[str], requests_mock
     parquet_url = "http://parquet.file"
 
     requests_mock.post(
-        environ["CUSTOMER_API_URL"] + "/api/v1/historical-data/sync",
+        customer_api_settings.URL + "/api/v1/historical-data/sync",
         json={"outputFile": parquet_url},
     )
 
@@ -216,7 +242,9 @@ def test_get_df_hot_and_cold(search_json: str, signals: List[str], requests_mock
     )
 
 
-def test_get_df_hot_and_cold_cold_empty(search_json: str, signals: List[str], requests_mock):
+def test_get_df_hot_and_cold_cold_empty(
+    search_json: str, signals: List[str], customer_api_settings: CustomerAPISettings, requests_mock
+):
     end = datetime.now(timezone.utc)
     start_hot = end - timedelta(days=1, seconds=10)
     start_cold = start_hot - timedelta(days=1)
@@ -238,12 +266,12 @@ def test_get_df_hot_and_cold_cold_empty(search_json: str, signals: List[str], re
     csv_content.seek(0)
 
     requests_mock.post(
-        environ["CUSTOMER_API_URL"] + "/timescale",
+        customer_api_settings.URL + "/timescale",
         content=csv_content.getvalue(),
     )
 
     requests_mock.post(
-        environ["CUSTOMER_API_URL"] + "/api/v1/historical-data/sync",
+        customer_api_settings.URL + "/api/v1/historical-data/sync",
         status_code=404,
     )
 
@@ -254,7 +282,9 @@ def test_get_df_hot_and_cold_cold_empty(search_json: str, signals: List[str], re
     pdt.assert_frame_equal(df, csv_df.set_index("timestamp"))
 
 
-def test_get_df_hot_and_cold_hot_empty(search_json: str, signals: List[str], requests_mock):
+def test_get_df_hot_and_cold_hot_empty(
+    search_json: str, signals: List[str], customer_api_settings: CustomerAPISettings, requests_mock
+):
     end = datetime.now(timezone.utc)
     start_hot = end_cold = end - timedelta(days=1, seconds=10)
     start_cold = start_hot - timedelta(days=1)
@@ -278,7 +308,7 @@ def test_get_df_hot_and_cold_hot_empty(search_json: str, signals: List[str], req
     parquet_url = "http://parquet.file"
 
     requests_mock.post(
-        environ["CUSTOMER_API_URL"] + "/api/v1/historical-data/sync",
+        customer_api_settings.URL + "/api/v1/historical-data/sync",
         json={"outputFile": parquet_url},
     )
 
@@ -288,7 +318,7 @@ def test_get_df_hot_and_cold_hot_empty(search_json: str, signals: List[str], req
     )
 
     requests_mock.post(
-        environ["CUSTOMER_API_URL"] + "/timescale",
+        customer_api_settings.URL + "/timescale",
         status_code=404,
     )
 
