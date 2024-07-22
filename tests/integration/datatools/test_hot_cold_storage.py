@@ -1,6 +1,5 @@
 from datetime import datetime, timezone
 from io import BytesIO
-from os import environ
 from typing import List
 from unittest.mock import patch
 from datetime import timedelta
