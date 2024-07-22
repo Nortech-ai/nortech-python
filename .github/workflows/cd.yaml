@@ -1,23 +1,22 @@
-name: CI
+name: CD
 
 on:
-  pull_request:
+  push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
-  lint-and-test:
+  publish-to-pypi:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version: ["3.9", "3.10", "3.11"]
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
+      - uses: actions/checkout@v3
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v3
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -27,11 +26,8 @@ jobs:
           pip install poetry==1.8.3
           poetry install --with dev
 
-      - name: Run ruff linting
+      - name: Publish to PyPI
+        env:
+          POETRY_PYPI_TOKEN_PYPI: ${{ secrets.PYPI_TOKEN }}
         run: |
-          poetry run ruff check .
-          poetry run ruff format --check .
-
-      - name: Run tests
-        run: |
-          poetry run pytest
+          poetry publish --build
