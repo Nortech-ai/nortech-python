@@ -4,6 +4,8 @@ from typing import List
 
 import pytest
 
+environ["CUSTOMER_API_TOKEN"] = "test_token"
+
 from nortech.datatools import TimeWindow
 from nortech.datatools.gateways.customer_api import CustomerAPISettings
 
@@ -92,5 +94,4 @@ def time_window() -> TimeWindow:
 
 @pytest.fixture(scope="session")
 def customer_api_settings() -> CustomerAPISettings:
-    environ["CUSTOMER_API_TOKEN"] = "test_token"
     return CustomerAPISettings()

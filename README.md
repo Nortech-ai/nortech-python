@@ -20,27 +20,12 @@ poetry add nortech
 
 
 
-### S3
-
 #### Config
 
-Setup your environment variables with the `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` provided to you:
+Setup your environment variables with the `CUSTOMER_API_TOKEN` provided to you:
 
 ```bash
-export AWS_ACCESS_KEY_ID="<AWS_ACCESS_KEY_ID>"
-export AWS_SECRET_ACCESS_KEY="<AWS_SECRET_ACCESS_KEY>"
-```
-
-If you have an `AWS_SESSION_TOKEN` instead:
-
-```bash
-export AWS_SESSION_TOKEN="<AWS_SESSION_TOKEN>"
-```
-
-As an alternative you can use the [AWS CLI](https://aws.amazon.com/cli/):
-
-```bash
-aws configure
+export CUSTOMER_API_TOKEN="<CUSTOMER_API_TOKEN>"
 ```
 
 #### Examples
