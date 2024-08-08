@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "nortech"
-version = "0.6.4"
+version = "0.7.0"
 description = "The official Python library for Nortech AI"
 authors = ["Nortech AI <info@nortech.ai>"]
 license = "Apache-2.0"
@@ -20,6 +20,7 @@ tzlocal = "^5.2"
 pyarrow = ">=4.0.0,<16"
 pandas = "^2.2.2"
 requests = "^2.32.3"
+urllib3 = "^1.26.19"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.3"
@@ -38,4 +39,6 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.ruff]
 line-length = 120
+
+[tool.ruff.lint]
 ignore = ["E501"]
