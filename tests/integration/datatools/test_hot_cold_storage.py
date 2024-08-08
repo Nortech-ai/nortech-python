@@ -1,16 +1,15 @@
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from io import BytesIO
 from typing import List
 from unittest.mock import patch
-from datetime import timedelta
 
 import numpy as np
 import pandas as pd
 import pandas.testing as pdt
 
+from nortech.datatools.gateways.customer_api import CustomerAPISettings, hash_signal_ADUS
 from nortech.datatools.handlers.pandas import get_df
 from nortech.datatools.values.signals import TimeWindow
-from nortech.datatools.gateways.customer_api import CustomerAPISettings, hash_signal_ADUS
 
 
 @patch("nortech.datatools.handlers.polars.get_lazy_polars_df_from_customer_api_historical_data")

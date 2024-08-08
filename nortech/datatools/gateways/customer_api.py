@@ -1,16 +1,11 @@
-from typing import List
 import hashlib
 from datetime import timezone
 from enum import Enum
 from io import BytesIO
 from tempfile import NamedTemporaryFile
-
-from pydantic import BaseModel, Field, field_serializer
-from pydantic_settings import BaseSettings, SettingsConfigDict
-from requests import Session, get
-from requests.adapters import HTTPAdapter
-from urllib3.util.retry import Retry
+from typing import List
 from urllib.parse import urljoin
+
 from pandas import DataFrame, read_csv, to_datetime
 from polars import (
     Datetime,
@@ -18,6 +13,11 @@ from polars import (
     from_pandas,
     read_parquet,
 )
+from pydantic import BaseModel, Field, field_serializer
+from pydantic_settings import BaseSettings, SettingsConfigDict
+from requests import Session, get
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 from nortech.datatools.values.signals import (
     Signal,
@@ -180,3 +180,41 @@ def get_lazy_polars_df_from_customer_api_historical_data(
     )
 
     return lazy_df
+
+
+def download_data_from_customer_api_historical_data(
+    customer_API: CustomerAPI, signal_list: List[Signal], time_window: TimeWindow, output_path: str
+):
+    request_json = {
+        "signals": [
+            {
+                "rename": hash_signal_ADUS(signal.ADUS),
+                **signal.model_dump(),
+            }
+            for signal in signal_list
+        ],
+        "timeWindow": {
+            "start": str(time_window.start.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")),
+            "end": str(time_window.end.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")),
+        },
+    }
+
+    response = customer_API.post(
+        url="/api/v1/historical-data/sync",
+        json=request_json,
+    )
+
+    try:
+        assert response.status_code == 200
+    except AssertionError:
+        raise AssertionError(
+            f"Failed to get historical data. " f"Status code: {response.status_code}. " f"Response: {response.text}"
+        )
+
+    response_json = response.json()
+
+    with get(response_json["outputFile"], stream=True) as r:
+        r.raise_for_status()
+        with open(output_path, "wb") as f:
+            for chunk in r.iter_content(chunk_size=8192):
+                f.write(chunk)
