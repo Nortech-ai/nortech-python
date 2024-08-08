@@ -18,7 +18,7 @@
         let
           inherit pkgsForAllSystems;
           pkgs = pkgsForAllSystems.${system};
-          pythonPkg = pkgs.python310;
+          pythonPkg = pkgs.python39;
           pythonEnv = pythonPkg.buildEnv.override {
             extraLibs = [ pythonPkg.pkgs.pip pythonPkg.pkgs.virtualenv ];
           };
