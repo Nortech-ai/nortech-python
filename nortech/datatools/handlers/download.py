@@ -2,10 +2,10 @@ from nortech.datatools.gateways.customer_api import (
     CustomerAPI,
     download_data_from_customer_api_historical_data,
 )
+from nortech.datatools.services.logger import logger
 from nortech.datatools.services.storage import get_hot_and_cold_time_windows
 from nortech.datatools.values.signals import TimeWindow, get_signal_list_from_search_json
 from nortech.datatools.values.windowing import ColdWindow, HotWindow
-from nortech.derivers.services.logger import logger
 
 
 def download_data(customer_API: CustomerAPI, search_json: str, time_window: TimeWindow, output_path: str):

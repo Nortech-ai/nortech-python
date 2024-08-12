@@ -1,6 +1,10 @@
+import os
+import tempfile
 from datetime import datetime, timedelta, timezone
-from typing import Union
+from typing import Dict, Union
 
+import pyarrow as pa
+import pyarrow.parquet as pq
 from polars import LazyFrame, col
 
 from nortech.datatools.values.signals import TimeWindow
@@ -56,3 +60,21 @@ def cast_hot_schema_to_cold_schema(cold_lazy_polars_df: LazyFrame, hot_lazy_pola
             hot_lazy_polars_df = hot_lazy_polars_df.with_columns(col(column_name).cast(dtype))
 
     return hot_lazy_polars_df
+
+
+def rename_parquet_columns(parquet_file_path: str, column_name_mapping: Dict[str, str]):
+    parquet_file = pq.ParquetFile(parquet_file_path)
+
+    old_schema = parquet_file.schema_arrow
+    new_fields = [pa.field(column_name_mapping.get(field.name, field.name), field.type) for field in old_schema]
+    new_schema = pa.schema(new_fields)
+
+    with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
+        tmp_filename = tmp_file.name
+
+    with pq.ParquetWriter(tmp_filename, new_schema) as writer:
+        for batch in parquet_file.iter_batches():
+            new_batch = pa.RecordBatch.from_arrays(batch.columns, schema=new_schema)
+            writer.write_batch(new_batch)
+
+    os.replace(tmp_filename, parquet_file_path)
