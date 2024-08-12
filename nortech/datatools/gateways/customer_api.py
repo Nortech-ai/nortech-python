@@ -19,6 +19,8 @@ from requests import Session, get
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
+from nortech.datatools.services.logger import logger
+from nortech.datatools.services.storage import rename_parquet_columns
 from nortech.datatools.values.signals import (
     Signal,
     TimeWindow,
@@ -199,10 +201,12 @@ def download_data_from_customer_api_historical_data(
         },
     }
 
+    logger.debug(f"Request to Customer API: {request_json}")
     response = customer_API.post(
         url="/api/v1/historical-data/sync",
         json=request_json,
     )
+    logger.debug(f"Response from Customer API: {response.json()}")
 
     try:
         assert response.status_code == 200
@@ -218,3 +222,8 @@ def download_data_from_customer_api_historical_data(
         with open(output_path, "wb") as f:
             for chunk in r.iter_content(chunk_size=8192):
                 f.write(chunk)
+
+    rename_parquet_columns(
+        parquet_file_path=output_path,
+        column_name_mapping={hash_signal_ADUS(signal.ADUS): f"{signal.ADUS}" for signal in signal_list},
+    )

@@ -1,10 +1,10 @@
 from polars import DataFrame, LazyFrame, concat, lit
 
 from nortech.datatools.gateways.customer_api import (
-    get_lazy_polars_df_from_customer_api,
-    get_lazy_polars_df_from_customer_api_historical_data,
     CustomerAPI,
     CustomerAPISettings,
+    get_lazy_polars_df_from_customer_api,
+    get_lazy_polars_df_from_customer_api_historical_data,
 )
 from nortech.datatools.services.storage import (
     cast_hot_schema_to_cold_schema,
@@ -15,8 +15,6 @@ from nortech.datatools.values.signals import (
     get_signal_list_from_search_json,
 )
 from nortech.datatools.values.windowing import ColdWindow, HotWindow
-
-customerAPI = CustomerAPI(settings=CustomerAPISettings())
 
 
 def get_lazy_polars_df(search_json: str, time_window: TimeWindow) -> LazyFrame:
@@ -115,6 +113,8 @@ def get_lazy_polars_df(search_json: str, time_window: TimeWindow) -> LazyFrame:
             'asset_2/division_2/unit_2/signal_3'
         ]
     """
+    customerAPI = CustomerAPI(settings=CustomerAPISettings())
+
     signal_list = get_signal_list_from_search_json(search_json=search_json)
 
     time_windows = get_hot_and_cold_time_windows(time_window=time_window)
