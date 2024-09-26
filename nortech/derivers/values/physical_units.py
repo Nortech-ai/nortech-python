@@ -181,13 +181,6 @@ radian = PhysicalUnit(
     physicalQuantity=angle,
 )
 
-gradian = PhysicalUnit(
-    name=str(unit_registry.gradian),
-    description="A gradian is a unit of plane angle, defined as 1/400 of a full rotation.",
-    symbol=f"{unit_registry.gradian:~}",
-    physicalQuantity=angle,
-)
-
 # Length
 length = PhysicalQuantity(
     name="Length",
@@ -379,13 +372,6 @@ calorie = PhysicalUnit(
     name=str(unit_registry.calorie),
     description="A calorie is a unit of energy equal to about 4.184 joules.",
     symbol=f"{unit_registry.calorie:~}",
-    physicalQuantity=energy,
-)
-
-british_thermal_unit = PhysicalUnit(
-    name=str(unit_registry.btu),
-    description="The British thermal unit (BTU) is a unit of heat, defined as the amount of heat required to raise the temperature of one pound of water by one degree Fahrenheit.",
-    symbol=f"{unit_registry.btu:~}",
     physicalQuantity=energy,
 )
 
