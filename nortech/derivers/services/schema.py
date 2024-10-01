@@ -1,7 +1,7 @@
 from inspect import getsource
 from re import DOTALL, sub
 from textwrap import dedent
-from typing import Callable, List, Type
+from typing import Any, Callable, List, Type
 
 from pydantic import BaseModel
 
@@ -38,9 +38,9 @@ def input_schema_to_deriver_schema_inputs(
             if field.json_schema_extra["physicalQuantity"]  # type: ignore
             else None,
             suggestedInputsFromOtherDerivers=[
-                DeriverSchemaOutputWithDAG(
+                DeriverSchemaOutputWithDAG(  # type: ignore
                     **suggestedInputFromOtherDeriver,
-                    deriverSchemaDAG=get_deriver_schema_DAG(suggestedInputFromOtherDeriver["create_deriver_schema"]),
+                    deriverSchemaDAG=get_deriver_schema_DAG(suggestedInputFromOtherDeriver["create_deriver_schema"]),  # type: ignore
                 )
                 for suggestedInputFromOtherDeriver in field.json_schema_extra[  # type: ignore
                     "suggestedInputsFromOtherDerivers"
@@ -116,7 +116,7 @@ def check_create_deriver_schema_imports(
     source_code_without_suggested_inputs = sub(pattern, "", source_code, flags=DOTALL)
 
     # Define a clean global environment for execution
-    clean_env = {}
+    clean_env: dict[str, Any] = {}
 
     # Execute the function within the clean environment
     try:

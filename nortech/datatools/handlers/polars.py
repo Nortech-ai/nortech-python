@@ -1,8 +1,9 @@
-from polars import DataFrame, LazyFrame, concat, lit
+from typing import Optional
 
-from nortech.datatools.gateways.customer_api import (
-    CustomerAPI,
-    CustomerAPISettings,
+from polars import DataFrame, LazyFrame, concat, lit
+from urllib3.util import Timeout
+
+from nortech.datatools.services.customer_api import (
     get_lazy_polars_df_from_customer_api,
     get_lazy_polars_df_from_customer_api_historical_data,
 )
@@ -15,9 +16,15 @@ from nortech.datatools.values.signals import (
     get_signal_list_from_search_json,
 )
 from nortech.datatools.values.windowing import ColdWindow, HotWindow
+from nortech.shared.gateways.customer_api import (
+    CustomerAPI,
+    CustomerAPISettings,
+)
+
+customer_API = CustomerAPI(settings=CustomerAPISettings())
 
 
-def get_lazy_polars_df(search_json: str, time_window: TimeWindow) -> LazyFrame:
+def get_lazy_polars_df(search_json: str, time_window: TimeWindow, timeout: Optional[Timeout] = None) -> LazyFrame:
     """
     This function retrieves a polars LazyFrame based on the provided search_json and time_window.
 
@@ -113,7 +120,7 @@ def get_lazy_polars_df(search_json: str, time_window: TimeWindow) -> LazyFrame:
             'asset_2/division_2/unit_2/signal_3'
         ]
     """
-    customerAPI = CustomerAPI(settings=CustomerAPISettings())
+    customer_API = CustomerAPI(settings=CustomerAPISettings())
 
     signal_list = get_signal_list_from_search_json(search_json=search_json)
 
@@ -121,27 +128,31 @@ def get_lazy_polars_df(search_json: str, time_window: TimeWindow) -> LazyFrame:
 
     if isinstance(time_windows, ColdWindow):
         return get_lazy_polars_df_from_customer_api_historical_data(
-            customerAPI=customerAPI,
+            customer_API=customer_API,
             signal_list=signal_list,
             time_window=time_windows.time_window,
+            timeout=timeout,
         )
     elif isinstance(time_windows, HotWindow):
         return get_lazy_polars_df_from_customer_api(
-            customerAPI=customerAPI,
+            customer_API=customer_API,
             signal_list=signal_list,
             time_window=time_windows.time_window,
+            timeout=timeout,
         )
     else:
         hot_lazy_polars_df = get_lazy_polars_df_from_customer_api(
-            customerAPI=customerAPI,
+            customer_API=customer_API,
             signal_list=signal_list,
             time_window=time_windows.hot_storage_time_window,
+            timeout=timeout,
         )
 
         cold_lazy_polars_df = get_lazy_polars_df_from_customer_api_historical_data(
-            customerAPI=customerAPI,
+            customer_API=customer_API,
             signal_list=signal_list,
             time_window=time_windows.cold_storage_time_window,
+            timeout=timeout,
         )
 
         hot_lazy_polars_df_casted = cast_hot_schema_to_cold_schema(
@@ -150,15 +161,19 @@ def get_lazy_polars_df(search_json: str, time_window: TimeWindow) -> LazyFrame:
         )
 
         # Get all unique columns from both dataframes and sort them
-        all_columns = sorted(set(hot_lazy_polars_df_casted.columns).union(set(cold_lazy_polars_df.columns)))
+        all_columns = sorted(
+            set(hot_lazy_polars_df_casted.collect_schema().names()).union(
+                set(cold_lazy_polars_df.collect_schema().names())
+            )
+        )
 
         # Add missing columns in hot_lazy_polars_df_casted
-        missing_in_hot = set(all_columns) - set(hot_lazy_polars_df_casted.columns)
+        missing_in_hot = set(all_columns) - set(hot_lazy_polars_df_casted.collect_schema().names())
         for column in missing_in_hot:
             hot_lazy_polars_df_casted = hot_lazy_polars_df_casted.with_columns(lit(None).alias(column))
 
         # Add missing columns in cold_lazy_polars_df
-        missing_in_cold = set(all_columns) - set(cold_lazy_polars_df.columns)
+        missing_in_cold = set(all_columns) - set(cold_lazy_polars_df.collect_schema().names())
         for column in missing_in_cold:
             cold_lazy_polars_df = cold_lazy_polars_df.with_columns(lit(None).alias(column))
 

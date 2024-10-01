@@ -1,3 +1,7 @@
+from typing import Optional
+
+from urllib3.util import Timeout
+
 from nortech.datatools.gateways.customer_api import (
     CustomerAPI,
     download_data_from_customer_api_historical_data,
@@ -8,7 +12,13 @@ from nortech.datatools.values.signals import TimeWindow, get_signal_list_from_se
 from nortech.datatools.values.windowing import ColdWindow, HotWindow
 
 
-def download_data(customer_API: CustomerAPI, search_json: str, time_window: TimeWindow, output_path: str):
+def download_data(
+    customer_API: CustomerAPI,
+    search_json: str,
+    time_window: TimeWindow,
+    output_path: str,
+    timeout: Optional[Timeout] = None,
+):
     signal_list = get_signal_list_from_search_json(search_json=search_json)
 
     time_windows = get_hot_and_cold_time_windows(time_window=time_window)
@@ -19,6 +29,7 @@ def download_data(customer_API: CustomerAPI, search_json: str, time_window: Time
             signal_list=signal_list,
             time_window=time_windows.time_window,
             output_path=output_path,
+            timeout=timeout,
         )
     elif isinstance(time_windows, HotWindow):
         raise NotImplementedError("Hot storage is not available for download yet. Use get DataFrame functions instead.")
@@ -30,4 +41,5 @@ def download_data(customer_API: CustomerAPI, search_json: str, time_window: Time
             signal_list=signal_list,
             time_window=time_windows.cold_storage_time_window,
             output_path=output_path,
+            timeout=timeout,
         )

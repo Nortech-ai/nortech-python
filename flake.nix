@@ -14,35 +14,21 @@
         config = { allowUnfree = true; };
       });
 
-      makeDevShell = system:
-        let
-          inherit pkgsForAllSystems;
-          pkgs = pkgsForAllSystems.${system};
-          pythonPkg = pkgs.python39;
-          pythonEnv = pythonPkg.buildEnv.override {
-            extraLibs = [ pythonPkg.pkgs.pip pythonPkg.pkgs.virtualenv ];
-          };
+      makeDevShell = system: let
+        inherit pkgsForAllSystems;
+        pkgs = pkgsForAllSystems.${system};
 
-          isDarwin = pkgs.stdenv.hostPlatform.isDarwin;
-          darwinPackages = if isDarwin then [ ] else [ ];
-        in
-        pkgs.mkShell {
-          buildInputs = [
-            pythonEnv
-            pkgs.git
-          ] ++ darwinPackages;
+        isDarwin = pkgs.stdenv.hostPlatform.isDarwin;
+        darwinPackages = if isDarwin then [ ] else [ ];
+      in
+      pkgs.mkShell {
+        buildInputs = [
+          pkgs.uv
+          pkgs.git
+        ] ++ darwinPackages;
 
-          shellHook = ''
-            # Create a virtual environment
-            virtualenv .venv
-
-            # Activate the virtual environment
-            source .venv/bin/activate
-
-            # Install poetry inside the virtual environment
-            pip install poetry==1.4.2
-          '';
-        };
+        shellHook = '''';
+      };
     in
     {
       devShells = forAllSystems (system: {
