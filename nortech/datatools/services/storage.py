@@ -52,11 +52,11 @@ def get_hot_and_cold_time_windows(
 
 
 def cast_hot_schema_to_cold_schema(cold_lazy_polars_df: LazyFrame, hot_lazy_polars_df: LazyFrame):
-    cold_schema = cold_lazy_polars_df.schema
+    cold_schema = cold_lazy_polars_df.collect_schema()
 
     # Iterate over the schema items and cast the hot DataFrame columns to match the cold DataFrame types
     for column_name, dtype in cold_schema.items():
-        if column_name in hot_lazy_polars_df.columns:
+        if column_name in hot_lazy_polars_df.collect_schema().names():
             hot_lazy_polars_df = hot_lazy_polars_df.with_columns(col(column_name).cast(dtype))
 
     return hot_lazy_polars_df
@@ -74,7 +74,7 @@ def rename_parquet_columns(parquet_file_path: str, column_name_mapping: Dict[str
 
     with pq.ParquetWriter(tmp_filename, new_schema) as writer:
         for batch in parquet_file.iter_batches():
-            new_batch = pa.RecordBatch.from_arrays(batch.columns, schema=new_schema)
+            new_batch = pa.RecordBatch.from_arrays(batch.columns, schema=new_schema)  # type: ignore
             writer.write_batch(new_batch)
 
     os.replace(tmp_filename, parquet_file_path)

@@ -7,9 +7,12 @@ import numpy as np
 import pandas as pd
 import pandas.testing as pdt
 
-from nortech.datatools.gateways.customer_api import CustomerAPISettings, hash_signal_ADUS
 from nortech.datatools.handlers.pandas import get_df
+from nortech.datatools.services.customer_api import (
+    hash_signal_ADUS,
+)
 from nortech.datatools.values.signals import TimeWindow
+from nortech.shared.gateways.customer_api import CustomerAPISettings
 
 
 @patch("nortech.datatools.handlers.polars.get_lazy_polars_df_from_customer_api_historical_data")

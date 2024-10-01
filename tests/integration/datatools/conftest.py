@@ -7,7 +7,7 @@ import pytest
 environ["CUSTOMER_API_TOKEN"] = "test_token"
 
 from nortech.datatools import TimeWindow
-from nortech.datatools.gateways.customer_api import CustomerAPISettings
+from nortech.shared.gateways.customer_api import CustomerAPISettings
 
 
 @pytest.fixture(scope="session")

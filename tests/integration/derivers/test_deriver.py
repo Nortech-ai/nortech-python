@@ -1,13 +1,13 @@
 from datetime import datetime, timezone
-from unittest.mock import ANY, patch
 
 import pandas as pd
 from pytest import raises
 
-from nortech.derivers.gateways.customer_api import CustomerAPI, CustomerWorkspace
 from nortech.derivers.handlers.deriver import deploy_deriver, run_deriver_locally
+from nortech.derivers.services.customer_api import CustomerWorkspace
 from nortech.derivers.values.instance import Deriver, DeriverInput, DeriverOutput
 from nortech.derivers.values.physical_units import celsius
+from nortech.shared.gateways.customer_api import CustomerAPI, CustomerAPISettings
 
 
 def create_test_schema():
@@ -204,10 +204,14 @@ def test_deriver_schema_fail():
         )
 
 
-def test_deriver_deploy():
+def test_deriver_deploy(requests_mock):
+    customer_api_url = "https://api.apps.nor.tech"
+
     customer_API = CustomerAPI(
-        URL="https://api.apps.nor.tech",
-        TOKEN="test",
+        settings=CustomerAPISettings(
+            URL=customer_api_url,
+            TOKEN="test",
+        )
     )
 
     customer_workspace = CustomerWorkspace(
@@ -220,24 +224,21 @@ def test_deriver_deploy():
         "data": {"message": "Deriver deployed successfully"},
     }
 
-    with patch("nortech.derivers.gateways.customer_api.session.post") as mock_post:
-        mock_post.return_value.status_code = 200
-        mock_post.return_value.json.return_value = mock_response_data
+    requests_mock.post(
+        url=customer_api_url + "/api/v1/derivers/createDeriver",
+        json=mock_response_data,
+    )
 
-        deriver_diff = deploy_deriver(
-            customer_API=customer_API,
-            customer_workspace=customer_workspace,
-            deriver=deriver,
-            dry_run=True,
-        )
+    deriver_diff = deploy_deriver(
+        customer_API=customer_API,
+        customer_workspace=customer_workspace,
+        deriver=deriver,
+        dry_run=True,
+    )
 
-        mock_post.assert_called_once_with(
-            url="https://api.apps.nor.tech/api/v1/derivers/createDeriver",
-            headers={"Authorization": "Bearer test"},
-            json=ANY,
-        )
+    assert requests_mock.call_count == 1
 
-        assert deriver_diff == mock_response_data
+    assert deriver_diff == mock_response_data
 
 
 def test_deriver_run_locally():

@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Callable
+from typing import Callable, Optional
 
 import bytewax.operators as op
 from bytewax.dataflow import Dataflow
@@ -8,12 +8,9 @@ from bytewax.testing import TestingSink, TestingSource, run_main
 from IPython.display import Markdown, display
 from pandas import DataFrame, DatetimeIndex, isna
 from pint import Quantity
+from urllib3.util import Timeout
 
-from nortech.derivers.gateways.customer_api import (
-    CustomerAPI,
-    CustomerWorkspace,
-    create_deriver,
-)
+from nortech.derivers.services.customer_api import CustomerWorkspace, create_deriver
 from nortech.derivers.services.schema import (
     get_deriver_schema_DAG,
 )
@@ -32,6 +29,7 @@ from nortech.derivers.values.schema import (
     InputType,
     OutputType,
 )
+from nortech.shared.gateways.customer_api import CustomerAPI
 
 
 @dataclass
@@ -48,6 +46,7 @@ def deploy_deriver(
     customer_workspace: CustomerWorkspace,
     deriver: Deriver,
     dry_run: bool,
+    timeout: Optional[Timeout] = None,
 ):
     deriver_schema_DAG = get_deriver_schema_DAG(deriver.create_deriver_schema)
 
@@ -57,6 +56,7 @@ def deploy_deriver(
         deriver=deriver,
         deriver_schema_DAG=deriver_schema_DAG,
         dry_run=dry_run,
+        timeout=timeout,
     )
 
     return deriver_diffs
@@ -127,7 +127,7 @@ def run_deriver_locally(
 
             yield deriver_schema.inputs(**input_with_None)  # type: ignore
 
-    source = TestingSource(ib=df_to_inputs(df), batch_size=batch_size)
+    source = TestingSource(ib=df_to_inputs(df), batch_size=batch_size)  # type: ignore
 
     flow = Dataflow(deriver.name)
 
@@ -177,7 +177,7 @@ def run_deriver_locally(
 
     converted_output_stream = op.map("convert_output", transformed_stream, convert_output)
 
-    output_list = []
+    output_list: list[OutputType] = []
     output_sink = TestingSink(output_list)
 
     op.output("out", converted_output_stream, output_sink)
