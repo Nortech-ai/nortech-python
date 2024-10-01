@@ -27,6 +27,9 @@ jobs:
       - name: Install the project
         run: uv sync --all-extras
 
+      - name: Build the project
+        run: uv build
+
       - name: Publish to PyPI
         env:
           TWINE_USERNAME: __token__
