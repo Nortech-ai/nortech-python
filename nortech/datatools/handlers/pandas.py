@@ -1,24 +1,42 @@
+from __future__ import annotations
+
 from pandas import DataFrame
 
+from nortech.common.gateways.nortech_api import NortechAPI
 from nortech.datatools.handlers.polars import get_polars_df
-from nortech.datatools.values.signals import TimeWindow
+from nortech.datatools.values.windowing import TimeWindow
+from nortech.metadata.values.signal import SignalInput, SignalInputDict, SignalOutput
 
 
-def get_df(search_json: str, time_window: TimeWindow) -> DataFrame:
+def get_df(
+    nortech_api: NortechAPI,
+    signals: list[SignalInput | SignalInputDict | SignalOutput | int],
+    time_window: TimeWindow,
+) -> DataFrame:
     """
-    This function retrieves a pandas DataFrame based on the provided search_json and time_window.
+    Retrieves a pandas DataFrame for the specified signals within the given time window.
 
     Parameters
     ----------
-    search_json : str
-        The json string result from Signal search.
+    nortech_api : NortechAPI
+        The API client for Nortech API.
+    signals : list[SignalInput | SignalInputDict | SignalOutput | int]
+        A list of signals to retrieve, which can be of the following types:
+        - SignalInputDict: A dictionary representation of a signal input.
+          Example: {"workspace": "my_workspace", "asset": "my_asset", "division": "my_division", "unit": "my_unit", "signal": "my_signal"}
+        - SignalInput: A pydantic model representing an input signal.
+          Example: SignalInput(workspace="my_workspace", asset="my_asset", division="my_division", unit="my_unit", signal="my_signal")
+        - SignalOutput: A pydantic model representing an output signal. Obtained
+          from a signal metadata request.
+        - int: Corresponds to a signalId, which is an integer identifier for a signal.
+          Example: 789
     time_window : TimeWindow
-        The time window for which to retrieve data.
+        The time window for which data should be retrieved.
 
     Returns
     -------
-    LazyFrame
-        A LazyFrame containing the data.
+    DataFrame
+        A pandas DataFrame containing the data.
 
     Raises
     ------
@@ -31,76 +49,31 @@ def get_df(search_json: str, time_window: TimeWindow) -> DataFrame:
     -------
     >>> from datetime import datetime
     >>> from nortech.datatools import get_df, TimeWindow
-    >>> search_json = \"""[
-        {
-            "name": "signal_1",
-            "dataType": "float",
-            "alias": 0,
-            "asset": {
-                "name": "asset_1"
-            },
-            "division": {
-                "name": "division_1"
-            },
-            "unit": {
-                "name": "unit_1"
-            },
-            "storage": {
-                "bucket": "nortech-test",
-                "path": "scope_1_group_0"
-            }
-        },
-        {
-            "name": "signal_2",
-            "dataType": "float",
-            "alias": 1,
-            "asset": {
-                "name": "asset_1"
-            },
-            "division": {
-                "name": "division_1"
-            },
-            "unit": {
-                "name": "unit_1"
-            },
-            "storage": {
-                "bucket": "nortech-test",
-                "path": "scope_1_group_0"
-            }
-        },
-        {
-            "name": "signal_3",
-            "dataType": "float",
-            "alias": 0,
-            "asset": {
-                "name": "asset_2"
-            },
-            "division": {
-                "name": "division_2"
-            },
-            "unit": {
-                "name": "unit_2"
-            },
-            "storage": {
-                "bucket": "nortech-test",
-                "path": "scope_1_group_1"
-            }
-        }
-    ]\"""
-    >>> time_window = TimeWindow(
-                start=datetime(2020, 1, 1),
-                end=datetime(2020, 1, 1),
-        )
-    >>> df = get_df(search_json=search_json, time_window=time_window)
+    >>> from nortech.metadata.values.signal import SignalInput
+    >>>
+    >>> # Define signals to retrieve
+    >>> signal1 = {"workspace": "workspace1", "asset": "asset1", "division": "division1", "unit": "unit1", "signal": "signal1"}
+    >>> signal2 = 789  # Signal ID
+    >>> signal3 = SignalInput(workspace="workspace2", asset="asset2", division="division2", unit="unit2", signal="signal3")
+    >>>
+    >>> # Define the time window for data retrieval
+    >>> my_time_window = TimeWindow(start=datetime(2020, 1, 1), end=datetime(2020, 1, 31))
+    >>>
+    >>> # Call the get_df function
+    >>> df = get_df(
+    ...     nortech_api=nortech_api,
+    ...     signals=[signal1, signal2, signal3],
+    ...     time_window=my_time_window
+    ... )
     >>> df.columns
-        [
-            'timestamp',
-            'asset_1/division_1/unit_1/signal_1',
-            'asset_1/division_1/unit_1/signal_2',
-            'asset_2/division_2/unit_2/signal_3'
-        ]
+    [
+        'timestamp',
+        'workspace_1/asset_1/division_1/unit_1/signal_1',
+        'workspace_1/asset_1/division_1/unit_1/signal_2',
+        'workspace_2/asset_2/division_2/unit_2/signal_3'
+    ]
     """
-    polars_df = get_polars_df(search_json=search_json, time_window=time_window)
+    polars_df = get_polars_df(nortech_api=nortech_api, signals=signals, time_window=time_window)
 
     df = polars_df.to_pandas().set_index("timestamp")
 

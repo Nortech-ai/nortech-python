@@ -2,6 +2,18 @@
 
 The official Python library for Nortech AI.
 
+## Table of Contents
+- [Install](#install)
+- [Config](#config) 
+- [Overview](#overview)
+  - [nortech.metadata](#nortechmetadata)
+  - [nortech.datatools](#nortechdatatools)
+  - [nortech.derivers](#nortechderivers)
+- [Examples](#examples)
+  - [Pandas DataFrame](#pandas-dataframe)
+  - [Polars DataFrame](#polars-dataframe)
+  - [Polars LazyFrame](#polars-lazyframe)
+
 ## Install
 
 You can install using pip:
@@ -16,19 +28,58 @@ Or if you are using poetry:
 poetry add nortech
 ```
 
-## nortech.datatools
-
-
-
-#### Config
-
-Setup your environment variables with the `CUSTOMER_API_TOKEN` provided to you:
+Or if you are using UV:
 
 ```bash
-export CUSTOMER_API_TOKEN="<CUSTOMER_API_TOKEN>"
+uv add nortech
 ```
 
-#### Examples
+
+## Config
+
+Setup your environment variables with your `NORTECH_API_TOKEN`:
+
+```bash
+export NORTECH_API_TOKEN="<NORTECH_API_TOKEN>"
+```
+
+Alternatively you can create a `.env` file in the root directory of your project with the content:
+
+```bash
+NORTECH_API_TOKEN="<NORTECH_API_TOKEN>"
+```
+
+## Overview
+
+The `NortechAPI` class is your connection point to the Nortech API (documented at https://api.apps.nor.tech/docs). The package is organized into three main sections:
+
+### nortech.metadata
+
+Contains functionalities to access and manage your metadata, including:
+- Workspaces
+- Assets
+- Divisions
+- Units
+- Signals
+
+### nortech.datatools
+
+Provides tools for fetching signal data, with support for:
+- Pandas DataFrames
+- Polars DataFrames
+- Time window queries
+- Signal filtering
+
+### nortech.derivers
+
+Enables creation and management of derivers - which allow you to compute new signals based on existing ones. Features include:
+- Creating deriver schemas
+- Deploying derivers
+- Managing deriver configurations
+- Testing derivers locally
+
+
+### Examples
 
 To get a DataFrame with the requested signals:
 
@@ -39,7 +90,7 @@ To get a DataFrame with the requested signals:
 
 ##### Pandas DataFrame
 
-In order to get a [pandas](https://pandas.pydata.org/docs/) DataFrame use the `get_df`:
+In order to get a [pandas](https://pandas.pydata.org/docs/) DataFrame use the `get_df` handler:
 
 ```python
 from datetime import datetime
@@ -49,7 +100,7 @@ from nortech.datatools import get_df, TimeWindow
 search_json = """[
     {
         "name": "signal_1",
-        "dataType": "float",
+        "data_type": "float",
         "alias": 0,
         "asset": {
             "name": "asset_1"
@@ -67,7 +118,7 @@ search_json = """[
     },
     {
         "name": "signal_2",
-        "dataType": "float",
+        "data_type": "float",
         "alias": 1,
         "asset": {
             "name": "asset_1"
@@ -85,7 +136,7 @@ search_json = """[
     },
     {
         "name": "signal_3",
-        "dataType": "float",
+        "data_type": "float",
         "alias": 0,
         "asset": {
             "name": "asset_2"
@@ -128,7 +179,7 @@ from nortech.datatools import get_polars_df, TimeWindow
 search_json = """[
     {
         "name": "signal_1",
-        "dataType": "float",
+        "data_type": "float",
         "alias": 0,
         "asset": {
             "name": "asset_1"
@@ -146,7 +197,7 @@ search_json = """[
     },
     {
         "name": "signal_2",
-        "dataType": "float",
+        "data_type": "float",
         "alias": 1,
         "asset": {
             "name": "asset_1"
@@ -164,7 +215,7 @@ search_json = """[
     },
     {
         "name": "signal_3",
-        "dataType": "float",
+        "data_type": "float",
         "alias": 0,
         "asset": {
             "name": "asset_2"
@@ -208,7 +259,7 @@ from nortech.datatools import get_lazy_polars_df, TimeWindow
 search_json = """[
     {
         "name": "signal_1",
-        "dataType": "float",
+        "data_type": "float",
         "alias": 0,
         "asset": {
             "name": "asset_1"
@@ -226,7 +277,7 @@ search_json = """[
     },
     {
         "name": "signal_2",
-        "dataType": "float",
+        "data_type": "float",
         "alias": 1,
         "asset": {
             "name": "asset_1"
@@ -244,7 +295,7 @@ search_json = """[
     },
     {
         "name": "signal_3",
-        "dataType": "float",
+        "data_type": "float",
         "alias": 0,
         "asset": {
             "name": "asset_2"

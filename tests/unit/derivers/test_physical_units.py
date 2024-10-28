@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from nortech.derivers.services.physical_units import get_physical_quantity
 from nortech.derivers.values.physical_units import unit_registry
 from nortech.derivers.values.physical_units_schema import PhysicalQuantity
@@ -5,8 +7,6 @@ from nortech.derivers.values.physical_units_schema import PhysicalQuantity
 
 def test_get_quantity_from_input():
     def create_test_schema():
-        from typing import Optional
-
         import bytewax.operators as op
         from bytewax.dataflow import Stream
         from pydantic import BaseModel
@@ -29,15 +29,15 @@ def test_get_quantity_from_input():
         )
 
         class Input(DeriverInputSchema):
-            input_signal: Optional[float] = InputField(
+            input_signal: float | None = InputField(
                 description="Input signal description",
-                physicalQuantity=temperature,
+                physical_quantity=temperature,
             )
 
         class Output(DeriverOutputSchema):
-            output_signal: Optional[float] = OutputField(
+            output_signal: float | None = OutputField(
                 description="Output signal description",
-                physicalQuantity=temperature,
+                physical_quantity=temperature,
                 create_deriver_schema=create_test_schema,
             )
 
@@ -48,7 +48,7 @@ def test_get_quantity_from_input():
             stream: Stream[Input],
             config: Configurations,
         ) -> Stream[Output]:
-            output_stream = op.map(
+            return op.map(
                 step_id="map_output",
                 up=stream,
                 mapper=lambda input_message: Output(
@@ -56,8 +56,6 @@ def test_get_quantity_from_input():
                     output_signal=input_message.input_signal,
                 ),
             )
-
-            return output_stream
 
         return DeriverSchema(
             name="Test Schema",
@@ -74,7 +72,8 @@ def test_get_quantity_from_input():
 
     assert input_physical_quantity == PhysicalQuantity(
         name="Temperature",
-        description="Temperature is a physical quantity that quantitatively expresses the attribute of hotness or coldness.",
+        description="Temperature is a physical quantity that quantitatively "
+        "expresses the attribute of hotness or coldness.",
         SIUnit=str(unit_registry.kelvin),
         SIUnitSymbol=f"{unit_registry.kelvin:~}",
     )
@@ -83,7 +82,8 @@ def test_get_quantity_from_input():
 
     assert output_physical_quantity == PhysicalQuantity(
         name="Temperature",
-        description="Temperature is a physical quantity that quantitatively expresses the attribute of hotness or coldness.",
+        description="Temperature is a physical quantity that quantitatively "
+        "expresses the attribute of hotness or coldness.",
         SIUnit=str(unit_registry.kelvin),
         SIUnitSymbol=f"{unit_registry.kelvin:~}",
     )

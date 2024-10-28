@@ -1,11 +1,10 @@
+from __future__ import annotations
+
+from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from typing import (
     Any,
-    Dict,
-    Iterable,
-    List,
-    Optional,
     Protocol,
     Tuple,
     Type,
@@ -16,7 +15,7 @@ import bytewax.operators as op
 import pandas as pd
 from bytewax.dataflow import Stream, operator
 from bytewax.operators.windowing import EventClock, TumblingWindower, collect_window
-from pandas import DataFrame, DateOffset, DatetimeIndex
+from pandas import DataFrame
 from pydantic import BaseModel
 
 from nortech.derivers.values.schema import DeriverInputSchema, InputType
@@ -37,25 +36,24 @@ def unkey_all(step_id: str, up: op.KeyedStream[T]) -> Stream[T]:
 
 
 @operator
-def filter_None(
+def filter_none(
     step_id: str, up: Stream[InputType], filtered_type: Type[FilteredInputType]
 ) -> Stream[FilteredInputType]:
-    def filter_None_mapper(
+    def filter_none_mapper(
         item: InputType,
-    ) -> Optional[FilteredInputType]:
+    ) -> FilteredInputType | None:
         model_dict = item.model_dump()
 
         if not all(value is not None for value in model_dict.values()):
             return None
-        else:
-            return filtered_type(**model_dict)
+        return filtered_type(**model_dict)
 
-    return op.filter_map(step_id="filter", up=up, mapper=filter_None_mapper)
+    return op.filter_map(step_id="filter", up=up, mapper=filter_none_mapper)
 
 
 @operator
 def ffill(step_id: str, up: Stream[InputType]) -> Stream[InputType]:
-    def ffill_mapper(state: Optional[Dict[str, Any]], item: InputType):
+    def ffill_mapper(state: dict[str, Any] | None, item: InputType):
         if state is None:
             state = {}
 
@@ -91,30 +89,6 @@ class Resampler:
 
 def smart_resample(df: DataFrame, frequency: timedelta, resampler: Resampler) -> DataFrame:
     return resampler.downsample_function(df, frequency)
-    assert isinstance(df.index, DatetimeIndex)
-
-    if len(df.index) < 3:
-        return resampler.downsample_function(df, frequency)
-
-    # Determine the original frequency
-    original_freq = pd.infer_freq(df.index)
-
-    # Convert original and target frequencies to periods
-    original_offset = pd.tseries.frequencies.to_offset(original_freq)
-    assert isinstance(original_offset, DateOffset)
-    original_period = original_offset.nanos
-
-    target_offset = pd.tseries.frequencies.to_offset(frequency)
-    assert isinstance(target_offset, DateOffset)
-    target_period = target_offset.nanos
-
-    # Downsample if target period is greater than original period, else upsample
-    if target_period > original_period:
-        # Downsampling
-        return resampler.downsample_function(df=df, frequency=frequency)
-    else:
-        # Upsampling
-        return resampler.upsample_function(df=df, frequency=frequency)
 
 
 @operator
@@ -171,7 +145,7 @@ def resample(step_id: str, up: Stream[InputType], frequency: timedelta, resample
         item: Tuple[Any, pd.DataFrame],
     ) -> Iterable[InputType]:
         df_with_index_as_column = item[1].reset_index()
-        df_with_index_as_column = df_with_index_as_column.where(pd.notnull(df_with_index_as_column), None)
+        df_with_index_as_column = df_with_index_as_column.where(pd.notna(df_with_index_as_column), None)
         return map(
             lambda model_dict: item[0](**model_dict),
             df_with_index_as_column.to_dict("records"),
@@ -187,8 +161,8 @@ def resample(step_id: str, up: Stream[InputType], frequency: timedelta, resample
 
 
 @operator
-def list_to_dataframe(step_id: str, up: Stream[List[BaseModel]]) -> Stream[DataFrame]:
-    def list_to_df_mapper(items: List[BaseModel]) -> DataFrame:
-        return pd.DataFrame.from_records((item.model_dump() for item in items)).set_index("timestamp")
+def list_to_dataframe(step_id: str, up: Stream[list[BaseModel]]) -> Stream[DataFrame]:
+    def list_to_df_mapper(items: list[BaseModel]) -> DataFrame:
+        return pd.DataFrame.from_records(item.model_dump() for item in items).set_index("timestamp")
 
     return op.map(step_id="list_to_dataframe", up=up, mapper=list_to_df_mapper)

@@ -169,6 +169,15 @@ wheels = [
 ]
 
 [[package]]
+name = "eval-type-backport"
+version = "0.2.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/23/ca/1601a9fa588867fe2ab6c19ed4c936929160d08a86597adf61bbd443fe57/eval_type_backport-0.2.0.tar.gz", hash = "sha256:68796cfbc7371ebf923f03bdf7bef415f3ec098aeced24e054b253a0e78f7b37", size = 8977 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ac/ac/aa3d8e0acbcd71140420bc752d7c9779cf3a2a3bb1d7ef30944e38b2cd39/eval_type_backport-0.2.0-py3-none-any.whl", hash = "sha256:ac2f73d30d40c5a30a80b8739a789d6bb5e49fdffa66d7912667e2015d9c9933", size = 5855 },
+]
+
+[[package]]
 name = "exceptiongroup"
 version = "1.2.2"
 source = { registry = "https://pypi.org/simple" }
@@ -323,6 +332,7 @@ version = "0.8.0"
 source = { editable = "." }
 dependencies = [
     { name = "bytewax" },
+    { name = "eval-type-backport" },
     { name = "ipython" },
     { name = "mypy" },
     { name = "pandas" },
@@ -332,6 +342,7 @@ dependencies = [
     { name = "pyarrow-stubs" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
+    { name = "python-dotenv" },
     { name = "requests" },
     { name = "types-urllib3" },
     { name = "tzlocal" },
@@ -350,6 +361,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "bytewax", specifier = ">=0.21.0" },
+    { name = "eval-type-backport", specifier = ">=0.2.0" },
     { name = "ipython", specifier = ">=8.18.1" },
     { name = "mypy", specifier = ">=1.11.2" },
     { name = "pandas", specifier = ">=2.2.2" },
@@ -359,6 +371,7 @@ requires-dist = [
     { name = "pyarrow-stubs", specifier = ">=17.5" },
     { name = "pydantic", specifier = ">=2.9.1" },
     { name = "pydantic-settings", specifier = ">=2.5.2" },
+    { name = "python-dotenv", specifier = ">=1.0.1" },
     { name = "requests", specifier = ">=2.32.3" },
     { name = "types-urllib3", specifier = ">=1.26.25.14" },
     { name = "tzlocal", specifier = ">=5.2" },

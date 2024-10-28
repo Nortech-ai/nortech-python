@@ -32,7 +32,7 @@ jobs:
       - name: Run linting
         run: |
           uvx ruff format --check
-          uvx ruff check --fix
+          uvx ruff check
 
       - name: Run tests
         run: |

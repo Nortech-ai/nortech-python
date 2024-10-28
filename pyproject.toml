@@ -1,6 +1,6 @@
 [project]
 name = "nortech"
-version = "0.8.0"
+version = "0.9.0"
 description = "The official Python library for Nortech AI"
 authors = [
     { name = "Nortech AI", email = "info@nortech.ai" }
@@ -11,20 +11,20 @@ repository = "https://github.com/Nortech-ai/nortech-python"
 readme = "README.md"
 requires-python = ">=3.9"
 dependencies = [
-    "pydantic>=2.9.1",
-    "pydantic-settings>=2.5.2",
-    "pandas>=2.2.2",
-    "polars>=1.7.1",
     "bytewax>=0.21.0",
-    "pint>=0.24.3",
+    "eval-type-backport>=0.2.0",
     "ipython>=8.18.1",
     "mypy>=1.11.2",
-    "tzlocal>=5.2",
+    "pandas>=2.2.2",
+    "pint>=0.24.3",
+    "polars>=1.7.1",
     "pyarrow>=17.0.0",
-    "urllib3<2.0",
+    "pydantic>=2.9.1",
+    "pydantic-settings>=2.5.2",
+    "python-dotenv>=1.0.1",
     "requests>=2.32.3",
-    "types-urllib3>=1.26.25.14",
-    "pyarrow-stubs>=17.5",
+    "tzlocal>=5.2",
+    "urllib3<2.0",
 ]
 
 [build-system]
@@ -36,12 +36,36 @@ packages = ["nortech"]
 
 [tool.uv]
 dev-dependencies = [
-    "pytest>=8.3.3",
-    "types-python-dateutil>=2.9.0.20240906",
     "pandas-stubs>=2.2.2.240807",
+    "pyarrow-stubs>=17.5",
+    "pytest>=8.3.3",
     "requests-mock>=1.12.1",
+    "types-python-dateutil>=2.9.0.20240906",
     "types-requests>=2.31.0.6",
+    "types-urllib3>=1.26.25.14",
 ]
 
 [tool.ruff]
 line-length = 120
+fix = true
+
+[tool.ruff.lint]
+select = [
+    "A",  # Flake8 builtin codes
+    "B",  # Bugbear codes
+    "E",  # Pyflakes error codes
+    "F",  # Pyflakes warning codes
+    "FA", # Pyflakes future annotations codes
+    "I",  # Isort codes
+    "N",  # Naming conventions
+    "PD", # Pandas Vet
+    "Q",  # Flake8-Quotes
+    "S",  # Security issues
+    "W",  # PEP 8 warning codes
+]
+
+ignore = [
+    "E501",   # Line too long
+    "PD901",  # Using the generic variable name `df` for DataFrames
+    "S101"    # Use of `assert` detected
+]
