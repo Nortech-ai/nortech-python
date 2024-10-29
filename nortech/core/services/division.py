@@ -2,14 +2,14 @@ from __future__ import annotations
 
 from typing import Literal
 
-from nortech.common.gateways.nortech_api import (
+from nortech.core.gateways.nortech_api import (
     NortechAPI,
     PaginatedResponse,
     PaginationOptions,
     validate_response,
 )
-from nortech.metadata.values.asset import AssetInput, AssetInputDict, parse_asset_input
-from nortech.metadata.values.division import (
+from nortech.core.values.asset import AssetInput, AssetInputDict, AssetOutput, parse_asset_input
+from nortech.core.values.division import (
     DivisionInput,
     DivisionInputDict,
     DivisionListOutput,
@@ -20,7 +20,7 @@ from nortech.metadata.values.division import (
 
 def list_workspace_asset_divisions(
     nortech_api: NortechAPI,
-    asset: AssetInputDict | AssetInput,
+    asset: AssetInputDict | AssetInput | AssetOutput,
     pagination_options: PaginationOptions[Literal["id", "name", "description"]] | None = None,
 ):
     asset_input = parse_asset_input(asset)
@@ -47,7 +47,7 @@ def list_workspace_asset_divisions(
     return resp
 
 
-def get_workspace_asset_division(nortech_api: NortechAPI, division: DivisionInputDict | DivisionInput):
+def get_workspace_asset_division(nortech_api: NortechAPI, division: DivisionInputDict | DivisionInput | DivisionOutput):
     division_input = parse_division_input(division)
     response = nortech_api.get(
         url=f"/api/v1/workspaces/{division_input.workspace}/assets/{division_input.asset}/divisions/{division_input.division}",

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from nortech.metadata.values.asset import AssetInput, AssetInputDict
+from nortech.core.values.asset import AssetInput, AssetInputDict
 
 from .common import MetadataOutput, MetadataTimestamps
 

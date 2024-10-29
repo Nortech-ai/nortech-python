@@ -1,6 +1,6 @@
 import pytest
 
-from nortech.common.gateways.nortech_api import (
+from nortech.core.gateways.nortech_api import (
     NortechAPI,
     NortechAPISettings,
 )
@@ -8,7 +8,7 @@ from nortech.common.gateways.nortech_api import (
 
 @pytest.fixture(scope="session", name="nortech_api_settings")
 def nortech_api_settings_fixture() -> NortechAPISettings:
-    return NortechAPISettings(URL="http://mock-customer-api.com", TOKEN="test_token")  # noqa: S106
+    return NortechAPISettings(URL="http://mock-customer-api.com", KEY="test_token")  # noqa: S106
 
 
 @pytest.fixture(scope="session", name="nortech_api")

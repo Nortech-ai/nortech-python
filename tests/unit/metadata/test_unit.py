@@ -1,7 +1,7 @@
 from requests_mock import Mocker
 
-from nortech.common.gateways.nortech_api import NortechAPI, PaginatedResponse
-from nortech.metadata.services.unit import (
+from nortech.core.gateways.nortech_api import NortechAPI, PaginatedResponse
+from nortech.core.services.unit import (
     get_unit,
     get_workspace_asset_division_unit,
     list_asset_units,
@@ -9,8 +9,8 @@ from nortech.metadata.services.unit import (
     list_workspace_asset_division_units,
     list_workspace_units,
 )
-from nortech.metadata.values.division import DivisionInput
-from nortech.metadata.values.unit import UnitInput, UnitListOutput, UnitOutput
+from nortech.core.values.division import DivisionInput
+from nortech.core.values.unit import UnitInput, UnitListOutput, UnitOutput
 
 
 def test_list_workspace_asset_division_units_from_input(

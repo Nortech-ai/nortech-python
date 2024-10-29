@@ -6,10 +6,10 @@ import pandas as pd
 import pandas.testing as pdt
 from requests_mock import Mocker
 
-from nortech.common.gateways.nortech_api import NortechAPI
+from nortech.core.gateways.nortech_api import NortechAPI
+from nortech.core.values.signal import SignalInput, SignalInputDict, SignalOutput
 from nortech.datatools.handlers.pandas import get_df
 from nortech.datatools.values.windowing import TimeWindow
-from nortech.metadata.values.signal import SignalInput, SignalInputDict, SignalOutput
 
 
 def test_get_df_hot(

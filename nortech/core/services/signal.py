@@ -2,20 +2,20 @@ from __future__ import annotations
 
 from typing import Literal
 
-from nortech.common.gateways.nortech_api import (
+from nortech.core.gateways.nortech_api import (
     NortechAPI,
     PaginatedResponse,
     PaginationOptions,
     validate_response,
 )
-from nortech.metadata.services.device import (
+from nortech.core.services.device import (
     DeviceInput,
     DeviceInputDict,
     DeviceOutput,
     parse_device_input,
 )
-from nortech.metadata.services.unit import UnitInput, UnitInputDict, UnitOutput, parse_unit_input
-from nortech.metadata.values.signal import (
+from nortech.core.services.unit import UnitInput, UnitInputDict, UnitOutput, parse_unit_input
+from nortech.core.values.signal import (
     SignalDeviceInput,
     SignalDeviceInputDict,
     SignalInput,

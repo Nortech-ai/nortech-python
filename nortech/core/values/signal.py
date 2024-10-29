@@ -5,8 +5,8 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from nortech.metadata.values.device import DeviceInput, DeviceInputDict
-from nortech.metadata.values.unit import UnitInput, UnitInputDict
+from nortech.core.values.device import DeviceInput, DeviceInputDict
+from nortech.core.values.unit import UnitInput, UnitInputDict
 
 from .common import MetadataOutput, MetadataTimestamps
 

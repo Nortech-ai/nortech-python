@@ -1,8 +1,8 @@
 from requests_mock import Mocker
 
-from nortech.common.gateways.nortech_api import NortechAPI, PaginatedResponse, PaginationOptions
-from nortech.metadata.services.workspace import get_workspace, list_workspaces
-from nortech.metadata.values.workspace import WorkspaceInput, WorkspaceListOutput, WorkspaceOutput
+from nortech.core.gateways.nortech_api import NortechAPI, PaginatedResponse, PaginationOptions
+from nortech.core.services.workspace import get_workspace, list_workspaces
+from nortech.core.values.workspace import WorkspaceInput, WorkspaceListOutput, WorkspaceOutput
 
 
 def test_list_workspaces(

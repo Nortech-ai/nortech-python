@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pydantic import BaseModel
 
-from nortech.metadata.values.division import (
+from nortech.core.values.division import (
     DivisionInput,
     DivisionInputDict,
 )

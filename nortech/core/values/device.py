@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from nortech.metadata.values.division import (
+from nortech.core.values.division import (
     DivisionInput,
     DivisionInputDict,
 )

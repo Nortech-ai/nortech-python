@@ -2,29 +2,30 @@ from __future__ import annotations
 
 from typing import Literal
 
-from nortech.common.gateways.nortech_api import (
+from nortech.core.gateways.nortech_api import (
     NortechAPI,
     PaginatedResponse,
     PaginationOptions,
     validate_response,
 )
-from nortech.metadata.values.asset import (
+from nortech.core.values.asset import (
     AssetInput,
     AssetInputDict,
     AssetListOutput,
     AssetOutput,
     parse_asset_input,
 )
-from nortech.metadata.values.workspace import (
+from nortech.core.values.workspace import (
     WorkspaceInput,
     WorkspaceInputDict,
+    WorkspaceOutput,
     parse_workspace_input,
 )
 
 
 def list_workspace_assets(
     nortech_api: NortechAPI,
-    workspace: WorkspaceInputDict | WorkspaceInput | int | str,
+    workspace: WorkspaceInputDict | WorkspaceInput | WorkspaceOutput | int | str,
     pagination_options: PaginationOptions[Literal["id", "name", "description"]] | None = None,
 ):
     workspace_input = parse_workspace_input(workspace)
@@ -51,7 +52,7 @@ def list_workspace_assets(
     return resp
 
 
-def get_workspace_asset(nortech_api: NortechAPI, asset: AssetInputDict | AssetInput):
+def get_workspace_asset(nortech_api: NortechAPI, asset: AssetInputDict | AssetInput | AssetOutput):
     asset_input = parse_asset_input(asset)
     response = nortech_api.get(
         url=f"/api/v1/workspaces/{asset_input.workspace}/assets/{asset_input.asset}",

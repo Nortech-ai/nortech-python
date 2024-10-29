@@ -2,8 +2,8 @@ from datetime import datetime
 
 import pytest
 
-from nortech.metadata.values.common import MetadataOutput
-from nortech.metadata.values.signal import (
+from nortech.core.values.common import MetadataOutput
+from nortech.core.values.signal import (
     SignalInput,
     SignalInputDict,
     SignalOutput,

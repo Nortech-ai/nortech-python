@@ -1,9 +1,9 @@
 from requests_mock import Mocker
 
-from nortech.common.gateways.nortech_api import NortechAPI, PaginatedResponse
-from nortech.metadata.services.asset import get_asset, get_workspace_asset, list_workspace_assets
-from nortech.metadata.values.asset import AssetInput, AssetListOutput, AssetOutput
-from nortech.metadata.values.workspace import WorkspaceInput
+from nortech.core.gateways.nortech_api import NortechAPI, PaginatedResponse
+from nortech.core.services.asset import get_asset, get_workspace_asset, list_workspace_assets
+from nortech.core.values.asset import AssetInput, AssetListOutput, AssetOutput
+from nortech.core.values.workspace import WorkspaceInput
 
 
 def test_list_workspace_assets_from_id(

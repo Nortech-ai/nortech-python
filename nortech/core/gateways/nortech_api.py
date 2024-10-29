@@ -14,7 +14,8 @@ class NortechAPISettings(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="NORTECH_API_", env_file=(".env", ".env.prod"))
 
     URL: str = Field(default="https://api.apps.nor.tech")
-    TOKEN: str = Field(default=...)
+    KEY: str = Field(default=...)
+    USER_AGENT: str = Field(default="nortech-python/0.0.9")
     IGNORE_PAGINATION: bool = True
 
 
@@ -34,7 +35,7 @@ class NortechAPI(Session):
                 )
             ),
         )
-        self.headers = {"Authorization": f"Bearer {self.settings.TOKEN}"}
+        self.headers = {"Authorization": f"Bearer {self.settings.KEY}", "User-Agent": self.settings.USER_AGENT}
         self.ignore_pagination = self.settings.IGNORE_PAGINATION
 
     def request(

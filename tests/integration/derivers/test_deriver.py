@@ -6,7 +6,7 @@ import pandas as pd
 from pytest import raises
 from requests_mock import Mocker
 
-from nortech.common.gateways.nortech_api import NortechAPI
+from nortech.core.gateways.nortech_api import NortechAPI
 from nortech.derivers.handlers.deriver import deploy_deriver, run_deriver_locally
 from nortech.derivers.values.instance import Deriver, DeriverInput, DeriverOutput
 from nortech.derivers.values.physical_units import celsius

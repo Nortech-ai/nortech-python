@@ -2,32 +2,32 @@ from datetime import datetime
 
 import pytest
 
-from nortech.common.gateways.nortech_api import (
+from nortech.core.gateways.nortech_api import (
     NextRef,
     PaginatedResponse,
 )
-from nortech.metadata.values.asset import AssetInput, AssetInputDict, AssetListOutput, AssetOutput
-from nortech.metadata.values.common import MetadataOutput
-from nortech.metadata.values.device import (
+from nortech.core.values.asset import AssetInput, AssetInputDict, AssetListOutput, AssetOutput
+from nortech.core.values.common import MetadataOutput
+from nortech.core.values.device import (
     DeviceInput,
     DeviceInputDict,
     DeviceListOutput,
     DeviceOutput,
 )
-from nortech.metadata.values.division import (
+from nortech.core.values.division import (
     DivisionInput,
     DivisionInputDict,
     DivisionListOutput,
     DivisionOutput,
 )
-from nortech.metadata.values.signal import (
+from nortech.core.values.signal import (
     SignalInput,
     SignalInputDict,
     SignalListOutput,
     SignalOutput,
 )
-from nortech.metadata.values.unit import UnitInput, UnitInputDict, UnitListOutput, UnitOutput
-from nortech.metadata.values.workspace import (
+from nortech.core.values.unit import UnitInput, UnitInputDict, UnitListOutput, UnitOutput
+from nortech.core.values.workspace import (
     WorkspaceInput,
     WorkspaceInputDict,
     WorkspaceListOutput,

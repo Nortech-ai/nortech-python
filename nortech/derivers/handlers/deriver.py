@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from datetime import datetime
 from typing import Callable
 
 import bytewax.operators as op
@@ -9,10 +8,9 @@ from bytewax.testing import TestingSink, TestingSource, run_main
 from IPython.display import Markdown, display
 from pandas import DataFrame, DatetimeIndex, isna
 from pint import Quantity
-from pydantic import BaseModel, field_validator
 from urllib3.util import Timeout
 
-from nortech.common.gateways.nortech_api import NortechAPI
+from nortech.core.gateways.nortech_api import NortechAPI
 from nortech.derivers.services.nortech_api import create_deriver
 from nortech.derivers.services.schema import (
     get_deriver_schema_dag,
@@ -32,19 +30,6 @@ from nortech.derivers.values.schema import (
     InputType,
     OutputType,
 )
-
-
-class TimeWindow(BaseModel):
-    start: datetime
-    end: datetime
-
-    @field_validator("end")
-    @classmethod
-    def check_start_end(cls, end, values):
-        start = values.get("start")
-        if start and start > end:
-            raise ValueError("start must be less than or equal to end")
-        return end
 
 
 def deploy_deriver(

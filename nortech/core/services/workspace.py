@@ -2,13 +2,13 @@ from __future__ import annotations
 
 from typing import Literal
 
-from nortech.common.gateways.nortech_api import (
+from nortech.core.gateways.nortech_api import (
     NortechAPI,
     PaginatedResponse,
     PaginationOptions,
     validate_response,
 )
-from nortech.metadata.values.workspace import (
+from nortech.core.values.workspace import (
     WorkspaceInput,
     WorkspaceInputDict,
     WorkspaceListOutput,
@@ -20,7 +20,7 @@ from nortech.metadata.values.workspace import (
 def list_workspaces(
     nortech_api: NortechAPI,
     pagination_options: PaginationOptions[Literal["id", "name", "description"]] | None = None,
-):
+) -> PaginatedResponse[WorkspaceListOutput]:
     response = nortech_api.get(
         url="/api/v1/workspaces",
         params=pagination_options.model_dump(exclude_none=True, by_alias=True) if pagination_options else None,
@@ -46,7 +46,7 @@ def list_workspaces(
 def get_workspace(
     nortech_api: NortechAPI,
     workspace: WorkspaceInputDict | WorkspaceInput | WorkspaceOutput | int | str,
-):
+) -> WorkspaceOutput | None:
     workspace_input = parse_workspace_input(workspace)
     response = nortech_api.get(url=f"/api/v1/workspaces/{workspace_input}")
     validate_response(response, [200, 404])

@@ -1,7 +1,7 @@
 from requests_mock import Mocker
 
-from nortech.common.gateways.nortech_api import NortechAPI, PaginatedResponse
-from nortech.metadata.services.signal import (
+from nortech.core.gateways.nortech_api import NortechAPI, PaginatedResponse
+from nortech.core.services.signal import (
     get_signal,
     get_signals,
     get_workspace_asset_division_device_signal,
@@ -15,15 +15,15 @@ from nortech.metadata.services.signal import (
     list_workspace_signals,
     parse_signal_input_or_output_or_id_union_to_signal_input,
 )
-from nortech.metadata.values.device import DeviceInput
-from nortech.metadata.values.signal import (
+from nortech.core.values.device import DeviceInput
+from nortech.core.values.signal import (
     SignalDeviceInput,
     SignalInput,
     SignalInputDict,
     SignalListOutput,
     SignalOutput,
 )
-from nortech.metadata.values.unit import UnitInput
+from nortech.core.values.unit import UnitInput
 
 
 def test_list_workspace_asset_division_unit_signals_from_input(

@@ -15,9 +15,9 @@ from polars import (
 from requests import get
 from urllib3.util import Timeout
 
-from nortech.common.gateways.nortech_api import NortechAPI, validate_response
+from nortech.core.gateways.nortech_api import NortechAPI, validate_response
+from nortech.core.values.signal import SignalInput
 from nortech.datatools.values.windowing import TimeWindow
-from nortech.metadata.values.signal import SignalInput
 
 
 def serialize_hot_storage_time_window(time_window: TimeWindow):
