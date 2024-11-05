@@ -24,6 +24,7 @@
       pkgs.mkShell {
         buildInputs = [
           pkgs.uv
+          pkgs.watchexec
           pkgs.git
         ] ++ darwinPackages;
 

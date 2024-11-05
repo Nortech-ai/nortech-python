@@ -1,8 +1,6 @@
 from __future__ import annotations
 
-from nortech.derivers.services.physical_units import get_physical_quantity
-from nortech.derivers.values.physical_units import unit_registry
-from nortech.derivers.values.physical_units_schema import PhysicalQuantity
+from nortech.derivers import get_physical_quantity, physical_units
 
 
 def test_get_quantity_from_input():
@@ -11,21 +9,20 @@ def test_get_quantity_from_input():
         from bytewax.dataflow import Stream
         from pydantic import BaseModel
 
-        from nortech.derivers.values.physical_units import unit_registry
-        from nortech.derivers.values.physical_units_schema import PhysicalQuantity
-        from nortech.derivers.values.schema import (
+        from nortech.derivers import (
             DeriverInputSchema,
             DeriverOutputSchema,
             DeriverSchema,
             InputField,
             OutputField,
+            physical_units,
         )
 
-        temperature = PhysicalQuantity(
+        temperature = physical_units.PhysicalQuantity(
             name="Temperature",
             description="Temperature is a physical quantity that quantitatively expresses the attribute of hotness or coldness.",
-            SIUnit=str(unit_registry.kelvin),
-            SIUnitSymbol=f"{unit_registry.kelvin:~}",
+            SIUnit=str(physical_units.unit_registry.kelvin),
+            SIUnitSymbol=f"{physical_units.unit_registry.kelvin:~}",
         )
 
         class Input(DeriverInputSchema):
@@ -70,20 +67,20 @@ def test_get_quantity_from_input():
 
     input_physical_quantity = get_physical_quantity(deriver_io=deriver_schema.inputs.input_signal)
 
-    assert input_physical_quantity == PhysicalQuantity(
+    assert input_physical_quantity == physical_units.PhysicalQuantity(
         name="Temperature",
         description="Temperature is a physical quantity that quantitatively "
         "expresses the attribute of hotness or coldness.",
-        SIUnit=str(unit_registry.kelvin),
-        SIUnitSymbol=f"{unit_registry.kelvin:~}",
+        SIUnit=str(physical_units.unit_registry.kelvin),
+        SIUnitSymbol=f"{physical_units.unit_registry.kelvin:~}",
     )
 
     output_physical_quantity = get_physical_quantity(deriver_io=deriver_schema.outputs.output_signal)
 
-    assert output_physical_quantity == PhysicalQuantity(
+    assert output_physical_quantity == physical_units.PhysicalQuantity(
         name="Temperature",
         description="Temperature is a physical quantity that quantitatively "
         "expresses the attribute of hotness or coldness.",
-        SIUnit=str(unit_registry.kelvin),
-        SIUnitSymbol=f"{unit_registry.kelvin:~}",
+        SIUnit=str(physical_units.unit_registry.kelvin),
+        SIUnitSymbol=f"{physical_units.unit_registry.kelvin:~}",
     )

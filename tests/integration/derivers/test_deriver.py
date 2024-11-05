@@ -6,10 +6,8 @@ import pandas as pd
 from pytest import raises
 from requests_mock import Mocker
 
-from nortech.core.gateways.nortech_api import NortechAPI
-from nortech.derivers.handlers.deriver import deploy_deriver, run_deriver_locally
-from nortech.derivers.values.instance import Deriver, DeriverInput, DeriverOutput
-from nortech.derivers.values.physical_units import celsius
+from nortech import Nortech
+from nortech.derivers import Deriver, DeriverInput, DeriverOutput, physical_units, run_deriver_locally
 
 
 def create_test_schema():
@@ -17,25 +15,25 @@ def create_test_schema():
     from bytewax.dataflow import Stream
     from pydantic import BaseModel
 
-    from nortech.derivers.values.physical_units import temperature
-    from nortech.derivers.values.schema import (
+    from nortech.derivers import (
         DeriverInputSchema,
         DeriverOutputSchema,
         DeriverSchema,
         InputField,
         OutputField,
+        physical_units,
     )
 
     class Input(DeriverInputSchema):
         input_signal: float | None = InputField(
             description="Input signal description",
-            physical_quantity=temperature,
+            physical_quantity=physical_units.temperature,
         )
 
     class Output(DeriverOutputSchema):
         output_signal: float | None = OutputField(
             description="Output signal description",
-            physical_quantity=temperature,
+            physical_quantity=physical_units.temperature,
             create_deriver_schema=create_test_schema,
         )
 
@@ -76,7 +74,7 @@ inputs = {
         division="Division",
         unit="Unit",
         signal="Signal",
-        physicalUnit=celsius,
+        physicalUnit=physical_units.celsius,
     )
 }
 
@@ -87,7 +85,7 @@ outputs = {
         division="Division",
         unit="Unit",
         signal="Signal",
-        physicalUnit=celsius,
+        physicalUnit=physical_units.celsius,
     )
 }
 
@@ -105,7 +103,7 @@ deriver = Deriver(
 
 
 def test_deriver_schema_fail():
-    from nortech.derivers.values.physical_units import temperature
+    from nortech.derivers import physical_units
 
     def create_test_schema_with_missing_import():
         import bytewax.operators as op
@@ -123,13 +121,13 @@ def test_deriver_schema_fail():
         class Input(DeriverInputSchema):
             input_signal: float | None = InputField(
                 description="Input signal description",
-                physical_quantity=temperature,
+                physical_quantity=physical_units.temperature,
             )
 
         class Output(DeriverOutputSchema):
             output_signal: float | None = OutputField(
                 description="Output signal description",
-                physical_quantity=temperature,
+                physical_quantity=physical_units.temperature,
                 create_deriver_schema=create_test_schema,
             )
 
@@ -169,7 +167,7 @@ def test_deriver_schema_fail():
             division="Division",
             unit="Unit",
             signal="Signal",
-            physicalUnit=celsius,
+            physicalUnit=physical_units.celsius,
         )
     }
 
@@ -180,7 +178,7 @@ def test_deriver_schema_fail():
             division="Division",
             unit="Unit",
             signal="Signal",
-            physicalUnit=celsius,
+            physicalUnit=physical_units.celsius,
         )
     }
 
@@ -198,19 +196,18 @@ def test_deriver_schema_fail():
         )
 
 
-def test_deriver_deploy(nortech_api: NortechAPI, requests_mock: Mocker):
+def test_deriver_deploy(nortech: Nortech, requests_mock: Mocker):
     mock_response_data = {
         "status": "success",
         "data": {"message": "Deriver deployed successfully"},
     }
 
     requests_mock.post(
-        url=nortech_api.settings.URL + "/api/v1/derivers",
+        url=nortech.settings.URL + "/api/v1/derivers",
         json=mock_response_data,
     )
 
-    deriver_diff = deploy_deriver(
-        nortech_api=nortech_api,
+    deriver_diff = nortech.derivers.deploy_deriver(
         deriver=deriver,
         dry_run=True,
     )

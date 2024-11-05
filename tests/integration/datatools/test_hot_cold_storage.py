@@ -6,14 +6,13 @@ import pandas as pd
 import pandas.testing as pdt
 from requests_mock import Mocker
 
-from nortech.core.gateways.nortech_api import NortechAPI
-from nortech.core.values.signal import SignalInput, SignalInputDict, SignalOutput
-from nortech.datatools.handlers.pandas import get_df
-from nortech.datatools.values.windowing import TimeWindow
+from nortech import Nortech
+from nortech.core import SignalInput, SignalInputDict, SignalOutput
+from nortech.datatools import TimeWindow
 
 
 def test_get_df_hot(
-    nortech_api: NortechAPI,
+    nortech: Nortech,
     data_signal_input: SignalInput,
     data_signal_input_dict: SignalInputDict,
     data_signal_output: SignalOutput,
@@ -22,7 +21,7 @@ def test_get_df_hot(
     requests_mock: Mocker,
 ):
     requests_mock.post(
-        f"{nortech_api.settings.URL}/api/v1/signals",
+        f"{nortech.settings.URL}/api/v1/signals",
         text=f"[{data_signal_output_id_1.model_dump_json(by_alias=True)}]",
     )
 
@@ -54,7 +53,7 @@ def test_get_df_hot(
     csv_content.seek(0)
 
     requests_mock.post(
-        nortech_api.settings.URL + "/timescale",
+        nortech.settings.URL + "/timescale",
         content=csv_content.getvalue(),
     )
 
@@ -62,8 +61,7 @@ def test_get_df_hot(
     data_signal_input_dict["signal"] = "test_signal_2"
     data_signal_output = data_signal_output.model_copy(update={"name": "test_signal_3"})
 
-    df = get_df(
-        nortech_api=nortech_api,
+    df = nortech.datatools.pandas.get_df(
         signals=[data_signal_input, data_signal_input_dict, data_signal_output, 1],
         time_window=time_window,
     )
@@ -85,7 +83,7 @@ def test_get_df_hot(
 
 
 def test_get_df_hot_empty(
-    nortech_api: NortechAPI,
+    nortech: Nortech,
     data_signal_input: SignalInput,
     data_signal_input_dict: SignalInputDict,
     data_signal_output: SignalOutput,
@@ -94,7 +92,7 @@ def test_get_df_hot_empty(
     requests_mock: Mocker,
 ):
     requests_mock.post(
-        f"{nortech_api.settings.URL}/api/v1/signals",
+        f"{nortech.settings.URL}/api/v1/signals",
         text=f"[{data_signal_output_id_1.model_dump_json(by_alias=True)}]",
     )
 
@@ -105,12 +103,11 @@ def test_get_df_hot_empty(
     )
 
     requests_mock.post(
-        nortech_api.settings.URL + "/timescale",
+        nortech.settings.URL + "/timescale",
         status_code=404,
     )
 
-    df = get_df(
-        nortech_api=nortech_api,
+    df = nortech.datatools.pandas.get_df(
         signals=[data_signal_input, data_signal_input_dict, data_signal_output, 1],
         time_window=time_window,
     )
@@ -148,7 +145,7 @@ def test_get_df_hot_empty(
 
 
 def test_get_df_cold(
-    nortech_api: NortechAPI,
+    nortech: Nortech,
     data_signal_input: SignalInput,
     data_signal_input_dict: SignalInputDict,
     data_signal_output: SignalOutput,
@@ -157,7 +154,7 @@ def test_get_df_cold(
     requests_mock: Mocker,
 ):
     requests_mock.post(
-        f"{nortech_api.settings.URL}/api/v1/signals",
+        f"{nortech.settings.URL}/api/v1/signals",
         text=f"[{data_signal_output_id_1.model_dump_json(by_alias=True)}]",
     )
 
@@ -181,7 +178,7 @@ def test_get_df_cold(
     parquet_url = "http://parquet.file/"
 
     requests_mock.post(
-        nortech_api.settings.URL + "/api/v1/historical-data/sync",
+        nortech.settings.URL + "/api/v1/historical-data/sync",
         json={"outputFile": parquet_url},
     )
 
@@ -190,8 +187,7 @@ def test_get_df_cold(
         content=parquet_content.getvalue(),
     )
 
-    df = get_df(
-        nortech_api=nortech_api,
+    df = nortech.datatools.pandas.get_df(
         signals=[data_signal_input, data_signal_input_dict, data_signal_output, 1],
         time_window=time_window,
     )
@@ -221,7 +217,7 @@ def test_get_df_cold(
 
 
 def test_get_df_cold_empty(
-    nortech_api: NortechAPI,
+    nortech: Nortech,
     data_signal_input: SignalInput,
     data_signal_input_dict: SignalInputDict,
     data_signal_output: SignalOutput,
@@ -230,7 +226,7 @@ def test_get_df_cold_empty(
     requests_mock: Mocker,
 ):
     requests_mock.post(
-        f"{nortech_api.settings.URL}/api/v1/signals",
+        f"{nortech.settings.URL}/api/v1/signals",
         text=f"[{data_signal_output_id_1.model_dump_json(by_alias=True)}]",
     )
 
@@ -241,12 +237,11 @@ def test_get_df_cold_empty(
     )
 
     requests_mock.post(
-        nortech_api.settings.URL + "/api/v1/historical-data/sync",
+        nortech.settings.URL + "/api/v1/historical-data/sync",
         status_code=404,
     )
 
-    df = get_df(
-        nortech_api=nortech_api,
+    df = nortech.datatools.pandas.get_df(
         signals=[data_signal_input, data_signal_input_dict, data_signal_output, 1],
         time_window=time_window,
     )
@@ -284,7 +279,7 @@ def test_get_df_cold_empty(
 
 
 def test_get_df_hot_and_cold(
-    nortech_api: NortechAPI,
+    nortech: Nortech,
     data_signal_input: SignalInput,
     data_signal_input_dict: SignalInputDict,
     data_signal_output: SignalOutput,
@@ -293,7 +288,7 @@ def test_get_df_hot_and_cold(
     requests_mock: Mocker,
 ):
     requests_mock.post(
-        f"{nortech_api.settings.URL}/api/v1/signals",
+        f"{nortech.settings.URL}/api/v1/signals",
         text=f"[{data_signal_output_id_1.model_dump_json(by_alias=True)}]",
     )
 
@@ -332,7 +327,7 @@ def test_get_df_hot_and_cold(
     csv_content.seek(0)
 
     requests_mock.post(
-        nortech_api.settings.URL + "/timescale",
+        nortech.settings.URL + "/timescale",
         content=csv_content.getvalue(),
     )
 
@@ -343,7 +338,7 @@ def test_get_df_hot_and_cold(
     parquet_url = "http://parquet.file/"
 
     requests_mock.post(
-        nortech_api.settings.URL + "/api/v1/historical-data/sync",
+        nortech.settings.URL + "/api/v1/historical-data/sync",
         json={"outputFile": parquet_url},
     )
 
@@ -352,8 +347,7 @@ def test_get_df_hot_and_cold(
         content=parquet_content.getvalue(),
     )
 
-    df = get_df(
-        nortech_api=nortech_api,
+    df = nortech.datatools.pandas.get_df(
         signals=[data_signal_input, data_signal_input_dict, data_signal_output, 1],
         time_window=time_window,
     )
@@ -392,7 +386,7 @@ def test_get_df_hot_and_cold(
 
 
 def test_get_df_hot_and_cold_cold_empty(
-    nortech_api: NortechAPI,
+    nortech: Nortech,
     data_signal_input: SignalInput,
     data_signal_input_dict: SignalInputDict,
     data_signal_output: SignalOutput,
@@ -401,7 +395,7 @@ def test_get_df_hot_and_cold_cold_empty(
     requests_mock: Mocker,
 ):
     requests_mock.post(
-        f"{nortech_api.settings.URL}/api/v1/signals",
+        f"{nortech.settings.URL}/api/v1/signals",
         text=f"[{data_signal_output_id_1.model_dump_json(by_alias=True)}]",
     )
 
@@ -434,17 +428,16 @@ def test_get_df_hot_and_cold_cold_empty(
     csv_content.seek(0)
 
     requests_mock.post(
-        nortech_api.settings.URL + "/timescale",
+        nortech.settings.URL + "/timescale",
         content=csv_content.getvalue(),
     )
 
     requests_mock.post(
-        nortech_api.settings.URL + "/api/v1/historical-data/sync",
+        nortech.settings.URL + "/api/v1/historical-data/sync",
         status_code=404,
     )
 
-    df = get_df(
-        nortech_api=nortech_api,
+    df = nortech.datatools.pandas.get_df(
         signals=[data_signal_input, data_signal_input_dict, data_signal_output, 1],
         time_window=time_window,
     )
@@ -471,7 +464,7 @@ def test_get_df_hot_and_cold_cold_empty(
 
 
 def test_get_df_hot_and_cold_hot_empty(
-    nortech_api: NortechAPI,
+    nortech: Nortech,
     data_signal_input: SignalInput,
     data_signal_input_dict: SignalInputDict,
     data_signal_output: SignalOutput,
@@ -480,7 +473,7 @@ def test_get_df_hot_and_cold_hot_empty(
     requests_mock: Mocker,
 ):
     requests_mock.post(
-        f"{nortech_api.settings.URL}/api/v1/signals",
+        f"{nortech.settings.URL}/api/v1/signals",
         text=f"[{data_signal_output_id_1.model_dump_json(by_alias=True)}]",
     )
 
@@ -507,7 +500,7 @@ def test_get_df_hot_and_cold_hot_empty(
     parquet_url = "http://parquet.file/"
 
     requests_mock.post(
-        nortech_api.settings.URL + "/api/v1/historical-data/sync",
+        nortech.settings.URL + "/api/v1/historical-data/sync",
         json={"outputFile": parquet_url},
     )
 
@@ -517,12 +510,11 @@ def test_get_df_hot_and_cold_hot_empty(
     )
 
     requests_mock.post(
-        nortech_api.settings.URL + "/timescale",
+        nortech.settings.URL + "/timescale",
         status_code=404,
     )
 
-    df = get_df(
-        nortech_api=nortech_api,
+    df = nortech.datatools.pandas.get_df(
         signals=[data_signal_input, data_signal_input_dict, data_signal_output, 1],
         time_window=time_window,
     )
@@ -555,7 +547,7 @@ def test_get_df_hot_and_cold_hot_empty(
 
 
 def test_get_df_hot_and_cold_hot_and_cold_empty(
-    nortech_api: NortechAPI,
+    nortech: Nortech,
     data_signal_input: SignalInput,
     data_signal_input_dict: SignalInputDict,
     data_signal_output: SignalOutput,
@@ -564,7 +556,7 @@ def test_get_df_hot_and_cold_hot_and_cold_empty(
     requests_mock: Mocker,
 ):
     requests_mock.post(
-        f"{nortech_api.settings.URL}/api/v1/signals",
+        f"{nortech.settings.URL}/api/v1/signals",
         text=f"[{data_signal_output_id_1.model_dump_json(by_alias=True)}]",
     )
 
@@ -578,17 +570,16 @@ def test_get_df_hot_and_cold_hot_and_cold_empty(
     )
 
     requests_mock.post(
-        nortech_api.settings.URL + "/api/v1/historical-data/sync",
+        nortech.settings.URL + "/api/v1/historical-data/sync",
         status_code=404,
     )
 
     requests_mock.post(
-        nortech_api.settings.URL + "/timescale",
+        nortech.settings.URL + "/timescale",
         status_code=404,
     )
 
-    df = get_df(
-        nortech_api=nortech_api,
+    df = nortech.datatools.pandas.get_df(
         signals=[data_signal_input, data_signal_input_dict, data_signal_output, 1],
         time_window=time_window,
     )

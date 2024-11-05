@@ -1,65 +1,59 @@
 from requests_mock import Mocker
 
-from nortech.core.gateways.nortech_api import NortechAPI, PaginatedResponse
-from nortech.core.services.unit import (
-    get_unit,
-    get_workspace_asset_division_unit,
-    list_asset_units,
-    list_division_units,
-    list_workspace_asset_division_units,
-    list_workspace_units,
+from nortech import Nortech
+from nortech.core import (
+    DivisionInput,
+    PaginatedResponse,
+    UnitInput,
+    UnitListOutput,
+    UnitOutput,
 )
-from nortech.core.values.division import DivisionInput
-from nortech.core.values.unit import UnitInput, UnitListOutput, UnitOutput
 
 
 def test_list_workspace_asset_division_units_from_input(
-    nortech_api: NortechAPI,
+    nortech: Nortech,
     unit_list_output: UnitListOutput,
     paginated_unit_list_output: PaginatedResponse[UnitOutput],
     requests_mock: Mocker,
 ):
     requests_mock.get(
-        f"{nortech_api.settings.URL}/api/v1/workspaces/test_workspace/assets/test_asset/divisions/test_division/units",
+        f"{nortech.settings.URL}/api/v1/workspaces/test_workspace/assets/test_asset/divisions/test_division/units",
         text=paginated_unit_list_output.model_dump_json(by_alias=True),
     )
 
-    divisions = list_workspace_asset_division_units(
-        nortech_api,
+    divisions = nortech.metadata.unit.list(
         DivisionInput(workspace="test_workspace", asset="test_asset", division="test_division"),
     )
     assert divisions.data == [unit_list_output]
 
 
 def test_list_workspace_asset_division_units_from_input_dict(
-    nortech_api: NortechAPI,
+    nortech: Nortech,
     unit_list_output: UnitListOutput,
     paginated_unit_list_output: PaginatedResponse[UnitOutput],
     requests_mock: Mocker,
 ):
     requests_mock.get(
-        f"{nortech_api.settings.URL}/api/v1/workspaces/test_workspace/assets/test_asset/divisions/test_division/units",
+        f"{nortech.settings.URL}/api/v1/workspaces/test_workspace/assets/test_asset/divisions/test_division/units",
         text=paginated_unit_list_output.model_dump_json(by_alias=True),
     )
 
-    divisions = list_workspace_asset_division_units(
-        nortech_api,
+    divisions = nortech.metadata.unit.list(
         {"workspace": "test_workspace", "asset": "test_asset", "division": "test_division"},
     )
     assert divisions.data == [unit_list_output]
 
 
 def test_get_workspace_asset_division_unit_404(
-    nortech_api: NortechAPI,
+    nortech: Nortech,
     requests_mock: Mocker,
 ):
     requests_mock.get(
-        f"{nortech_api.settings.URL}/api/v1/workspaces/test_workspace/assets/test_asset/divisions/test_division/units/test_unit",
+        f"{nortech.settings.URL}/api/v1/workspaces/test_workspace/assets/test_asset/divisions/test_division/units/test_unit",
         status_code=404,
     )
 
-    division = get_workspace_asset_division_unit(
-        nortech_api,
+    division = nortech.metadata.unit.get(
         UnitInput(
             workspace="test_workspace",
             asset="test_asset",
@@ -71,17 +65,16 @@ def test_get_workspace_asset_division_unit_404(
 
 
 def test_get_workspace_asset_division_unit_with_input(
-    nortech_api: NortechAPI,
+    nortech: Nortech,
     unit_output: UnitOutput,
     requests_mock,
 ):
     requests_mock.get(
-        f"{nortech_api.settings.URL}/api/v1/workspaces/test_workspace/assets/test_asset/divisions/test_division/units/test_unit",
+        f"{nortech.settings.URL}/api/v1/workspaces/test_workspace/assets/test_asset/divisions/test_division/units/test_unit",
         text=unit_output.model_dump_json(by_alias=True),
     )
 
-    division = get_workspace_asset_division_unit(
-        nortech_api,
+    division = nortech.metadata.unit.get(
         UnitInput(
             workspace="test_workspace",
             asset="test_asset",
@@ -93,17 +86,16 @@ def test_get_workspace_asset_division_unit_with_input(
 
 
 def test_get_workspace_asset_division_unit_with_input_dict(
-    nortech_api: NortechAPI,
+    nortech: Nortech,
     unit_output: UnitOutput,
     requests_mock,
 ):
     requests_mock.get(
-        f"{nortech_api.settings.URL}/api/v1/workspaces/test_workspace/assets/test_asset/divisions/test_division/units/test_unit",
+        f"{nortech.settings.URL}/api/v1/workspaces/test_workspace/assets/test_asset/divisions/test_division/units/test_unit",
         text=unit_output.model_dump_json(by_alias=True),
     )
 
-    division = get_workspace_asset_division_unit(
-        nortech_api,
+    division = nortech.metadata.unit.get(
         {
             "workspace": "test_workspace",
             "asset": "test_asset",
@@ -115,68 +107,68 @@ def test_get_workspace_asset_division_unit_with_input_dict(
 
 
 def test_list_workspace_units(
-    nortech_api: NortechAPI,
+    nortech: Nortech,
     unit_list_output: UnitListOutput,
     paginated_unit_list_output: PaginatedResponse[UnitOutput],
     requests_mock: Mocker,
 ):
     requests_mock.get(
-        f"{nortech_api.settings.URL}/api/v1/workspaces/1/units",
+        f"{nortech.settings.URL}/api/v1/workspaces/1/units",
         text=paginated_unit_list_output.model_dump_json(by_alias=True),
     )
 
-    divisions = list_workspace_units(nortech_api, 1)
+    divisions = nortech.metadata.unit.list_by_workspace_id(1)
     assert divisions.data == [unit_list_output]
 
 
 def test_list_asset_units(
-    nortech_api: NortechAPI,
+    nortech: Nortech,
     unit_list_output: UnitListOutput,
     paginated_unit_list_output: PaginatedResponse[UnitOutput],
     requests_mock: Mocker,
 ):
     requests_mock.get(
-        f"{nortech_api.settings.URL}/api/v1/assets/1/units",
+        f"{nortech.settings.URL}/api/v1/assets/1/units",
         text=paginated_unit_list_output.model_dump_json(by_alias=True),
     )
 
-    divisions = list_asset_units(nortech_api, 1)
+    divisions = nortech.metadata.unit.list_by_asset_id(1)
     assert divisions.data == [unit_list_output]
 
 
 def test_list_division_units(
-    nortech_api: NortechAPI,
+    nortech: Nortech,
     unit_list_output: UnitListOutput,
     paginated_unit_list_output: PaginatedResponse[UnitOutput],
     requests_mock: Mocker,
 ):
     requests_mock.get(
-        f"{nortech_api.settings.URL}/api/v1/divisions/1/units",
+        f"{nortech.settings.URL}/api/v1/divisions/1/units",
         text=paginated_unit_list_output.model_dump_json(by_alias=True),
     )
 
-    divisions = list_division_units(nortech_api, 1)
+    divisions = nortech.metadata.unit.list(1)
     assert divisions.data == [unit_list_output]
 
 
 def test_get_unit_404(
-    nortech_api: NortechAPI,
+    nortech: Nortech,
     requests_mock,
 ):
-    requests_mock.get(f"{nortech_api.settings.URL}/api/v1/units/1", status_code=404)
-    division = get_unit(nortech_api, 1)
+    requests_mock.get(f"{nortech.settings.URL}/api/v1/units/1", status_code=404)
+    division = nortech.metadata.unit.get(1)
     assert division is None
 
 
 def test_get_unit(
-    nortech_api: NortechAPI,
+    nortech: Nortech,
     unit_output: UnitOutput,
     requests_mock,
 ):
     requests_mock.get(
-        f"{nortech_api.settings.URL}/api/v1/units/1",
+        f"{nortech.settings.URL}/api/v1/units/1",
         text=unit_output.model_dump_json(by_alias=True),
     )
 
-    division = get_unit(nortech_api, 1)
+    division = nortech.metadata.unit.get(1)
     assert division == unit_output

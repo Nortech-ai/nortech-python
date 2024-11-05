@@ -1,27 +1,26 @@
 from requests_mock import Mocker
 
-from nortech.core.gateways.nortech_api import NortechAPI, PaginatedResponse, PaginationOptions
-from nortech.core.services.workspace import get_workspace, list_workspaces
-from nortech.core.values.workspace import WorkspaceInput, WorkspaceListOutput, WorkspaceOutput
+from nortech import Nortech
+from nortech.core import PaginatedResponse, PaginationOptions, WorkspaceInput, WorkspaceListOutput, WorkspaceOutput
 
 
 def test_list_workspaces(
-    nortech_api: NortechAPI,
+    nortech: Nortech,
     workspace_list_output: list[WorkspaceListOutput],
     paginated_workspace_list_output: PaginatedResponse[WorkspaceListOutput],
     requests_mock: Mocker,
 ):
     requests_mock.get(
-        f"{nortech_api.settings.URL}/api/v1/workspaces",
+        f"{nortech.settings.URL}/api/v1/workspaces",
         text=paginated_workspace_list_output.model_dump_json(by_alias=True),
     )
 
-    workspaces = list_workspaces(nortech_api)
+    workspaces = nortech.metadata.workspace.list()
     assert workspaces.data == workspace_list_output
 
 
 def test_list_workspaces_ignore_pagination(
-    nortech_api: NortechAPI,
+    nortech: Nortech,
     workspace_list_output: list[WorkspaceListOutput],
     paginated_workspace_list_output_first_page: PaginatedResponse[WorkspaceListOutput],
     paginated_workspace_list_output_second_page: PaginatedResponse[WorkspaceListOutput],
@@ -29,7 +28,7 @@ def test_list_workspaces_ignore_pagination(
 ):
     requests_mock.register_uri(
         "GET",
-        f"{nortech_api.settings.URL}/api/v1/workspaces",
+        f"{nortech.settings.URL}/api/v1/workspaces",
         [
             {
                 "text": paginated_workspace_list_output_first_page.model_dump_json(by_alias=True),
@@ -42,93 +41,93 @@ def test_list_workspaces_ignore_pagination(
         ],
     )
 
-    workspaces = list_workspaces(nortech_api, PaginationOptions(size=2))
+    workspaces = nortech.metadata.workspace.list(pagination_options=PaginationOptions(size=2))
     assert workspaces.data == workspace_list_output
     assert requests_mock.call_count == 2
     assert requests_mock.request_history[1].qs == {"nexttoken": ["test_token"], "size": ["2"]}
 
 
 def test_list_workspaces_with_pagination(
-    nortech_api: NortechAPI,
+    nortech: Nortech,
     workspace_list_output: list[WorkspaceListOutput],
     paginated_workspace_list_output_first_page: PaginatedResponse[WorkspaceListOutput],
     requests_mock: Mocker,
 ):
-    nortech_api.ignore_pagination = False
+    nortech.api.ignore_pagination = False
     requests_mock.get(
-        f"{nortech_api.settings.URL}/api/v1/workspaces",
+        f"{nortech.settings.URL}/api/v1/workspaces",
         text=paginated_workspace_list_output_first_page.model_dump_json(by_alias=True),
     )
 
-    workspaces = list_workspaces(nortech_api, PaginationOptions(size=2))
+    workspaces = nortech.metadata.workspace.list(pagination_options=PaginationOptions(size=2))
     assert workspaces.data == workspace_list_output[:2]
     assert requests_mock.call_count == 1
 
 
 def test_get_workspace_404(
-    nortech_api: NortechAPI,
+    nortech: Nortech,
     requests_mock: Mocker,
 ):
     requests_mock.get(
-        f"{nortech_api.settings.URL}/api/v1/workspaces/1",
+        f"{nortech.settings.URL}/api/v1/workspaces/1",
         status_code=404,
     )
 
-    workspace = get_workspace(nortech_api, 1)
+    workspace = nortech.metadata.workspace.get(workspace=1)
     assert workspace is None
 
 
 def test_get_workspace_with_id(
-    nortech_api: NortechAPI,
+    nortech: Nortech,
     workspace_output: WorkspaceOutput,
     requests_mock: Mocker,
 ):
     requests_mock.get(
-        f"{nortech_api.settings.URL}/api/v1/workspaces/1",
+        f"{nortech.settings.URL}/api/v1/workspaces/1",
         text=workspace_output.model_dump_json(by_alias=True),
     )
 
-    workspace = get_workspace(nortech_api, 1)
+    workspace = nortech.metadata.workspace.get(workspace=1)
     assert workspace == workspace_output
 
 
 def test_get_workspace_with_name(
-    nortech_api: NortechAPI,
+    nortech: Nortech,
     workspace_output: WorkspaceOutput,
     requests_mock: Mocker,
 ):
     requests_mock.get(
-        f"{nortech_api.settings.URL}/api/v1/workspaces/test_workspace",
+        f"{nortech.settings.URL}/api/v1/workspaces/test_workspace",
         text=workspace_output.model_dump_json(by_alias=True),
     )
 
-    workspace = get_workspace(nortech_api, "test_workspace")
+    workspace = nortech.metadata.workspace.get(workspace="test_workspace")
     assert workspace == workspace_output
 
 
 def test_get_workspace_with_input(
-    nortech_api: NortechAPI,
+    nortech: Nortech,
     workspace_output: WorkspaceOutput,
     requests_mock: Mocker,
 ):
     requests_mock.get(
-        f"{nortech_api.settings.URL}/api/v1/workspaces/test_workspace",
+        f"{nortech.settings.URL}/api/v1/workspaces/test_workspace",
         text=workspace_output.model_dump_json(by_alias=True),
     )
 
-    workspace = get_workspace(nortech_api, WorkspaceInput(workspace="test_workspace"))
+    workspace = nortech.metadata.workspace.get(workspace=WorkspaceInput(workspace="test_workspace"))
     assert workspace == workspace_output
 
 
 def test_get_workspace_with_input_dict(
-    nortech_api: NortechAPI,
+    nortech: Nortech,
     workspace_output: WorkspaceOutput,
     requests_mock: Mocker,
 ):
     requests_mock.get(
-        f"{nortech_api.settings.URL}/api/v1/workspaces/test_workspace",
+        f"{nortech.settings.URL}/api/v1/workspaces/test_workspace",
         text=workspace_output.model_dump_json(by_alias=True),
     )
 
-    workspace = get_workspace(nortech_api, {"workspace": "test_workspace"})
+    workspace = nortech.metadata.workspace.get(workspace={"workspace": "test_workspace"})
     assert workspace == workspace_output
