@@ -6,6 +6,7 @@ from datetime import datetime, timedelta, timezone
 from typing import (
     Any,
     Protocol,
+    Sequence,
     Tuple,
     Type,
     TypeVar,
@@ -161,8 +162,8 @@ def resample(step_id: str, up: Stream[InputType], frequency: timedelta, resample
 
 
 @operator
-def list_to_dataframe(step_id: str, up: Stream[list[BaseModel]]) -> Stream[DataFrame]:
-    def list_to_df_mapper(items: list[BaseModel]) -> DataFrame:
+def list_to_dataframe(step_id: str, up: Stream[Sequence[BaseModel]]) -> Stream[DataFrame]:
+    def list_to_df_mapper(items: Sequence[BaseModel]) -> DataFrame:
         return pd.DataFrame.from_records(item.model_dump() for item in items).set_index("timestamp")
 
     return op.map(step_id="list_to_dataframe", up=up, mapper=list_to_df_mapper)

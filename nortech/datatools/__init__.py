@@ -340,3 +340,6 @@ class Polars:
         ]
         """
         return polars_handlers.get_polars_df(self.nortech_api, signals, time_window, timeout)
+
+
+__all__ = ["Format"]
