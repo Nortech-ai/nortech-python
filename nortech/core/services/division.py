@@ -8,7 +8,7 @@ from nortech.core.gateways.nortech_api import (
     PaginationOptions,
     validate_response,
 )
-from nortech.core.values.asset import AssetInput, AssetInputDict, AssetOutput, parse_asset_input
+from nortech.core.values.asset import AssetInput, AssetInputDict, AssetListOutput, AssetOutput, parse_asset_input
 from nortech.core.values.division import (
     DivisionInput,
     DivisionInputDict,
@@ -20,15 +20,20 @@ from nortech.core.values.division import (
 
 def list_workspace_asset_divisions(
     nortech_api: NortechAPI,
-    asset: AssetInputDict | AssetInput | AssetOutput,
+    asset: int | AssetInputDict | AssetInput | AssetOutput | AssetListOutput,
     pagination_options: PaginationOptions[Literal["id", "name", "description"]] | None = None,
 ):
+    if isinstance(asset, int):
+        return list_asset_divisions(nortech_api, asset, pagination_options)
+    if isinstance(asset, AssetListOutput):
+        return list_asset_divisions(nortech_api, asset.id, pagination_options)
+
     asset_input = parse_asset_input(asset)
     response = nortech_api.get(
         url=f"/api/v1/workspaces/{asset_input.workspace}/assets/{asset_input.asset}/divisions",
         params=pagination_options.model_dump(exclude_none=True, by_alias=True) if pagination_options else None,
     )
-    validate_response(response, [200])
+    validate_response(response)
 
     resp = PaginatedResponse[DivisionListOutput].model_validate(
         {**response.json(), "pagination_options": pagination_options}
@@ -47,14 +52,19 @@ def list_workspace_asset_divisions(
     return resp
 
 
-def get_workspace_asset_division(nortech_api: NortechAPI, division: DivisionInputDict | DivisionInput | DivisionOutput):
+def get_workspace_asset_division(
+    nortech_api: NortechAPI, division: int | DivisionInputDict | DivisionInput | DivisionOutput | DivisionListOutput
+):
+    if isinstance(division, int):
+        return get_division(nortech_api, division)
+    if isinstance(division, DivisionListOutput):
+        return get_division(nortech_api, division.id)
+
     division_input = parse_division_input(division)
     response = nortech_api.get(
         url=f"/api/v1/workspaces/{division_input.workspace}/assets/{division_input.asset}/divisions/{division_input.division}",
     )
-    validate_response(response, [200, 404])
-    if response.status_code == 404:
-        return None
+    validate_response(response)
     return DivisionOutput.model_validate(response.json())
 
 
@@ -67,7 +77,7 @@ def list_workspace_divisions(
         url=f"/api/v1/workspaces/{workspace_id}/divisions",
         params=pagination_options.model_dump(exclude_none=True, by_alias=True) if pagination_options else None,
     )
-    validate_response(response, [200])
+    validate_response(response)
 
     resp = PaginatedResponse[DivisionListOutput].model_validate(
         {**response.json(), "pagination_options": pagination_options}
@@ -95,7 +105,7 @@ def list_asset_divisions(
         url=f"/api/v1/assets/{asset_id}/divisions",
         params=pagination_options.model_dump(exclude_none=True, by_alias=True) if pagination_options else None,
     )
-    validate_response(response, [200])
+    validate_response(response)
 
     resp = PaginatedResponse[DivisionListOutput].model_validate(
         {**response.json(), "pagination_options": pagination_options}
@@ -118,7 +128,5 @@ def get_division(nortech_api: NortechAPI, division_id: int):
     response = nortech_api.get(
         url=f"/api/v1/divisions/{division_id}",
     )
-    validate_response(response, [200, 404])
-    if response.status_code == 404:
-        return None
+    validate_response(response)
     return DivisionOutput.model_validate(response.json())

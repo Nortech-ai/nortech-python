@@ -1,3 +1,4 @@
+import pytest
 from requests_mock import Mocker
 
 from nortech import Nortech
@@ -44,20 +45,19 @@ def test_list_workspace_asset_divisions_from_input_dict(
     assert divisions.data == [division_list_output]
 
 
-def test_get_workspace_asset_division_404(
+def test_list_workspace_asset_division_error(
     nortech: Nortech,
-    division_output: DivisionOutput,
     requests_mock: Mocker,
 ):
     requests_mock.get(
-        f"{nortech.settings.URL}/api/v1/workspaces/test_workspace/assets/test_asset/divisions/test_division",
-        status_code=404,
+        f"{nortech.settings.URL}/api/v1/workspaces/test_workspace/assets/test_asset/divisions", status_code=404
     )
 
-    division = nortech.metadata.division.get(
-        DivisionInput(workspace="test_workspace", asset="test_asset", division="test_division"),
-    )
-    assert division is None
+    with pytest.raises(AssertionError) as err:
+        nortech.metadata.division.list(
+            AssetInput(workspace="test_workspace", asset="test_asset"),
+        )
+    assert "Fetch failed." in str(err.value)
 
 
 def test_get_workspace_asset_division_with_input(
@@ -92,6 +92,51 @@ def test_get_workspace_asset_division_with_input_dict(
     assert division == division_output
 
 
+def test_get_workspace_asset_division_with_output(
+    nortech: Nortech,
+    division_output: DivisionOutput,
+    requests_mock,
+):
+    requests_mock.get(
+        f"{nortech.settings.URL}/api/v1/divisions/1",
+        text=division_output.model_dump_json(by_alias=True),
+    )
+
+    division = nortech.metadata.division.get(division=division_output)
+    assert division == division_output
+
+
+def test_get_workspace_asset_division_with_list_output(
+    nortech: Nortech,
+    division_output: DivisionOutput,
+    division_list_output: DivisionListOutput,
+    requests_mock,
+):
+    requests_mock.get(
+        f"{nortech.settings.URL}/api/v1/divisions/1",
+        text=division_output.model_dump_json(by_alias=True),
+    )
+
+    division = nortech.metadata.division.get(division=division_list_output)
+    assert division == division_output
+
+
+def test_get_workspace_asset_division_error(
+    nortech: Nortech,
+    requests_mock: Mocker,
+):
+    requests_mock.get(
+        f"{nortech.settings.URL}/api/v1/workspaces/test_workspace/assets/test_asset/divisions/test_division",
+        status_code=404,
+    )
+
+    with pytest.raises(AssertionError) as err:
+        nortech.metadata.division.get(
+            DivisionInput(workspace="test_workspace", asset="test_asset", division="test_division"),
+        )
+    assert "Fetch failed." in str(err.value)
+
+
 def test_list_workspace_divisions(
     nortech: Nortech,
     division_list_output: DivisionListOutput,
@@ -105,6 +150,17 @@ def test_list_workspace_divisions(
 
     divisions = nortech.metadata.division.list_by_workspace_id(workspace_id=1)
     assert divisions.data == [division_list_output]
+
+
+def test_list_workspace_divisions_error(
+    nortech: Nortech,
+    requests_mock: Mocker,
+):
+    requests_mock.get(f"{nortech.settings.URL}/api/v1/workspaces/1/divisions", status_code=404)
+
+    with pytest.raises(AssertionError) as err:
+        nortech.metadata.division.list_by_workspace_id(workspace_id=1)
+    assert "Fetch failed." in str(err.value)
 
 
 def test_list_asset_divisions(
@@ -122,13 +178,15 @@ def test_list_asset_divisions(
     assert divisions.data == [division_list_output]
 
 
-def test_get_division_404(
+def test_list_asset_divisions_error(
     nortech: Nortech,
-    requests_mock,
+    requests_mock: Mocker,
 ):
-    requests_mock.get(f"{nortech.settings.URL}/api/v1/divisions/1", status_code=404)
-    division = nortech.metadata.division.get(1)
-    assert division is None
+    requests_mock.get(f"{nortech.settings.URL}/api/v1/assets/1/divisions", status_code=404)
+
+    with pytest.raises(AssertionError) as err:
+        nortech.metadata.division.list(asset=1)
+    assert "Fetch failed." in str(err.value)
 
 
 def test_get_division(
@@ -143,3 +201,14 @@ def test_get_division(
 
     division = nortech.metadata.division.get(1)
     assert division == division_output
+
+
+def test_get_division_error(
+    nortech: Nortech,
+    requests_mock,
+):
+    requests_mock.get(f"{nortech.settings.URL}/api/v1/divisions/1", status_code=404)
+
+    with pytest.raises(AssertionError) as err:
+        nortech.metadata.division.get(1)
+    assert "Fetch failed." in str(err.value)

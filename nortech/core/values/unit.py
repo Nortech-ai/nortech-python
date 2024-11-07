@@ -18,11 +18,9 @@ class UnitInput(DivisionInput):
     unit: str
 
 
-def parse_unit_input(unit_input: UnitInput | UnitInputDict | UnitOutput):
+def parse_unit_input(unit_input: UnitInput | UnitInputDict):
     if isinstance(unit_input, UnitInput):
         return unit_input
-    elif isinstance(unit_input, UnitOutput):
-        return unit_input.to_unit_input()
     else:
         return UnitInput.model_validate(unit_input)
 
@@ -41,11 +39,3 @@ class UnitOutput(UnitListOutput, MetadataTimestamps):
     workspace: MetadataOutput
     asset: MetadataOutput
     division: MetadataOutput
-
-    def to_unit_input(self) -> UnitInput:
-        return UnitInput(
-            workspace=self.workspace.name,
-            asset=self.asset.name,
-            division=self.division.name,
-            unit=self.name,
-        )

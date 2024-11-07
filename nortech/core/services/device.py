@@ -11,6 +11,7 @@ from nortech.core.gateways.nortech_api import (
 from nortech.core.services.division import (
     DivisionInput,
     DivisionInputDict,
+    DivisionListOutput,
     DivisionOutput,
     parse_division_input,
 )
@@ -25,15 +26,20 @@ from nortech.core.values.device import (
 
 def list_workspace_asset_division_devices(
     nortech_api: NortechAPI,
-    division: DivisionInputDict | DivisionInput | DivisionOutput,
+    division: int | DivisionInputDict | DivisionInput | DivisionOutput | DivisionListOutput,
     pagination_options: PaginationOptions[Literal["id", "name", "type", "onboarded"]] | None = None,
 ):
+    if isinstance(division, int):
+        return list_division_devices(nortech_api, division, pagination_options)
+    if isinstance(division, DivisionListOutput):
+        return list_division_devices(nortech_api, division.id, pagination_options)
+
     division_input = parse_division_input(division)
     response = nortech_api.get(
         url=f"/api/v1/workspaces/{division_input.workspace}/assets/{division_input.asset}/divisions/{division_input.division}/devices",
         params=pagination_options.model_dump(exclude_none=True, by_alias=True) if pagination_options else None,
     )
-    validate_response(response, [200])
+    validate_response(response)
 
     resp = PaginatedResponse[DeviceListOutput].model_validate(
         {**response.json(), "pagination_options": pagination_options}
@@ -52,14 +58,19 @@ def list_workspace_asset_division_devices(
     return resp
 
 
-def get_workspace_asset_division_device(nortech_api: NortechAPI, device: DeviceInputDict | DeviceInput | DeviceOutput):
+def get_workspace_asset_division_device(
+    nortech_api: NortechAPI, device: int | DeviceInputDict | DeviceInput | DeviceOutput | DeviceListOutput
+):
+    if isinstance(device, int):
+        return get_device(nortech_api, device)
+    if isinstance(device, DeviceListOutput):
+        return get_device(nortech_api, device.id)
+
     device_input = parse_device_input(device)
     response = nortech_api.get(
         url=f"/api/v1/workspaces/{device_input.workspace}/assets/{device_input.asset}/divisions/{device_input.division}/devices/{device_input.device}",
     )
-    validate_response(response, [200, 404])
-    if response.status_code == 404:
-        return None
+    validate_response(response)
     return DeviceOutput.model_validate(response.json())
 
 
@@ -72,7 +83,7 @@ def list_workspace_devices(
         url=f"/api/v1/workspaces/{workspace_id}/devices",
         params=pagination_options.model_dump(exclude_none=True, by_alias=True) if pagination_options else None,
     )
-    validate_response(response, [200])
+    validate_response(response)
 
     resp = PaginatedResponse[DeviceListOutput].model_validate(
         {**response.json(), "pagination_options": pagination_options}
@@ -100,7 +111,7 @@ def list_asset_devices(
         url=f"/api/v1/assets/{asset_id}/devices",
         params=pagination_options.model_dump(exclude_none=True, by_alias=True) if pagination_options else None,
     )
-    validate_response(response, [200])
+    validate_response(response)
 
     resp = PaginatedResponse[DeviceListOutput].model_validate(
         {**response.json(), "pagination_options": pagination_options}
@@ -128,7 +139,7 @@ def list_division_devices(
         url=f"/api/v1/divisions/{division_id}/devices",
         params=pagination_options.model_dump(exclude_none=True, by_alias=True) if pagination_options else None,
     )
-    validate_response(response, [200])
+    validate_response(response)
 
     resp = PaginatedResponse[DeviceListOutput].model_validate(
         {**response.json(), "pagination_options": pagination_options}
@@ -151,7 +162,5 @@ def get_device(nortech_api: NortechAPI, device_id: int):
     response = nortech_api.get(
         url=f"/api/v1/devices/{device_id}",
     )
-    validate_response(response, [200, 404])
-    if response.status_code == 404:
-        return None
+    validate_response(response)
     return DeviceOutput.model_validate(response.json())

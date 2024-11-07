@@ -40,8 +40,8 @@ class Workspace:
         self.nortech_api = nortech_api
 
     def get(
-        self, workspace: WorkspaceInputDict | WorkspaceInput | WorkspaceOutput | int | str
-    ) -> WorkspaceOutput | None:
+        self, workspace: WorkspaceInputDict | WorkspaceInput | WorkspaceOutput | WorkspaceListOutput | int | str
+    ) -> WorkspaceOutput:
         return workspace_service.get_workspace(self.nortech_api, workspace)
 
     def list(
@@ -54,15 +54,12 @@ class Asset:
     def __init__(self, nortech_api: NortechAPI):
         self.nortech_api = nortech_api
 
-    def get(self, asset: int | AssetInputDict | AssetInput | AssetOutput) -> AssetOutput | None:
-        if isinstance(asset, int):
-            return asset_service.get_asset(self.nortech_api, asset)
-
+    def get(self, asset: int | AssetInputDict | AssetInput | AssetOutput | AssetListOutput) -> AssetOutput:
         return asset_service.get_workspace_asset(self.nortech_api, asset)
 
     def list(
         self,
-        workspace: WorkspaceInputDict | WorkspaceInput | int | str,
+        workspace: WorkspaceInputDict | WorkspaceInput | WorkspaceOutput | WorkspaceListOutput | int | str,
         pagination_options: PaginationOptions[Literal["id", "name", "description"]] | None = None,
     ) -> PaginatedResponse[AssetListOutput]:
         return asset_service.list_workspace_assets(self.nortech_api, workspace, pagination_options)
@@ -72,20 +69,16 @@ class Division:
     def __init__(self, nortech_api: NortechAPI):
         self.nortech_api = nortech_api
 
-    def get(self, division: int | DivisionInputDict | DivisionInput | DivisionOutput) -> DivisionOutput | None:
-        if isinstance(division, int):
-            return division_service.get_division(self.nortech_api, division)
-
+    def get(
+        self, division: int | DivisionInputDict | DivisionInput | DivisionOutput | DivisionListOutput
+    ) -> DivisionOutput:
         return division_service.get_workspace_asset_division(self.nortech_api, division)
 
     def list(
         self,
-        asset: int | AssetInputDict | AssetInput | AssetOutput,
+        asset: int | AssetInputDict | AssetInput | AssetOutput | AssetListOutput,
         pagination_options: PaginationOptions[Literal["id", "name", "description"]] | None = None,
     ) -> PaginatedResponse[DivisionListOutput]:
-        if isinstance(asset, int):
-            return division_service.list_asset_divisions(self.nortech_api, asset, pagination_options)
-
         return division_service.list_workspace_asset_divisions(self.nortech_api, asset, pagination_options)
 
     def list_by_workspace_id(
@@ -102,18 +95,12 @@ class Unit:
 
     def list(
         self,
-        division: int | DivisionInputDict | DivisionInput | DivisionOutput,
+        division: int | DivisionInputDict | DivisionInput | DivisionOutput | DivisionListOutput,
         pagination_options: PaginationOptions[Literal["id", "name"]] | None = None,
     ) -> PaginatedResponse[UnitListOutput]:
-        if isinstance(division, int):
-            return unit_service.list_division_units(self.nortech_api, division, pagination_options)
-
         return unit_service.list_workspace_asset_division_units(self.nortech_api, division, pagination_options)
 
-    def get(self, unit: int | UnitInputDict | UnitInput | UnitOutput) -> UnitOutput | None:
-        if isinstance(unit, int):
-            return unit_service.get_unit(self.nortech_api, unit)
-
+    def get(self, unit: int | UnitInputDict | UnitInput | UnitOutput | UnitListOutput) -> UnitOutput:
         return unit_service.get_workspace_asset_division_unit(self.nortech_api, unit)
 
     def list_by_workspace_id(
@@ -135,20 +122,14 @@ class Device:
     def __init__(self, nortech_api: NortechAPI):
         self.nortech_api = nortech_api
 
-    def get(self, device: int | DeviceInputDict | DeviceInput | DeviceOutput) -> DeviceOutput | None:
-        if isinstance(device, int):
-            return device_service.get_device(self.nortech_api, device)
-
+    def get(self, device: int | DeviceInputDict | DeviceInput | DeviceOutput | DeviceListOutput) -> DeviceOutput:
         return device_service.get_workspace_asset_division_device(self.nortech_api, device)
 
     def list(
         self,
-        division: int | DivisionInputDict | DivisionInput | DivisionOutput,
+        division: int | DivisionInputDict | DivisionInput | DivisionOutput | DivisionListOutput,
         pagination_options: PaginationOptions[Literal["id", "name", "type", "onboarded"]] | None = None,
     ) -> PaginatedResponse[DeviceListOutput]:
-        if isinstance(division, int):
-            return device_service.list_division_devices(self.nortech_api, division, pagination_options)
-
         return device_service.list_workspace_asset_division_devices(self.nortech_api, division, pagination_options)
 
     def list_by_workspace_id(
@@ -171,11 +152,15 @@ class Signal:
         self.nortech_api = nortech_api
 
     def get(
-        self, signal: int | SignalInputDict | SignalInput | SignalOutput | SignalDeviceInputDict | SignalDeviceInput
-    ) -> SignalOutput | None:
-        if isinstance(signal, int):
-            return signal_service.get_signal(self.nortech_api, signal)
-
+        self,
+        signal: int
+        | SignalInputDict
+        | SignalInput
+        | SignalOutput
+        | SignalListOutput
+        | SignalDeviceInputDict
+        | SignalDeviceInput,
+    ) -> SignalOutput:
         if isinstance(signal, dict):
             if "device" in signal:
                 signal = SignalDeviceInput.model_validate(signal)
@@ -187,32 +172,28 @@ class Signal:
 
         return signal_service.get_workspace_asset_division_unit_signal(self.nortech_api, signal)
 
-    def get_signals(self, signals: list[SignalInput | SignalInputDict | SignalOutput | int]) -> list[SignalOutput]:
-        return signal_service.get_signals(self.nortech_api, signals)
-
     def list(
         self,
-        parent: int | UnitInputDict | UnitInput | UnitOutput | DeviceInputDict | DeviceInput | DeviceOutput,
+        unit_or_signal: int | UnitInputDict | UnitInput | UnitOutput | DeviceInputDict | DeviceInput | DeviceOutput,
         pagination_options: PaginationOptions[
             Literal["id", "name", "physical_unit", "data_type", "description", "long_description"]
         ]
         | None = None,
     ) -> PaginatedResponse[SignalListOutput]:
-        if isinstance(parent, int):
-            return signal_service.list_unit_signals(self.nortech_api, parent, pagination_options)
-
-        if isinstance(parent, dict):
-            if "device" in parent:
-                parent = DeviceInput.model_validate(parent)
+        if isinstance(unit_or_signal, dict):
+            if "device" in unit_or_signal:
+                unit_or_signal = DeviceInput.model_validate(unit_or_signal)
             else:
-                parent = UnitInput.model_validate(parent)
+                unit_or_signal = UnitInput.model_validate(unit_or_signal)
 
-        if isinstance(parent, DeviceInput) or isinstance(parent, DeviceOutput):
+        if isinstance(unit_or_signal, DeviceInput) or isinstance(unit_or_signal, DeviceOutput):
             return signal_service.list_workspace_asset_division_device_signals(
-                self.nortech_api, parent, pagination_options
+                self.nortech_api, unit_or_signal, pagination_options
             )
 
-        return signal_service.list_workspace_asset_division_unit_signals(self.nortech_api, parent, pagination_options)
+        return signal_service.list_workspace_asset_division_unit_signals(
+            self.nortech_api, unit_or_signal, pagination_options
+        )
 
     def list_by_workspace_id(
         self,

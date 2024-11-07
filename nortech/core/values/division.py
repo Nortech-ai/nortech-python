@@ -13,11 +13,9 @@ class DivisionInput(AssetInput):
     division: str
 
 
-def parse_division_input(division_input: DivisionInput | DivisionInputDict | DivisionOutput):
+def parse_division_input(division_input: DivisionInput | DivisionInputDict):
     if isinstance(division_input, DivisionInput):
         return division_input
-    elif isinstance(division_input, DivisionOutput):
-        return division_input.to_division_input()
     else:
         return DivisionInput.model_validate(division_input)
 
@@ -29,6 +27,3 @@ class DivisionListOutput(MetadataOutput):
 class DivisionOutput(DivisionListOutput, MetadataTimestamps):
     workspace: MetadataOutput
     asset: MetadataOutput
-
-    def to_division_input(self) -> DivisionInput:
-        return DivisionInput(workspace=self.workspace.name, asset=self.asset.name, division=self.name)

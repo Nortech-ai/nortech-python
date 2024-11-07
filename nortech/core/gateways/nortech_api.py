@@ -87,7 +87,7 @@ def validate_response(
     try:
         assert response.status_code in (valid_status_codes or [200])
     except AssertionError as e:
-        raise AssertionError(f"{error_message} Status code: {response.status_code}. Response: {response.json()}") from e
+        raise AssertionError(f"{error_message} Status code: {response.status_code}. Response: {response.text}") from e
 
 
 SortBy = TypeVar("SortBy")

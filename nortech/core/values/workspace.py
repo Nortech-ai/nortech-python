@@ -15,14 +15,14 @@ class WorkspaceInput(BaseModel):
 
 
 def parse_workspace_input(
-    workspace_input: WorkspaceInput | WorkspaceInputDict | WorkspaceOutput | str | int,
+    workspace_input: WorkspaceInput | WorkspaceInputDict | WorkspaceOutput | WorkspaceListOutput | str | int,
 ):
     if isinstance(workspace_input, int):
         return workspace_input
     if isinstance(workspace_input, WorkspaceInput):
         return workspace_input.workspace
-    elif isinstance(workspace_input, WorkspaceOutput):
-        return workspace_input.to_workspace_input()
+    elif isinstance(workspace_input, WorkspaceListOutput):
+        return workspace_input.id
     if isinstance(workspace_input, str):
         return workspace_input
     return workspace_input["workspace"]
@@ -33,5 +33,4 @@ class WorkspaceListOutput(MetadataOutput):
 
 
 class WorkspaceOutput(WorkspaceListOutput, MetadataTimestamps):
-    def to_workspace_input(self) -> WorkspaceInput:
-        return WorkspaceInput(workspace=self.name)
+    pass

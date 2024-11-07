@@ -15,33 +15,15 @@ The official Python library for Nortech AI.
 
 ## Overview
 
-This package is built on top of the Nortech API (documented at https://api.apps.nor.tech/docs). The `NortechAPI` class, in `nortech.common.gateways.nortech_api`, is your connection point to the API. The package is organized into three main sections:
+The `nortech-python` library is the official Python client for interacting with the Nortech AI platform. It provides a comprehensive interface to access and manage various components of the Nortech ecosystem, including metadata, data tools, and derivers.
 
-### nortech.metadata
+The `Nortech` class serves as the primary entry point for the library. It encapsulates the core functionalities and provides a unified interface to interact with the Nortech API. It has 3 main components:
 
-Contains functionalities to access and manage your metadata, including:
-- Workspaces
-- Assets
-- Divisions
-- Units
-- Devices
-- Signals
+- **Metadata**: Access and manage metadata such as workspaces, assets, divisions, units, devices, and signals.
+- **Datatools**: Fetch and manipulate signal data, supporting both Pandas and Polars DataFrames, time window queries, and signal filtering.
+- **Derivers**: Create and manage derivers, which allow computation of new signals based on existing ones. This includes creating deriver schemas, deploying derivers, managing configurations, and testing locally.
 
-### nortech.datatools
-
-Provides tools for fetching signal data, with support for:
-- Pandas DataFrames
-- Polars DataFrames
-- Time window queries
-- Signal filtering
-
-### nortech.derivers
-
-Enables creation and management of derivers - which allow you to compute new signals based on existing ones. Features include:
-- Creating deriver schemas
-- Deploying derivers
-- Managing deriver configurations
-- Testing derivers locally
+The `Nortech` class is designed to be flexible, allowing customization of API settings such as the base URL, API key, pagination behavior, and user agent. This makes it easy to integrate the library into various environments and workflows.
 
 ## Dependencies
 
@@ -82,6 +64,8 @@ Alternatively you can create a `.env` file in the root directory of your project
 ```bash
 NORTECH_API_KEY="<NORTECH_API_KEY>"
 ```
+
+The `Nortech` class can also recieve all configurations during initialization.
 
 ## Pagination
 

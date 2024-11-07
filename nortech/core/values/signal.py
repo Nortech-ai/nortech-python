@@ -32,11 +32,9 @@ class SignalInput(UnitInput):
         }
 
 
-def parse_signal_input(signal_input: SignalInput | SignalInputDict | SignalOutput):
+def parse_signal_input(signal_input: SignalInput | SignalInputDict):
     if isinstance(signal_input, SignalInput):
         return signal_input
-    elif isinstance(signal_input, SignalOutput):
-        return signal_input.to_signal_input()
     else:
         return SignalInput.model_validate(signal_input)
 
@@ -81,14 +79,5 @@ class SignalOutput(SignalListOutput, MetadataTimestamps):
             asset=self.asset.name,
             division=self.division.name,
             unit=self.unit.name,
-            signal=self.name,
-        )
-
-    def to_signal_device_input(self):
-        return SignalDeviceInput(
-            workspace=self.workspace.name,
-            asset=self.asset.name,
-            division=self.division.name,
-            device=self.device.name,
             signal=self.name,
         )

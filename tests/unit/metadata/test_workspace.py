@@ -1,3 +1,4 @@
+import pytest
 from requests_mock import Mocker
 
 from nortech import Nortech
@@ -64,17 +65,15 @@ def test_list_workspaces_with_pagination(
     assert requests_mock.call_count == 1
 
 
-def test_get_workspace_404(
+def test_list_workspaces_error(
     nortech: Nortech,
     requests_mock: Mocker,
 ):
-    requests_mock.get(
-        f"{nortech.settings.URL}/api/v1/workspaces/1",
-        status_code=404,
-    )
+    requests_mock.get(f"{nortech.settings.URL}/api/v1/workspaces", status_code=404)
 
-    workspace = nortech.metadata.workspace.get(workspace=1)
-    assert workspace is None
+    with pytest.raises(AssertionError) as err:
+        nortech.metadata.workspace.list()
+    assert "Fetch failed." in str(err.value)
 
 
 def test_get_workspace_with_id(
@@ -131,3 +130,46 @@ def test_get_workspace_with_input_dict(
 
     workspace = nortech.metadata.workspace.get(workspace={"workspace": "test_workspace"})
     assert workspace == workspace_output
+
+
+def test_get_workspace_with_output(
+    nortech: Nortech,
+    workspace_output: WorkspaceOutput,
+    requests_mock: Mocker,
+):
+    requests_mock.get(
+        f"{nortech.settings.URL}/api/v1/workspaces/1",
+        text=workspace_output.model_dump_json(by_alias=True),
+    )
+
+    workspace = nortech.metadata.workspace.get(workspace=workspace_output)
+    assert workspace == workspace_output
+
+
+def test_get_workspace_with_list_output(
+    nortech: Nortech,
+    workspace_output: WorkspaceOutput,
+    workspace_list_output: list[WorkspaceListOutput],
+    requests_mock: Mocker,
+):
+    requests_mock.get(
+        f"{nortech.settings.URL}/api/v1/workspaces/1",
+        text=workspace_output.model_dump_json(by_alias=True),
+    )
+
+    workspace = nortech.metadata.workspace.get(workspace=workspace_list_output[0])
+    assert workspace == workspace_output
+
+
+def test_get_workspace_error(
+    nortech: Nortech,
+    requests_mock: Mocker,
+):
+    requests_mock.get(
+        f"{nortech.settings.URL}/api/v1/workspaces/1",
+        status_code=404,
+    )
+
+    with pytest.raises(AssertionError) as err:
+        nortech.metadata.workspace.get(workspace=1)
+    assert "Fetch failed." in str(err.value)

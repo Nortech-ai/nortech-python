@@ -9,7 +9,7 @@ from nortech.core.gateways.nortech_api import (
 from nortech.core.services.signal import (
     parse_signal_input_or_output_or_id_union_to_signal_input,
 )
-from nortech.core.values.signal import SignalInput, SignalInputDict, SignalOutput
+from nortech.core.values.signal import SignalInput, SignalInputDict, SignalListOutput, SignalOutput
 from nortech.datatools.services.nortech_api import (
     get_lazy_polars_df_from_cold_storage,
     get_lazy_polars_df_from_hot_storage,
@@ -23,7 +23,7 @@ from nortech.datatools.values.windowing import ColdWindow, HotWindow, TimeWindow
 
 def get_lazy_polars_df(
     nortech_api: NortechAPI,
-    signals: list[SignalInput | SignalInputDict | SignalOutput | int],
+    signals: list[SignalInput | SignalInputDict | SignalOutput | SignalListOutput | int],
     time_window: TimeWindow,
     timeout: Timeout | None = None,
 ) -> LazyFrame:
@@ -90,7 +90,7 @@ def get_lazy_polars_df(
 
 def get_polars_df(
     nortech_api: NortechAPI,
-    signals: list[SignalInput | SignalInputDict | SignalOutput | int],
+    signals: list[SignalInput | SignalInputDict | SignalOutput | SignalListOutput | int],
     time_window: TimeWindow,
     timeout: Timeout | None = None,
 ) -> DataFrame:

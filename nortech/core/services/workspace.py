@@ -25,7 +25,7 @@ def list_workspaces(
         url="/api/v1/workspaces",
         params=pagination_options.model_dump(exclude_none=True, by_alias=True) if pagination_options else None,
     )
-    validate_response(response, [200])
+    validate_response(response)
 
     resp = PaginatedResponse[WorkspaceListOutput].model_validate(
         {**response.json(), "pagination_options": pagination_options}
@@ -45,12 +45,9 @@ def list_workspaces(
 
 def get_workspace(
     nortech_api: NortechAPI,
-    workspace: WorkspaceInputDict | WorkspaceInput | WorkspaceOutput | int | str,
-) -> WorkspaceOutput | None:
+    workspace: WorkspaceInputDict | WorkspaceInput | WorkspaceOutput | WorkspaceListOutput | int | str,
+):
     workspace_input = parse_workspace_input(workspace)
     response = nortech_api.get(url=f"/api/v1/workspaces/{workspace_input}")
-    validate_response(response, [200, 404])
-
-    if response.status_code == 404:
-        return None
+    validate_response(response)
     return WorkspaceOutput.model_validate(response.json())

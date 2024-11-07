@@ -1,3 +1,4 @@
+import pytest
 from requests_mock import Mocker
 
 from nortech import Nortech
@@ -8,6 +9,7 @@ from nortech.core import (
     UnitListOutput,
     UnitOutput,
 )
+from nortech.core.values.division import DivisionListOutput, DivisionOutput
 
 
 def test_list_workspace_asset_division_units_from_input(
@@ -44,24 +46,47 @@ def test_list_workspace_asset_division_units_from_input_dict(
     assert divisions.data == [unit_list_output]
 
 
-def test_get_workspace_asset_division_unit_404(
+def test_list_workspace_asset_division_units_from_output(
     nortech: Nortech,
+    unit_list_output: UnitListOutput,
+    division_output: DivisionOutput,
+    paginated_unit_list_output: PaginatedResponse[UnitOutput],
     requests_mock: Mocker,
 ):
     requests_mock.get(
-        f"{nortech.settings.URL}/api/v1/workspaces/test_workspace/assets/test_asset/divisions/test_division/units/test_unit",
-        status_code=404,
+        f"{nortech.settings.URL}/api/v1/divisions/1/units",
+        text=paginated_unit_list_output.model_dump_json(by_alias=True),
     )
 
-    division = nortech.metadata.unit.get(
-        UnitInput(
-            workspace="test_workspace",
-            asset="test_asset",
-            division="test_division",
-            unit="test_unit",
-        ),
+    divisions = nortech.metadata.unit.list(division=division_output)
+    assert divisions.data == [unit_list_output]
+
+
+def test_list_workspace_asset_division_units_from_list_output(
+    nortech: Nortech,
+    unit_list_output: UnitListOutput,
+    division_list_output: DivisionListOutput,
+    paginated_unit_list_output: PaginatedResponse[UnitOutput],
+    requests_mock: Mocker,
+):
+    requests_mock.get(
+        f"{nortech.settings.URL}/api/v1/divisions/1/units",
+        text=paginated_unit_list_output.model_dump_json(by_alias=True),
     )
-    assert division is None
+
+    divisions = nortech.metadata.unit.list(division=division_list_output)
+    assert divisions.data == [unit_list_output]
+
+
+def test_list_workspace_asset_division_units_error(
+    nortech: Nortech,
+    requests_mock: Mocker,
+):
+    requests_mock.get(f"{nortech.settings.URL}/api/v1/divisions/1/units", status_code=404)
+
+    with pytest.raises(AssertionError) as err:
+        nortech.metadata.unit.list(division=1)
+    assert "Fetch failed." in str(err.value)
 
 
 def test_get_workspace_asset_division_unit_with_input(
@@ -106,6 +131,53 @@ def test_get_workspace_asset_division_unit_with_input_dict(
     assert division == unit_output
 
 
+def test_get_workspace_asset_division_unit_with_output(
+    nortech: Nortech,
+    unit_output: UnitOutput,
+    requests_mock,
+):
+    requests_mock.get(
+        f"{nortech.settings.URL}/api/v1/units/1",
+        text=unit_output.model_dump_json(by_alias=True),
+    )
+
+    division = nortech.metadata.unit.get(1)
+    assert division == unit_output
+
+
+def test_get_workspace_asset_division_unit_with_list_output(
+    nortech: Nortech,
+    unit_output: UnitOutput,
+    unit_list_output: UnitListOutput,
+    requests_mock,
+):
+    requests_mock.get(f"{nortech.settings.URL}/api/v1/units/1", text=unit_output.model_dump_json(by_alias=True))
+
+    division = nortech.metadata.unit.get(unit_list_output)
+    assert division == unit_output
+
+
+def test_get_workspace_asset_division_unit_error(
+    nortech: Nortech,
+    requests_mock: Mocker,
+):
+    requests_mock.get(
+        f"{nortech.settings.URL}/api/v1/workspaces/test_workspace/assets/test_asset/divisions/test_division/units/test_unit",
+        status_code=404,
+    )
+
+    with pytest.raises(AssertionError) as err:
+        nortech.metadata.unit.get(
+            UnitInput(
+                workspace="test_workspace",
+                asset="test_asset",
+                division="test_division",
+                unit="test_unit",
+            ),
+        )
+    assert "Fetch failed." in str(err.value)
+
+
 def test_list_workspace_units(
     nortech: Nortech,
     unit_list_output: UnitListOutput,
@@ -119,6 +191,17 @@ def test_list_workspace_units(
 
     divisions = nortech.metadata.unit.list_by_workspace_id(1)
     assert divisions.data == [unit_list_output]
+
+
+def test_list_workspace_units_error(
+    nortech: Nortech,
+    requests_mock: Mocker,
+):
+    requests_mock.get(f"{nortech.settings.URL}/api/v1/workspaces/1/units", status_code=404)
+
+    with pytest.raises(AssertionError) as err:
+        nortech.metadata.unit.list_by_workspace_id(1)
+    assert "Fetch failed." in str(err.value)
 
 
 def test_list_asset_units(
@@ -136,6 +219,17 @@ def test_list_asset_units(
     assert divisions.data == [unit_list_output]
 
 
+def test_list_asset_units_error(
+    nortech: Nortech,
+    requests_mock: Mocker,
+):
+    requests_mock.get(f"{nortech.settings.URL}/api/v1/assets/1/units", status_code=404)
+
+    with pytest.raises(AssertionError) as err:
+        nortech.metadata.unit.list_by_asset_id(1)
+    assert "Fetch failed." in str(err.value)
+
+
 def test_list_division_units(
     nortech: Nortech,
     unit_list_output: UnitListOutput,
@@ -151,13 +245,15 @@ def test_list_division_units(
     assert divisions.data == [unit_list_output]
 
 
-def test_get_unit_404(
+def test_list_division_units_error(
     nortech: Nortech,
-    requests_mock,
+    requests_mock: Mocker,
 ):
-    requests_mock.get(f"{nortech.settings.URL}/api/v1/units/1", status_code=404)
-    division = nortech.metadata.unit.get(1)
-    assert division is None
+    requests_mock.get(f"{nortech.settings.URL}/api/v1/divisions/1/units", status_code=404)
+
+    with pytest.raises(AssertionError) as err:
+        nortech.metadata.unit.list(1)
+    assert "Fetch failed." in str(err.value)
 
 
 def test_get_unit(
@@ -172,3 +268,14 @@ def test_get_unit(
 
     division = nortech.metadata.unit.get(1)
     assert division == unit_output
+
+
+def test_get_unit_error(
+    nortech: Nortech,
+    requests_mock,
+):
+    requests_mock.get(f"{nortech.settings.URL}/api/v1/units/1", status_code=404)
+
+    with pytest.raises(AssertionError) as err:
+        nortech.metadata.unit.get(1)
+    assert "Fetch failed." in str(err.value)

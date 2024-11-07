@@ -9,7 +9,7 @@ import nortech.datatools.handlers.download as download_handlers
 import nortech.datatools.handlers.pandas as pandas_handlers
 import nortech.datatools.handlers.polars as polars_handlers
 from nortech.core.gateways.nortech_api import NortechAPI
-from nortech.core.values.signal import SignalInput, SignalInputDict, SignalOutput
+from nortech.core.values.signal import SignalInput, SignalInputDict, SignalListOutput, SignalOutput
 from nortech.datatools.services.nortech_api import Format
 from nortech.datatools.values.windowing import TimeWindow
 
@@ -27,7 +27,7 @@ class Download:
 
     def download_data(
         self,
-        signals: list[SignalInput | SignalInputDict | SignalOutput | int],
+        signals: list[SignalInput | SignalInputDict | SignalOutput | SignalListOutput | int],
         time_window: TimeWindow,
         output_path: str,
         file_format: Format,
@@ -109,7 +109,7 @@ class Pandas:
 
     def get_df(
         self,
-        signals: list[SignalInput | SignalInputDict | SignalOutput | int],
+        signals: list[SignalInput | SignalInputDict | SignalOutput | SignalListOutput | int],
         time_window: TimeWindow,
         timeout: Timeout | None = None,
     ) -> DataFrame:
@@ -191,7 +191,7 @@ class Polars:
 
     def get_lazy_polars_df(
         self,
-        signals: list[SignalInput | SignalInputDict | SignalOutput | int],
+        signals: list[SignalInput | SignalInputDict | SignalOutput | SignalListOutput | int],
         time_window: TimeWindow,
         timeout: Timeout | None = None,
     ) -> LazyFrame:
@@ -268,7 +268,7 @@ class Polars:
 
     def get_polars_df(
         self,
-        signals: list[SignalInput | SignalInputDict | SignalOutput | int],
+        signals: list[SignalInput | SignalInputDict | SignalOutput | SignalListOutput | int],
         time_window: TimeWindow,
         timeout: Timeout | None = None,
     ) -> PolarsDataFrame:

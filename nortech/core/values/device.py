@@ -16,11 +16,9 @@ class DeviceInput(DivisionInput):
     device: str
 
 
-def parse_device_input(device_input: DeviceInput | DeviceInputDict | DeviceOutput):
+def parse_device_input(device_input: DeviceInput | DeviceInputDict):
     if isinstance(device_input, DeviceInput):
         return device_input
-    elif isinstance(device_input, DeviceOutput):
-        return device_input.to_device_input()
     else:
         return DeviceInput.model_validate(device_input)
 
@@ -34,11 +32,3 @@ class DeviceOutput(DeviceListOutput, MetadataTimestamps):
     workspace: MetadataOutput
     asset: MetadataOutput
     division: MetadataOutput
-
-    def to_device_input(self) -> DeviceInput:
-        return DeviceInput(
-            workspace=self.workspace.name,
-            asset=self.asset.name,
-            division=self.division.name,
-            device=self.name,
-        )

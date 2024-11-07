@@ -17,12 +17,13 @@ def test_get_df_hot(
     data_signal_input_dict: SignalInputDict,
     data_signal_output: SignalOutput,
     data_signal_output_id_1: SignalOutput,
+    data_signal_output_id_2: SignalOutput,
     data_signal_inputs: list[SignalInput],
     requests_mock: Mocker,
 ):
     requests_mock.post(
         f"{nortech.settings.URL}/api/v1/signals",
-        text=f"[{data_signal_output_id_1.model_dump_json(by_alias=True)}]",
+        text=f"[{data_signal_output_id_1.model_dump_json(by_alias=True)},{data_signal_output_id_2.model_dump_json(by_alias=True)}]",
     )
 
     end = datetime.now(timezone.utc) + timedelta(seconds=10)
@@ -62,7 +63,7 @@ def test_get_df_hot(
     data_signal_output = data_signal_output.model_copy(update={"name": "test_signal_3"})
 
     df = nortech.datatools.pandas.get_df(
-        signals=[data_signal_input, data_signal_input_dict, data_signal_output, 1],
+        signals=[data_signal_input, data_signal_input_dict, data_signal_output, 2],
         time_window=time_window,
     )
     pdt.assert_frame_equal(df, csv_df.set_index("timestamp"))
@@ -71,7 +72,7 @@ def test_get_df_hot(
     get_signals_request = requests_mock.request_history[0]
     get_timescale_request = requests_mock.request_history[1]
     assert get_signals_request is not None
-    assert get_signals_request.json() == {"signals": [1]}
+    assert get_signals_request.json() == {"signals": [1, 2]}
     assert get_timescale_request is not None
     assert get_timescale_request.json() == {
         "signals": [signal.model_dump() for signal in data_signal_inputs],
@@ -88,12 +89,13 @@ def test_get_df_hot_empty(
     data_signal_input_dict: SignalInputDict,
     data_signal_output: SignalOutput,
     data_signal_output_id_1: SignalOutput,
+    data_signal_output_id_2: SignalOutput,
     data_signal_inputs: list[SignalInput],
     requests_mock: Mocker,
 ):
     requests_mock.post(
         f"{nortech.settings.URL}/api/v1/signals",
-        text=f"[{data_signal_output_id_1.model_dump_json(by_alias=True)}]",
+        text=f"[{data_signal_output_id_1.model_dump_json(by_alias=True)},{data_signal_output_id_2.model_dump_json(by_alias=True)}]",
     )
 
     end = datetime.now(timezone.utc) + timedelta(seconds=10)
@@ -108,14 +110,14 @@ def test_get_df_hot_empty(
     )
 
     df = nortech.datatools.pandas.get_df(
-        signals=[data_signal_input, data_signal_input_dict, data_signal_output, 1],
+        signals=[data_signal_input, data_signal_input_dict, data_signal_output, 2],
         time_window=time_window,
     )
     signals = [
         f"{data_signal_output_id_1.workspace.name}/{data_signal_output_id_1.asset.name}/{data_signal_output_id_1.division.name}/{data_signal_output_id_1.unit.name}/{data_signal_output_id_1.name}",
+        f"{data_signal_output_id_2.workspace.name}/{data_signal_output_id_2.asset.name}/{data_signal_output_id_2.division.name}/{data_signal_output_id_2.unit.name}/{data_signal_output_id_2.name}",
         f"{data_signal_input.workspace}/{data_signal_input.asset}/{data_signal_input.division}/{data_signal_input.unit}/{data_signal_input.signal}",
         f"{data_signal_input_dict['workspace']}/{data_signal_input_dict['asset']}/{data_signal_input_dict['division']}/{data_signal_input_dict['unit']}/{data_signal_input_dict['signal']}",
-        f"{data_signal_output.workspace.name}/{data_signal_output.asset.name}/{data_signal_output.division.name}/{data_signal_output.unit.name}/{data_signal_output.name}",
     ]
     pdt.assert_frame_equal(
         df,
@@ -133,7 +135,7 @@ def test_get_df_hot_empty(
     get_signals_request = requests_mock.request_history[0]
     get_timescale_request = requests_mock.request_history[1]
     assert get_signals_request is not None
-    assert get_signals_request.json() == {"signals": [1]}
+    assert get_signals_request.json() == {"signals": [1, 2]}
     assert get_timescale_request is not None
     assert get_timescale_request.json() == {
         "signals": [signal.model_dump() for signal in data_signal_inputs],
@@ -150,12 +152,13 @@ def test_get_df_cold(
     data_signal_input_dict: SignalInputDict,
     data_signal_output: SignalOutput,
     data_signal_output_id_1: SignalOutput,
+    data_signal_output_id_2: SignalOutput,
     data_signal_inputs: list[SignalInput],
     requests_mock: Mocker,
 ):
     requests_mock.post(
         f"{nortech.settings.URL}/api/v1/signals",
-        text=f"[{data_signal_output_id_1.model_dump_json(by_alias=True)}]",
+        text=f"[{data_signal_output_id_1.model_dump_json(by_alias=True)},{data_signal_output_id_2.model_dump_json(by_alias=True)}]",
     )
 
     end = datetime.now(timezone.utc) - timedelta(days=1, seconds=10)
@@ -188,7 +191,7 @@ def test_get_df_cold(
     )
 
     df = nortech.datatools.pandas.get_df(
-        signals=[data_signal_input, data_signal_input_dict, data_signal_output, 1],
+        signals=[data_signal_input, data_signal_input_dict, data_signal_output, 2],
         time_window=time_window,
     )
     pdt.assert_frame_equal(
@@ -203,7 +206,7 @@ def test_get_df_cold(
     get_historical_data_request = requests_mock.request_history[1]
     get_parquet_request = requests_mock.request_history[2]
     assert get_signals_request is not None
-    assert get_signals_request.json() == {"signals": [1]}
+    assert get_signals_request.json() == {"signals": [1, 2]}
     assert get_historical_data_request is not None
     assert get_historical_data_request.json() == {
         "signals": [signal.model_dump_with_rename() for signal in data_signal_inputs],
@@ -222,12 +225,13 @@ def test_get_df_cold_empty(
     data_signal_input_dict: SignalInputDict,
     data_signal_output: SignalOutput,
     data_signal_output_id_1: SignalOutput,
+    data_signal_output_id_2: SignalOutput,
     data_signal_inputs: list[SignalInput],
     requests_mock: Mocker,
 ):
     requests_mock.post(
         f"{nortech.settings.URL}/api/v1/signals",
-        text=f"[{data_signal_output_id_1.model_dump_json(by_alias=True)}]",
+        text=f"[{data_signal_output_id_1.model_dump_json(by_alias=True)},{data_signal_output_id_2.model_dump_json(by_alias=True)}]",
     )
 
     end = datetime.now(timezone.utc) - timedelta(days=1, seconds=10)
@@ -242,14 +246,14 @@ def test_get_df_cold_empty(
     )
 
     df = nortech.datatools.pandas.get_df(
-        signals=[data_signal_input, data_signal_input_dict, data_signal_output, 1],
+        signals=[data_signal_input, data_signal_input_dict, data_signal_output, 2],
         time_window=time_window,
     )
     signals = [
         f"{data_signal_output_id_1.workspace.name}/{data_signal_output_id_1.asset.name}/{data_signal_output_id_1.division.name}/{data_signal_output_id_1.unit.name}/{data_signal_output_id_1.name}",
+        f"{data_signal_output_id_2.workspace.name}/{data_signal_output_id_2.asset.name}/{data_signal_output_id_2.division.name}/{data_signal_output_id_2.unit.name}/{data_signal_output_id_2.name}",
         f"{data_signal_input.workspace}/{data_signal_input.asset}/{data_signal_input.division}/{data_signal_input.unit}/{data_signal_input.signal}",
         f"{data_signal_input_dict['workspace']}/{data_signal_input_dict['asset']}/{data_signal_input_dict['division']}/{data_signal_input_dict['unit']}/{data_signal_input_dict['signal']}",
-        f"{data_signal_output.workspace.name}/{data_signal_output.asset.name}/{data_signal_output.division.name}/{data_signal_output.unit.name}/{data_signal_output.name}",
     ]
     pdt.assert_frame_equal(
         df,
@@ -267,7 +271,7 @@ def test_get_df_cold_empty(
     get_signals_request = requests_mock.request_history[0]
     get_historical_data_request = requests_mock.request_history[1]
     assert get_signals_request is not None
-    assert get_signals_request.json() == {"signals": [1]}
+    assert get_signals_request.json() == {"signals": [1, 2]}
     assert get_historical_data_request is not None
     assert get_historical_data_request.json() == {
         "signals": [signal.model_dump_with_rename() for signal in data_signal_inputs],
@@ -284,12 +288,13 @@ def test_get_df_hot_and_cold(
     data_signal_input_dict: SignalInputDict,
     data_signal_output: SignalOutput,
     data_signal_output_id_1: SignalOutput,
+    data_signal_output_id_2: SignalOutput,
     data_signal_inputs: list[SignalInput],
     requests_mock: Mocker,
 ):
     requests_mock.post(
         f"{nortech.settings.URL}/api/v1/signals",
-        text=f"[{data_signal_output_id_1.model_dump_json(by_alias=True)}]",
+        text=f"[{data_signal_output_id_1.model_dump_json(by_alias=True)},{data_signal_output_id_2.model_dump_json(by_alias=True)}]",
     )
 
     end = datetime.now(timezone.utc)
@@ -348,7 +353,7 @@ def test_get_df_hot_and_cold(
     )
 
     df = nortech.datatools.pandas.get_df(
-        signals=[data_signal_input, data_signal_input_dict, data_signal_output, 1],
+        signals=[data_signal_input, data_signal_input_dict, data_signal_output, 2],
         time_window=time_window,
     )
     pdt.assert_frame_equal(
@@ -370,7 +375,7 @@ def test_get_df_hot_and_cold(
     get_historical_data_request = requests_mock.request_history[2]
     get_parquet_request = requests_mock.request_history[3]
     assert get_signals_request is not None
-    assert get_signals_request.json() == {"signals": [1]}
+    assert get_signals_request.json() == {"signals": [1, 2]}
     assert get_timescale_request is not None
     assert get_timescale_request.json()["signals"] == [signal.model_dump() for signal in data_signal_inputs]
     assert get_timescale_request.json()["time_window"]["end"] == time_window.end.isoformat().replace("+00:00", "Z")
@@ -391,12 +396,13 @@ def test_get_df_hot_and_cold_cold_empty(
     data_signal_input_dict: SignalInputDict,
     data_signal_output: SignalOutput,
     data_signal_output_id_1: SignalOutput,
+    data_signal_output_id_2: SignalOutput,
     data_signal_inputs: list[SignalInput],
     requests_mock: Mocker,
 ):
     requests_mock.post(
         f"{nortech.settings.URL}/api/v1/signals",
-        text=f"[{data_signal_output_id_1.model_dump_json(by_alias=True)}]",
+        text=f"[{data_signal_output_id_1.model_dump_json(by_alias=True)},{data_signal_output_id_2.model_dump_json(by_alias=True)}]",
     )
 
     end = datetime.now(timezone.utc)
@@ -438,7 +444,7 @@ def test_get_df_hot_and_cold_cold_empty(
     )
 
     df = nortech.datatools.pandas.get_df(
-        signals=[data_signal_input, data_signal_input_dict, data_signal_output, 1],
+        signals=[data_signal_input, data_signal_input_dict, data_signal_output, 2],
         time_window=time_window,
     )
 
@@ -450,7 +456,7 @@ def test_get_df_hot_and_cold_cold_empty(
     get_timescale_request = requests_mock.request_history[1]
     get_historical_data_request = requests_mock.request_history[2]
     assert get_signals_request is not None
-    assert get_signals_request.json() == {"signals": [1]}
+    assert get_signals_request.json() == {"signals": [1, 2]}
     assert get_timescale_request is not None
     assert get_timescale_request.json()["signals"] == [signal.model_dump() for signal in data_signal_inputs]
     assert get_timescale_request.json()["time_window"]["end"] == time_window.end.isoformat().replace("+00:00", "Z")
@@ -469,12 +475,13 @@ def test_get_df_hot_and_cold_hot_empty(
     data_signal_input_dict: SignalInputDict,
     data_signal_output: SignalOutput,
     data_signal_output_id_1: SignalOutput,
+    data_signal_output_id_2: SignalOutput,
     data_signal_inputs: list[SignalInput],
     requests_mock: Mocker,
 ):
     requests_mock.post(
         f"{nortech.settings.URL}/api/v1/signals",
-        text=f"[{data_signal_output_id_1.model_dump_json(by_alias=True)}]",
+        text=f"[{data_signal_output_id_1.model_dump_json(by_alias=True)},{data_signal_output_id_2.model_dump_json(by_alias=True)}]",
     )
 
     end = datetime.now(timezone.utc)
@@ -515,7 +522,7 @@ def test_get_df_hot_and_cold_hot_empty(
     )
 
     df = nortech.datatools.pandas.get_df(
-        signals=[data_signal_input, data_signal_input_dict, data_signal_output, 1],
+        signals=[data_signal_input, data_signal_input_dict, data_signal_output, 2],
         time_window=time_window,
     )
     pdt.assert_frame_equal(
@@ -531,7 +538,7 @@ def test_get_df_hot_and_cold_hot_empty(
     get_historical_data_request = requests_mock.request_history[2]
     get_parquet_request = requests_mock.request_history[3]
     assert get_signals_request is not None
-    assert get_signals_request.json() == {"signals": [1]}
+    assert get_signals_request.json() == {"signals": [1, 2]}
     assert get_timescale_request is not None
     assert get_timescale_request.json()["signals"] == [signal.model_dump() for signal in data_signal_inputs]
     assert get_timescale_request.json()["time_window"]["end"] == time_window.end.isoformat().replace("+00:00", "Z")
@@ -552,12 +559,13 @@ def test_get_df_hot_and_cold_hot_and_cold_empty(
     data_signal_input_dict: SignalInputDict,
     data_signal_output: SignalOutput,
     data_signal_output_id_1: SignalOutput,
+    data_signal_output_id_2: SignalOutput,
     data_signal_inputs: list[SignalInput],
     requests_mock: Mocker,
 ):
     requests_mock.post(
         f"{nortech.settings.URL}/api/v1/signals",
-        text=f"[{data_signal_output_id_1.model_dump_json(by_alias=True)}]",
+        text=f"[{data_signal_output_id_1.model_dump_json(by_alias=True)},{data_signal_output_id_2.model_dump_json(by_alias=True)}]",
     )
 
     end = datetime.now(timezone.utc)
@@ -580,7 +588,7 @@ def test_get_df_hot_and_cold_hot_and_cold_empty(
     )
 
     df = nortech.datatools.pandas.get_df(
-        signals=[data_signal_input, data_signal_input_dict, data_signal_output, 1],
+        signals=[data_signal_input, data_signal_input_dict, data_signal_output, 2],
         time_window=time_window,
     )
     signals = [
@@ -607,7 +615,7 @@ def test_get_df_hot_and_cold_hot_and_cold_empty(
     get_timescale_request = requests_mock.request_history[1]
     get_historical_data_request = requests_mock.request_history[2]
     assert get_signals_request is not None
-    assert get_signals_request.json() == {"signals": [1]}
+    assert get_signals_request.json() == {"signals": [1, 2]}
     assert get_timescale_request is not None
     assert get_timescale_request.json()["signals"] == [signal.model_dump() for signal in data_signal_inputs]
     assert get_timescale_request.json()["time_window"]["end"] == time_window.end.isoformat().replace("+00:00", "Z")
