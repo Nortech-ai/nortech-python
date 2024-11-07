@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 from inspect import getsource
 from re import DOTALL, sub
 from textwrap import dedent
-from typing import Any, Callable, List, Type
+from typing import Any, Callable, Type
 
 from pydantic import BaseModel
 
@@ -22,7 +24,7 @@ from nortech.derivers.values.schema import (
 
 def input_schema_to_deriver_schema_inputs(
     input_schema: Type[BaseModel],
-) -> List[DeriverSchemaInput]:
+) -> list[DeriverSchemaInput]:
     input_fields = (
         (field_name, field) for field_name, field in input_schema.model_fields.items() if field_name != "timestamp"
     )
@@ -33,17 +35,19 @@ def input_schema_to_deriver_schema_inputs(
             description=field.description,  # type: ignore
             dataType=get_actual_type(field.annotation),
             physicalQuantity=PhysicalQuantity(
-                **field.json_schema_extra["physicalQuantity"]  # type: ignore  # noqa: E501
+                **field.json_schema_extra["physical_quantity"]  # type: ignore
             )
-            if field.json_schema_extra["physicalQuantity"]  # type: ignore
+            if field.json_schema_extra["physical_quantity"]  # type: ignore
             else None,
             suggestedInputsFromOtherDerivers=[
                 DeriverSchemaOutputWithDAG(  # type: ignore
                     **suggestedInputFromOtherDeriver,
-                    deriverSchemaDAG=get_deriver_schema_DAG(suggestedInputFromOtherDeriver["create_deriver_schema"]),  # type: ignore
+                    deriver_schema_dag=get_deriver_schema_dag(
+                        suggestedInputFromOtherDeriver["create_deriver_schema"]  # type: ignore
+                    ),
                 )
                 for suggestedInputFromOtherDeriver in field.json_schema_extra[  # type: ignore
-                    "suggestedInputsFromOtherDerivers"
+                    "suggested_inputs_from_other_derivers"
                 ]
             ],
         )
@@ -53,7 +57,7 @@ def input_schema_to_deriver_schema_inputs(
 
 def output_schema_to_deriver_schema_outputs(
     output_schema: Type[BaseModel],
-) -> List[DeriverSchemaOutput]:
+) -> list[DeriverSchemaOutput]:
     output_fields = (
         (field_name, field) for field_name, field in output_schema.model_fields.items() if field_name != "timestamp"
     )
@@ -63,8 +67,8 @@ def output_schema_to_deriver_schema_outputs(
             name=field_name,
             description=field.description,  # type: ignore
             dataType=get_actual_type(field.annotation),
-            physicalQuantity=PhysicalQuantity(**field.json_schema_extra["physicalQuantity"])  # type: ignore
-            if field.json_schema_extra["physicalQuantity"]  # type: ignore
+            physicalQuantity=PhysicalQuantity(**field.json_schema_extra["physical_quantity"])  # type: ignore
+            if field.json_schema_extra["physical_quantity"]  # type: ignore
             else None,
         )
         for field_name, field in output_fields
@@ -73,7 +77,7 @@ def output_schema_to_deriver_schema_outputs(
 
 def config_schema_to_config_dict(
     config_schema: Type[BaseModel],
-) -> List[DeriverSchemaConfiguration]:
+) -> list[DeriverSchemaConfiguration]:
     return [
         DeriverSchemaConfiguration(
             name=field_name,
@@ -84,7 +88,7 @@ def config_schema_to_config_dict(
     ]
 
 
-def get_deriver_schema_DAG(
+def get_deriver_schema_dag(
     create_deriver_schema: Callable[[], DeriverSchema],
 ) -> DeriverSchemaDAG:
     script = getsource(create_deriver_schema)
@@ -120,7 +124,7 @@ def check_create_deriver_schema_imports(
 
     # Execute the function within the clean environment
     try:
-        exec(source_code_without_suggested_inputs, clean_env)
+        exec(source_code_without_suggested_inputs, clean_env)  # noqa: S102
         # Call the function by its name in the clean environment
         clean_env[create_deriver_schema.__name__]()
     except NameError as e:

@@ -10,7 +10,8 @@ unit_registry = UnitRegistry()
 # Temperature
 temperature = PhysicalQuantity(
     name="Temperature",
-    description="Temperature is a physical quantity that quantitatively expresses the attribute of hotness or coldness.",
+    description="Temperature is a physical quantity that quantitatively expresses "
+    "the attribute of hotness or coldness.",
     SIUnit=str(unit_registry.kelvin),
     SIUnitSymbol=f"{unit_registry.kelvin:~}",
 )
@@ -24,14 +25,16 @@ kelvin = PhysicalUnit(
 
 celsius = PhysicalUnit(
     name=str(unit_registry.celsius),
-    description="The Celsius scale is based on 0°C for the freezing point of water and 100°C for the boiling point of water at 1 atm pressure.",
+    description="The Celsius scale is based on 0°C for the freezing point of water "
+    "and 100°C for the boiling point of water at 1 atm pressure.",
     symbol=f"{unit_registry.celsius:~}",
     physicalQuantity=temperature,
 )
 
 fahrenheit = PhysicalUnit(
     name=str(unit_registry.fahrenheit),
-    description="The Fahrenheit scale where the freezing point of water is 32°F and the boiling point is 212°F at standard atmospheric pressure.",
+    description="The Fahrenheit scale where the freezing point of water is 32°F "
+    "and the boiling point is 212°F at standard atmospheric pressure.",
     symbol=f"{unit_registry.fahrenheit:~}",
     physicalQuantity=temperature,
 )
@@ -125,7 +128,8 @@ meters_per_second = PhysicalUnit(
 
 kilometers_per_hour = PhysicalUnit(
     name=str(unit_registry("km/h")),
-    description="Kilometers per hour (km/h) is a unit of speed expressing the number of kilometers traveled in one hour.",
+    description="Kilometers per hour (km/h) is a unit of speed expressing "
+    "the number of kilometers traveled in one hour.",
     symbol=f"{unit_registry('km/h'):~}",
     physicalQuantity=speed,
 )
@@ -176,7 +180,8 @@ degree = PhysicalUnit(
 
 radian = PhysicalUnit(
     name=str(unit_registry.radian),
-    description="A radian is the SI unit of angular measure, defined by the angle subtended at the center of a circle by an arc equal in length to the radius.",
+    description="A radian is the SI unit of angular measure, defined by the angle "
+    "subtended at the center of a circle by an arc equal in length to the radius.",
     symbol=f"{unit_registry.radian:~}",
     physicalQuantity=angle,
 )
@@ -306,7 +311,8 @@ cubic_feet_per_minute = PhysicalUnit(
 # Mass
 mass = PhysicalQuantity(
     name="Mass",
-    description="Mass is a property of a physical body and a measure of its resistance to acceleration when a net force is applied.",
+    description="Mass is a property of a physical body and a measure "
+    "of its resistance to acceleration when a net force is applied.",
     SIUnit=str(unit_registry.kilogram),
     SIUnitSymbol=f"{unit_registry.kilogram:~}",
 )
@@ -349,14 +355,16 @@ ounce = PhysicalUnit(
 # Energy
 energy = PhysicalQuantity(
     name="Energy",
-    description="Energy is the capacity for doing work. It may exist in potential, kinetic, thermal, electrical, chemical, nuclear, or other various forms.",
+    description="Energy is the capacity for doing work. It may exist in "
+    "potential, kinetic, thermal, electrical, chemical, nuclear, or other various forms.",
     SIUnit=str(unit_registry.joule),
     SIUnitSymbol=f"{unit_registry.joule:~}",
 )
 
 joule = PhysicalUnit(
     name=str(unit_registry.joule),
-    description="The joule is the SI unit of energy, equal to the energy transferred when applying a force of one newton through a distance of one meter.",
+    description="The joule is the SI unit of energy, equal to the energy transferred "
+    "when applying a force of one newton through a distance of one meter.",
     symbol=f"{unit_registry.joule:~}",
     physicalQuantity=energy,
 )
@@ -385,14 +393,16 @@ electron_volt = PhysicalUnit(
 # Time
 time = PhysicalQuantity(
     name="Time",
-    description="Time is the indefinite continued progress of existence and events that occur in an apparently irreversible succession from the past, through the present, into the future.",
+    description="Time is the indefinite continued progress of existence and events that occur in an apparently "
+    "irreversible succession from the past, through the present, into the future.",
     SIUnit=str(unit_registry.second),
     SIUnitSymbol=f"{unit_registry.second:~}",
 )
 
 second = PhysicalUnit(
     name=str(unit_registry.second),
-    description="The second is the SI base unit of time, defined by taking the fixed numerical value of the caesium frequency.",
+    description="The second is the SI base unit of time, defined by taking"
+    " the fixed numerical value of the caesium frequency.",
     symbol=f"{unit_registry.second:~}",
     physicalQuantity=time,
 )
@@ -442,14 +452,16 @@ force = PhysicalQuantity(
 
 newton = PhysicalUnit(
     name=str(unit_registry.newton),
-    description="The newton is the SI unit of force. It is defined as the force required to accelerate a mass of one kilogram at a rate of one meter per second squared.",
+    description="The newton is the SI unit of force. It is defined as the force required "
+    "to accelerate a mass of one kilogram at a rate of one meter per second squared.",
     symbol=f"{unit_registry.newton:~}",
     physicalQuantity=force,
 )
 
 pound_force = PhysicalUnit(
     name=str(unit_registry.pound_force),
-    description="The pound-force is a unit of force in some systems of measurement including English Engineering units and British Gravitational units.",
+    description="The pound-force is a unit of force in some systems of measurement "
+    "including English Engineering units and British Gravitational units.",
     symbol=f"{unit_registry.pound_force:~}",
     physicalQuantity=force,
 )
@@ -580,7 +592,8 @@ voltage = PhysicalQuantity(
 
 volt = PhysicalUnit(
     name=str(unit_registry.volt),
-    description="The volt is the SI derived unit for electric potential, electric potential difference, and electromotive force.",
+    description="The volt is the SI derived unit for electric potential, "
+    "electric potential difference, and electromotive force.",
     symbol=f"{unit_registry.volt:~}",
     physicalQuantity=voltage,
 )

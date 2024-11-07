@@ -1,8 +1,9 @@
 from datetime import datetime
-from typing import Any, Callable, Dict, Generic, TypeVar
+from typing import Any, Callable, Generic, TypeVar
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
+from nortech.core.values.signal import SignalInput
 from nortech.derivers.services.physical_units import get_physical_quantity
 from nortech.derivers.services.schema import check_create_deriver_schema_imports
 from nortech.derivers.values.physical_units_schema import PhysicalUnit
@@ -14,21 +15,16 @@ from nortech.derivers.values.schema import (
 )
 
 
-class CWADUS(BaseModel):
-    customer: str = Field()
-    workspace: str = Field()
-    asset: str = Field()
-    division: str = Field()
-    unit: str = Field()
-    signal: str = Field()
+class DeriverInput(SignalInput):
+    model_config = ConfigDict(populate_by_name=True)
+
+    physical_unit: PhysicalUnit = Field(alias="physicalUnit")
 
 
-class DeriverInput(CWADUS):
-    physicalUnit: PhysicalUnit
+class DeriverOutput(SignalInput):
+    model_config = ConfigDict(populate_by_name=True)
 
-
-class DeriverOutput(CWADUS):
-    physicalUnit: PhysicalUnit
+    physical_unit: PhysicalUnit = Field(alias="physicalUnit")
 
 
 DeriverInputType = TypeVar("DeriverInputType", bound=DeriverInput)
@@ -39,18 +35,19 @@ class Deriver(
     BaseModel,
     Generic[InputType, OutputType, ConfigurationType, DeriverInputType, DeriverOutputType],
 ):
-    name: str = Field()
-    description: str = Field()
+    name: str
+    description: str
 
-    inputs: Dict[Any, DeriverInputType] = Field()
-    outputs: Dict[Any, DeriverOutputType] = Field()
-    configurations: ConfigurationType = Field()
+    inputs: dict[Any, DeriverInputType]
+    outputs: dict[Any, DeriverOutputType]
+    configurations: ConfigurationType
 
-    start_at: datetime = Field()
+    start_at: datetime
 
-    create_deriver_schema: Callable[[], DeriverSchema[InputType, OutputType, ConfigurationType]] = Field()
+    create_deriver_schema: Callable[[], DeriverSchema[InputType, OutputType, ConfigurationType]]
 
     @model_validator(mode="before")
+    @classmethod
     def parse_inputs_outputs(cls, values):
         # Parse inputs
         inputs = values.get("inputs")
@@ -61,9 +58,12 @@ class Deriver(
             except ValueError:
                 continue
 
-            if deriver_schema_input_physical_quantity != deriver_input.physicalUnit.physicalQuantity:
+            if deriver_schema_input_physical_quantity != deriver_input.physical_unit.physical_quantity:
                 raise ValueError(
-                    f"Physical quantity mismatch for {deriver_schema_input[0]}, physical quantity of the physical unit of the input is {deriver_schema_input_physical_quantity.name}, but the physical quantity of the input is {deriver_input.physicalUnit.physicalQuantity.name}."
+                    f"Physical quantity mismatch for {deriver_schema_input[0]}, "
+                    "physical quantity of the physical unit of the input is "
+                    f"{deriver_schema_input_physical_quantity.name}, but the "
+                    f"physical quantity of the input is {deriver_input.physical_unit.physical_quantity.name}."
                 )
 
         parsed_inputs = {str(key[0]): value for key, value in inputs.items() if isinstance(key, tuple) and len(key) > 0}
@@ -78,9 +78,12 @@ class Deriver(
             except ValueError:
                 continue
 
-            if deriver_schema_output_physical_quantity != deriver_output.physicalUnit.physicalQuantity:
+            if deriver_schema_output_physical_quantity != deriver_output.physical_unit.physical_quantity:
                 raise ValueError(
-                    f"Physical quantity mismatch for {deriver_schema_ouput[0]}, physical quantity of the physical unit of the output is {deriver_schema_output_physical_quantity.name}, but the physical quantity of the input is {deriver_output.physicalUnit.physicalQuantity.name}."
+                    f"Physical quantity mismatch for {deriver_schema_ouput[0]}, "
+                    "physical quantity of the physical unit of "
+                    f"the output is {deriver_schema_output_physical_quantity.name}, "
+                    f"but the physical quantity of the input is {deriver_output.physical_unit.physical_quantity.name}."
                 )
 
         parsed_outputs = {

@@ -1,59 +1,58 @@
+from __future__ import annotations
+
 from datetime import datetime
-from typing import Dict, Generic, List, Optional
+from typing import Generic, Literal
 
 from dateutil.parser import parse
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from urllib3.util import Timeout
 
+from nortech.core.gateways.nortech_api import (
+    NortechAPI,
+    PaginatedResponse,
+    PaginationOptions,
+    validate_response,
+)
 from nortech.derivers.values.instance import (
     Deriver,
     DeriverInputType,
     DeriverOutputType,
 )
 from nortech.derivers.values.schema import ConfigurationType, DeriverSchemaDAG
-from nortech.shared.gateways.customer_api import CustomerAPI
 
 
 class CreateDeriver(BaseModel, Generic[DeriverInputType, DeriverOutputType, ConfigurationType]):
-    name: str = Field()
-    description: str = Field()
+    model_config = ConfigDict(populate_by_name=True)
 
-    inputs: Dict[str, DeriverInputType] = Field()
-    outputs: Dict[str, DeriverOutputType] = Field()
-    configurations: ConfigurationType = Field()
+    name: str
+    description: str
 
-    startAt: str = Field()
+    inputs: dict[str, DeriverInputType]
+    outputs: dict[str, DeriverOutputType]
+    configurations: ConfigurationType
 
-
-class CustomerWorkspace(BaseModel):
-    customer_name: str = Field()
-    workspace_name: str = Field()
-
-
-class CustomerWorkspaceExternal(BaseModel):
-    customerName: str = Field()
-    workspaceName: str = Field()
+    start_at: str = Field(alias="startAt")
 
 
 class CreateDeriverRequest(BaseModel, Generic[DeriverInputType, DeriverOutputType, ConfigurationType]):
-    customerWorkspace: CustomerWorkspaceExternal = Field()
+    model_config = ConfigDict(populate_by_name=True)
 
+    workspace: str | None
     deriver: CreateDeriver[DeriverInputType, DeriverOutputType, ConfigurationType]
-    deriverSchemaDAG: DeriverSchemaDAG = Field()
-
-    dryRun: bool = Field()
+    deriver_schema_dag: DeriverSchemaDAG = Field(alias="deriverSchemaDAG")
+    dry_run: bool = Field(alias="dryRun")
 
 
 class Log(BaseModel):
-    timestamp: datetime = Field()
-    message: str = Field()
+    timestamp: datetime
+    message: str
 
     def __str__(self):
         return f"{self.timestamp} {self.message}"
 
 
 class LogList(BaseModel):
-    logs: List[Log] = Field()
+    logs: list[Log]
 
     def __str__(self) -> str:
         str_representation = "\n".join([str(log) for log in self.logs])
@@ -61,9 +60,9 @@ class LogList(BaseModel):
 
 
 class DeriverLogs(BaseModel):
-    name: str = Field()
-    flow: LogList = Field()
-    processor: LogList = Field()
+    name: str
+    flow: LogList
+    processor: LogList
 
     def __str__(self) -> str:
         str_representation = f"Pod: {self.name}\n"
@@ -79,7 +78,7 @@ class DeriverLogs(BaseModel):
 
 
 class LogsPerPod(BaseModel):
-    pods: List[DeriverLogs] = Field()
+    pods: list[DeriverLogs]
 
     def __str__(self) -> str:
         str_representation = "Pods:\n"
@@ -89,19 +88,38 @@ class LogsPerPod(BaseModel):
         return str_representation
 
 
+def list_derivers(
+    nortech_api: NortechAPI,
+    pagination_options: PaginationOptions[Literal["id", "name", "description"]] | None = None,
+    timeout: Timeout | None = None,
+):
+    response = nortech_api.get(
+        url="/api/v1/derivers",
+        params=pagination_options.model_dump(by_alias=True) if pagination_options else None,
+        timeout=timeout,  # type: ignore
+    )
+    validate_response(response, [200], "Failed to list Derivers.")
+
+    return PaginatedResponse[Deriver](**response.json())
+
+
+def get_deriver(nortech_api: NortechAPI, deriver_id: int):
+    response = nortech_api.get(url=f"/api/v1/derivers/{deriver_id}")
+    validate_response(response, [200], "Failed to get Deriver.")
+
+    return Deriver(**response.json())
+
+
 def create_deriver(
-    customer_API: CustomerAPI,
-    customer_workspace: CustomerWorkspace,
+    nortech_api: NortechAPI,
     deriver: Deriver,
-    deriver_schema_DAG: DeriverSchemaDAG,
-    dry_run: bool,
-    timeout: Optional[Timeout] = None,
+    deriver_schema_dag: DeriverSchemaDAG,
+    workspace: str | None = None,
+    dry_run: bool = True,
+    timeout: Timeout | None = None,
 ):
     create_deriver_request = CreateDeriverRequest(
-        customerWorkspace=CustomerWorkspaceExternal(
-            customerName=customer_workspace.customer_name,
-            workspaceName=customer_workspace.workspace_name,
-        ),
+        workspace=workspace,
         deriver=CreateDeriver(
             name=deriver.name,
             description=deriver.description,
@@ -110,22 +128,18 @@ def create_deriver(
             configurations=deriver.configurations,
             startAt=str(deriver.start_at),
         ),
-        deriverSchemaDAG=deriver_schema_DAG,
+        deriverSchemaDAG=deriver_schema_dag,
         dryRun=dry_run,
     )
 
-    response = customer_API.post(
-        url="/api/v1/derivers/createDeriver",
-        json=create_deriver_request.model_dump(),
+    print(create_deriver_request.model_dump_json(by_alias=True))
+
+    response = nortech_api.post(
+        url="/api/v1/derivers",
+        json=create_deriver_request.model_dump(by_alias=True),
         timeout=timeout,  # type: ignore
     )
-
-    try:
-        assert response.status_code == 200
-    except AssertionError:
-        raise AssertionError(
-            f"Failed to create DeriverDAG. Status code: {response.status_code}. Response: {response.json()}"
-        )
+    validate_response(response, [200], "Failed to create Deriver.")
 
     return response.json()
 
@@ -144,19 +158,13 @@ def get_logs_from_response_logs(response_logs: str) -> LogList:
 
 
 def get_deriver_logs(
-    customer_API: CustomerAPI,
-    deriverId: int,
+    nortech_api: NortechAPI,
+    deriver_id: int,
 ):
-    response = customer_API.get(
-        url="/api/v1/derivers/getDeriverLogs/{deriverId}",
+    response = nortech_api.get(
+        url=f"/api/v1/derivers/{deriver_id}/logs",
     )
-
-    try:
-        assert response.status_code == 200
-    except AssertionError:
-        raise AssertionError(
-            f"Failed to get Deriver logs. Status code: {response.status_code}. Response: {response.json()}"
-        )
+    validate_response(response, [200], "Failed to get Deriver logs.")
 
     return LogsPerPod(
         pods=[

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import typing
 from datetime import datetime
 from enum import Enum
@@ -5,7 +7,6 @@ from typing import (
     Any,
     Callable,
     Generic,
-    List,
     Optional,
     Type,
     TypeVar,
@@ -30,33 +31,37 @@ class DataTypeEnum(str, Enum):
 
 
 class DeriverSchemaConfiguration(BaseModel):
-    name: str = Field()
-    description: str = Field()
-    dataType: DataTypeEnum = Field()
+    model_config = ConfigDict(populate_by_name=True)
+
+    name: str
+    description: str
+    data_type: DataTypeEnum = Field(alias="dataType")
 
 
 class DeriverSchemaOutput(BaseModel):
-    name: str = Field()
-    description: str = Field()
-    dataType: DataTypeEnum = Field()
-    physicalQuantity: Optional[PhysicalQuantity] = Field()
+    model_config = ConfigDict(populate_by_name=True)
+
+    name: str
+    description: str
+    data_type: DataTypeEnum = Field(alias="dataType")
+    physical_quantity: PhysicalQuantity | None = Field(alias="physicalQuantity")
 
 
 class SuggestedInput(DeriverSchemaOutput):
-    create_deriver_schema: Callable[[], "DeriverSchema"] = Field()
+    create_deriver_schema: Callable[[], "DeriverSchema"] = Field(alias="createDeriverSchema")
 
 
-def InputField(
+def InputField(  # noqa: N802
     description: str,
-    physicalQuantity: Optional[PhysicalQuantity],
-    suggestedInputs: List[Any] = [],
+    physical_quantity: PhysicalQuantity | None,
+    suggested_inputs: list[Any] | None = None,
 ):
     return Field(
         description=description,
         json_schema_extra={
-            "physicalQuantity": physicalQuantity.model_dump() if physicalQuantity else None,
-            "suggestedInputsFromOtherDerivers": [
-                output.model_dump() for output in map(suggested_input_to_output_schema, suggestedInputs)
+            "physical_quantity": physical_quantity.model_dump() if physical_quantity else None,
+            "suggested_inputs_from_other_derivers": [
+                output.model_dump() for output in map(suggested_input_to_output_schema, suggested_inputs or [])
             ],
         },
     )
@@ -64,21 +69,20 @@ def InputField(
 
 def get_actual_type(field_annotation) -> DataTypeEnum:
     # Extract the actual type from Optional or Union hints
-    if get_origin(field_annotation) in (Union, typing.Optional):
+    if get_origin(field_annotation) in (Union, Optional):
         # Assuming the first argument is the desired type and not None
-        actual_type = next(t for t in get_args(field_annotation) if not isinstance(t, type(None)))
+        actual_type = next(t for t in get_args(field_annotation) if t is not None)
     else:
         actual_type = field_annotation
 
     # Convert actual_type to DataTypeEnum
     if actual_type in [int, float]:
         return DataTypeEnum.float
-    elif actual_type is bool:
+    if actual_type is bool:
         return DataTypeEnum.boolean
-    elif actual_type is str:
+    if actual_type is str:
         return DataTypeEnum.string
-    else:
-        return DataTypeEnum.json
+    return DataTypeEnum.json
 
 
 def suggested_input_to_output_schema(
@@ -87,8 +91,8 @@ def suggested_input_to_output_schema(
     field_name, field = suggested_input
 
     json_schema_extra = field.json_schema_extra
-    physicalQuantity = (
-        PhysicalQuantity(**json_schema_extra["physicalQuantity"]) if json_schema_extra["physicalQuantity"] else None
+    physical_quantity = (
+        PhysicalQuantity(**json_schema_extra["physical_quantity"]) if json_schema_extra["physical_quantity"] else None
     )
     create_deriver_schema = json_schema_extra["create_deriver_schema"]  # type: ignore
 
@@ -101,8 +105,8 @@ def suggested_input_to_output_schema(
         name=field_name,
         description=field.description,
         dataType=actual_type,
-        physicalQuantity=physicalQuantity,
-        create_deriver_schema=create_deriver_schema,
+        physicalQuantity=physical_quantity,
+        createDeriverSchema=create_deriver_schema,
     )
 
 
@@ -154,51 +158,55 @@ ConfigurationType = TypeVar("ConfigurationType", bound=BaseModel)
 
 
 class DeriverSchema(BaseModel, Generic[InputType, OutputType, ConfigurationType]):
-    name: str = Field()
-    description: str = Field()
+    name: str
+    description: str
 
-    inputs: Type[InputType] = Field()
-    outputs: Type[OutputType] = Field()
-    configurations: Type[ConfigurationType] = Field()
-    transform_stream: Callable[[Stream[InputType], ConfigurationType], Stream[OutputType]] = Field()
+    inputs: Type[InputType]
+    outputs: Type[OutputType]
+    configurations: Type[ConfigurationType]
+    transform_stream: Callable[[Stream[InputType], ConfigurationType], Stream[OutputType]]
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
 
-def OutputField(
+def OutputField(  # noqa: N802
     description: str,
-    physicalQuantity: Optional[PhysicalQuantity],
+    physical_quantity: PhysicalQuantity | None,
     create_deriver_schema: Callable[[], DeriverSchema],
 ):
     return Field(
         description=description,
         json_schema_extra={
-            "physicalQuantity": physicalQuantity.model_dump() if physicalQuantity else None,
+            "physical_quantity": physical_quantity.model_dump() if physical_quantity else None,
             "create_deriver_schema": create_deriver_schema,  # type: ignore
         },
     )
 
 
 class DeriverSchemaOutputWithDAG(DeriverSchemaOutput):
-    deriverSchemaDAG: "DeriverSchemaDAG" = Field()
+    deriver_schema_dag: "DeriverSchemaDAG"
 
 
 class DeriverSchemaInput(BaseModel, Generic[InputType, OutputType, ConfigurationType]):
-    name: str = Field()
-    description: str = Field()
-    dataType: DataTypeEnum = Field()
+    model_config = ConfigDict(populate_by_name=True)
 
-    physicalQuantity: Optional[PhysicalQuantity] = Field()
+    name: str
+    description: str
+    data_type: DataTypeEnum = Field(alias="dataType")
 
-    suggestedInputsFromOtherDerivers: List["DeriverSchemaOutputWithDAG"] = Field(default_factory=list)
+    physical_quantity: PhysicalQuantity | None = Field(alias="physicalQuantity")
+
+    suggested_inputs_from_other_derivers: list["DeriverSchemaOutputWithDAG"] = Field(
+        default_factory=list, alias="suggestedInputsFromOtherDerivers"
+    )
 
 
 class DeriverSchemaDAG(BaseModel):
-    name: str = Field()
-    description: str = Field()
+    name: str
+    description: str
 
-    inputs: List[DeriverSchemaInput] = Field()
-    outputs: List[DeriverSchemaOutput] = Field()
-    configurations: List[DeriverSchemaConfiguration] = Field()
+    inputs: list[DeriverSchemaInput]
+    outputs: list[DeriverSchemaOutput]
+    configurations: list[DeriverSchemaConfiguration]
 
-    script: str = Field()
+    script: str

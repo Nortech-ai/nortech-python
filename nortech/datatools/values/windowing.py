@@ -1,19 +1,16 @@
-from dataclasses import dataclass
+from pydantic import BaseModel
 
-from nortech.datatools.values.signals import TimeWindow
+from nortech.core.values.time_window import TimeWindow
 
 
-@dataclass
-class HotColdWindow:
+class HotColdWindow(BaseModel):
     hot_storage_time_window: TimeWindow
     cold_storage_time_window: TimeWindow
 
 
-@dataclass
-class HotWindow:
+class HotWindow(BaseModel):
     time_window: TimeWindow
 
 
-@dataclass
-class ColdWindow:
+class ColdWindow(BaseModel):
     time_window: TimeWindow

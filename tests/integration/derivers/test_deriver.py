@@ -1,41 +1,39 @@
+from __future__ import annotations
+
 from datetime import datetime, timezone
 
 import pandas as pd
 from pytest import raises
+from requests_mock import Mocker
 
-from nortech.derivers.handlers.deriver import deploy_deriver, run_deriver_locally
-from nortech.derivers.services.customer_api import CustomerWorkspace
-from nortech.derivers.values.instance import Deriver, DeriverInput, DeriverOutput
-from nortech.derivers.values.physical_units import celsius
-from nortech.shared.gateways.customer_api import CustomerAPI, CustomerAPISettings
+from nortech import Nortech
+from nortech.derivers import Deriver, DeriverInput, DeriverOutput, physical_units, run_deriver_locally
 
 
 def create_test_schema():
-    from typing import Optional
-
     import bytewax.operators as op
     from bytewax.dataflow import Stream
     from pydantic import BaseModel
 
-    from nortech.derivers.values.physical_units import temperature
-    from nortech.derivers.values.schema import (
+    from nortech.derivers import (
         DeriverInputSchema,
         DeriverOutputSchema,
         DeriverSchema,
         InputField,
         OutputField,
+        physical_units,
     )
 
     class Input(DeriverInputSchema):
-        input_signal: Optional[float] = InputField(
+        input_signal: float | None = InputField(
             description="Input signal description",
-            physicalQuantity=temperature,
+            physical_quantity=physical_units.temperature,
         )
 
     class Output(DeriverOutputSchema):
-        output_signal: Optional[float] = OutputField(
+        output_signal: float | None = OutputField(
             description="Output signal description",
-            physicalQuantity=temperature,
+            physical_quantity=physical_units.temperature,
             create_deriver_schema=create_test_schema,
         )
 
@@ -71,25 +69,23 @@ deriver_schema = create_test_schema()
 
 inputs = {
     deriver_schema.inputs.input_signal: DeriverInput(
-        customer="Customer",
         workspace="Workspace",
         asset="Asset",
         division="Division",
         unit="Unit",
         signal="Signal",
-        physicalUnit=celsius,
+        physicalUnit=physical_units.celsius,
     )
 }
 
 outputs = {
     deriver_schema.outputs.output_signal: DeriverOutput(
-        customer="Customer",
         workspace="Workspace",
         asset="Asset",
         division="Division",
         unit="Unit",
         signal="Signal",
-        physicalUnit=celsius,
+        physicalUnit=physical_units.celsius,
     )
 }
 
@@ -107,11 +103,9 @@ deriver = Deriver(
 
 
 def test_deriver_schema_fail():
-    from nortech.derivers.values.physical_units import temperature
+    from nortech.derivers import physical_units
 
     def create_test_schema_with_missing_import():
-        from typing import Optional
-
         import bytewax.operators as op
         from bytewax.dataflow import Stream
         from pydantic import BaseModel
@@ -125,15 +119,15 @@ def test_deriver_schema_fail():
         )
 
         class Input(DeriverInputSchema):
-            input_signal: Optional[float] = InputField(
+            input_signal: float | None = InputField(
                 description="Input signal description",
-                physicalQuantity=temperature,
+                physical_quantity=physical_units.temperature,
             )
 
         class Output(DeriverOutputSchema):
-            output_signal: Optional[float] = OutputField(
+            output_signal: float | None = OutputField(
                 description="Output signal description",
-                physicalQuantity=temperature,
+                physical_quantity=physical_units.temperature,
                 create_deriver_schema=create_test_schema,
             )
 
@@ -168,25 +162,23 @@ def test_deriver_schema_fail():
 
     inputs = {
         deriver_schema.inputs.input_signal: DeriverInput(
-            customer="Customer",
             workspace="Workspace",
             asset="Asset",
             division="Division",
             unit="Unit",
             signal="Signal",
-            physicalUnit=celsius,
+            physicalUnit=physical_units.celsius,
         )
     }
 
     outputs = {
         deriver_schema.outputs.output_signal: DeriverOutput(
-            customer="Customer",
             workspace="Workspace",
             asset="Asset",
             division="Division",
             unit="Unit",
             signal="Signal",
-            physicalUnit=celsius,
+            physicalUnit=physical_units.celsius,
         )
     }
 
@@ -204,34 +196,18 @@ def test_deriver_schema_fail():
         )
 
 
-def test_deriver_deploy(requests_mock):
-    customer_api_url = "https://api.apps.nor.tech"
-
-    customer_API = CustomerAPI(
-        settings=CustomerAPISettings(
-            URL=customer_api_url,
-            TOKEN="test",
-        )
-    )
-
-    customer_workspace = CustomerWorkspace(
-        customer_name="Customer",
-        workspace_name="Workspace",
-    )
-
+def test_deriver_deploy(nortech: Nortech, requests_mock: Mocker):
     mock_response_data = {
         "status": "success",
         "data": {"message": "Deriver deployed successfully"},
     }
 
     requests_mock.post(
-        url=customer_api_url + "/api/v1/derivers/createDeriver",
+        url=nortech.settings.URL + "/api/v1/derivers",
         json=mock_response_data,
     )
 
-    deriver_diff = deploy_deriver(
-        customer_API=customer_API,
-        customer_workspace=customer_workspace,
+    deriver_diff = nortech.derivers.deploy_deriver(
         deriver=deriver,
         dry_run=True,
     )

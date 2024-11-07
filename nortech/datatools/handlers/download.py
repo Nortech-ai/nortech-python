@@ -1,34 +1,39 @@
-from typing import Optional
+from __future__ import annotations
 
 from urllib3.util import Timeout
 
-from nortech.datatools.gateways.customer_api import (
-    CustomerAPI,
-    download_data_from_customer_api_historical_data,
+from nortech.core.services.logger import logger
+from nortech.core.services.signal import (
+    parse_signal_input_or_output_or_id_union_to_signal_input,
 )
-from nortech.datatools.services.logger import logger
+from nortech.core.values.signal import SignalInput, SignalInputDict, SignalListOutput, SignalOutput
+from nortech.datatools.services.nortech_api import (
+    Format,
+    NortechAPI,
+    download_data_from_cold_storage,
+)
 from nortech.datatools.services.storage import get_hot_and_cold_time_windows
-from nortech.datatools.values.signals import TimeWindow, get_signal_list_from_search_json
-from nortech.datatools.values.windowing import ColdWindow, HotWindow
+from nortech.datatools.values.windowing import ColdWindow, HotWindow, TimeWindow
 
 
 def download_data(
-    customer_API: CustomerAPI,
-    search_json: str,
+    nortech_api: NortechAPI,
+    signals: list[SignalInput | SignalInputDict | SignalOutput | SignalListOutput | int],
     time_window: TimeWindow,
     output_path: str,
-    timeout: Optional[Timeout] = None,
+    file_format: Format,
+    timeout: Timeout | None = None,
 ):
-    signal_list = get_signal_list_from_search_json(search_json=search_json)
-
+    signal_inputs = parse_signal_input_or_output_or_id_union_to_signal_input(nortech_api, signals)
     time_windows = get_hot_and_cold_time_windows(time_window=time_window)
 
     if isinstance(time_windows, ColdWindow):
-        download_data_from_customer_api_historical_data(
-            customer_API=customer_API,
-            signal_list=signal_list,
+        download_data_from_cold_storage(
+            nortech_api=nortech_api,
+            signals=signal_inputs,
             time_window=time_windows.time_window,
             output_path=output_path,
+            file_format=file_format,
             timeout=timeout,
         )
     elif isinstance(time_windows, HotWindow):
@@ -36,10 +41,11 @@ def download_data(
     else:
         logger.warning("Hot storage is not available for download yet. Limiting time window to cold storage.")
 
-        download_data_from_customer_api_historical_data(
-            customer_API=customer_API,
-            signal_list=signal_list,
+        download_data_from_cold_storage(
+            nortech_api=nortech_api,
+            signals=signal_inputs,
             time_window=time_windows.cold_storage_time_window,
             output_path=output_path,
+            file_format=file_format,
             timeout=timeout,
         )
