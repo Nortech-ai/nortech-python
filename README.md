@@ -1,4 +1,5 @@
 # nortech-python
+[![codecov](https://codecov.io/github/Nortech-ai/nortech-python/graph/badge.svg)](https://codecov.io/github/Nortech-ai/nortech-python)
 
 The official Python library for Nortech AI.
 
