@@ -11,9 +11,9 @@ flowchart LR
                 
         end
     
-            9189106559205202560_Signal["Signal<br/>[°C]"] --> 3644306499827952024_input_signal
+            847cb464_Signal["Signal<br/>[°C]"] --> 4a9b921b_input_signal
         
-            3644306499827952024_output_signal --> 9189106559205202560_output_signal["output_signal<br/>[°C]"]
+            4a9b921b_output_signal --> 847cb464_output_signal["output_signal<br/>[°C]"]
         
 end
 ```
