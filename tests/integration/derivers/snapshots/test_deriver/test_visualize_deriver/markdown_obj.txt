@@ -3,17 +3,17 @@
 flowchart LR
     subgraph "Deriver (Test Deriver)"
 
-        subgraph "DeriverSchema (Test Schema)"
+        subgraph "DeriverSchema (Test Schema with suggested inputs)"
     
-                    4a9b921b_input_signal["input_signal<br/>[K]"] --> transform_stream_4a9b921b["transform_stream"]
+                    91ea505a_input_signal["input_signal<br/>[K]"] --> transform_stream_91ea505a["transform_stream"]
                 
-                    transform_stream_4a9b921b --> 4a9b921b_output_signal["output_signal<br/>[K]"]
+                    transform_stream_91ea505a --> 91ea505a_output_signal["output_signal<br/>[K]"]
                 
         end
     
-            847cb464_Signal["Signal<br/>[°C]"] --> 4a9b921b_input_signal
+            847cb464_Signal["Signal<br/>[°C]"] --> 91ea505a_input_signal
         
-            4a9b921b_output_signal --> 847cb464_output_signal["output_signal<br/>[°C]"]
+            91ea505a_output_signal --> 847cb464_output_signal["output_signal<br/>[°C]"]
         
 end
 ```

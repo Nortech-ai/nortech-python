@@ -10,4 +10,14 @@ flowchart LR
                 
         end
     
+                    4a9b921b_output_signal -.->|suggestedInput| 91ea505a_input_signal
+                
+        subgraph "DeriverSchema (Test Schema with suggested inputs)"
+    
+                    91ea505a_input_signal["input_signal<br/>[K]"] --> transform_stream_91ea505a["transform_stream"]
+                
+                    transform_stream_91ea505a --> 91ea505a_output_signal["output_signal<br/>[K]"]
+                
+        end
+    
 ```

@@ -74,7 +74,66 @@ def create_test_schema():
     )
 
 
-deriver_schema = create_test_schema()
+deriver_schema_without_suggested_inputs = create_test_schema()
+
+
+def create_test_schema_with_suggested_inputs():
+    import bytewax.operators as op
+    from bytewax.dataflow import Stream
+    from pydantic import BaseModel
+
+    from nortech.derivers import (
+        DeriverInputSchema,
+        DeriverOutputSchema,
+        DeriverSchema,
+        InputField,
+        OutputField,
+        physical_units,
+    )
+
+    class Input(DeriverInputSchema):
+        input_signal: float | None = InputField(
+            description="Input signal description",
+            physical_quantity=physical_units.temperature,
+            suggested_inputs=[deriver_schema_without_suggested_inputs.outputs.output_signal],
+        )
+
+    class Output(DeriverOutputSchema):
+        output_signal: float | None = OutputField(
+            description="Output signal description",
+            physical_quantity=physical_units.temperature,
+            create_deriver_schema=create_test_schema_with_suggested_inputs,
+        )
+
+    class Configurations(BaseModel):
+        pass
+
+    def transform_stream(
+        stream: Stream[Input],
+        config: Configurations,
+    ) -> Stream[Output]:
+        output_stream = op.map(
+            step_id="map_output",
+            up=stream,
+            mapper=lambda input_message: Output(
+                timestamp=input_message.timestamp,
+                output_signal=input_message.input_signal,
+            ),
+        )
+
+        return output_stream
+
+    return DeriverSchema(
+        name="Test Schema with suggested inputs",
+        description="Test Schema description with suggested inputs",
+        inputs=Input,
+        outputs=Output,
+        configurations=Configurations,
+        transform_stream=transform_stream,
+    )
+
+
+deriver_schema = create_test_schema_with_suggested_inputs()
 
 inputs = {
     deriver_schema.inputs.input_signal: DeriverInput(
@@ -107,7 +166,7 @@ deriver = Deriver(
     outputs=outputs,
     configurations=configurations,
     start_at=datetime(2022, 1, 1, 0, 0, 0),
-    create_deriver_schema=create_test_schema,
+    create_deriver_schema=create_test_schema_with_suggested_inputs,
 )
 
 
