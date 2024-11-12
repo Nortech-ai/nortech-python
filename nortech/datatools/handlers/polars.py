@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Sequence
+
 from polars import DataFrame, LazyFrame, concat, lit
 from urllib3.util import Timeout
 
@@ -23,7 +25,7 @@ from nortech.datatools.values.windowing import ColdWindow, HotWindow, TimeWindow
 
 def get_lazy_polars_df(
     nortech_api: NortechAPI,
-    signals: list[SignalInput | SignalInputDict | SignalOutput | SignalListOutput | int],
+    signals: Sequence[SignalInput | SignalInputDict | SignalOutput | SignalListOutput | int],
     time_window: TimeWindow,
     timeout: Timeout | None = None,
 ) -> LazyFrame:
@@ -90,7 +92,7 @@ def get_lazy_polars_df(
 
 def get_polars_df(
     nortech_api: NortechAPI,
-    signals: list[SignalInput | SignalInputDict | SignalOutput | SignalListOutput | int],
+    signals: Sequence[SignalInput | SignalInputDict | SignalOutput | SignalListOutput | int],
     time_window: TimeWindow,
     timeout: Timeout | None = None,
 ) -> DataFrame:

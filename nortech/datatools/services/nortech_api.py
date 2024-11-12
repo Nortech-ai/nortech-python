@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import timezone
 from io import BytesIO
 from tempfile import NamedTemporaryFile
-from typing import Literal
+from typing import Literal, Sequence
 
 from pandas import DataFrame, read_csv, to_datetime
 from polars import (
@@ -29,7 +29,7 @@ def serialize_hot_storage_time_window(time_window: TimeWindow):
 
 def get_lazy_polars_df_from_hot_storage(
     nortech_api: NortechAPI,
-    signals: list[SignalInput],
+    signals: Sequence[SignalInput],
     time_window: TimeWindow,
     timeout: Timeout | None = None,
 ):
@@ -75,7 +75,7 @@ def get_lazy_polars_df_from_hot_storage(
 
 def get_lazy_polars_df_from_cold_storage(
     nortech_api: NortechAPI,
-    signals: list[SignalInput],
+    signals: Sequence[SignalInput],
     time_window: TimeWindow,
     timeout: Timeout | None = None,
 ):
@@ -126,7 +126,7 @@ Format = Literal["parquet", "json", "csv"]
 
 def download_data_from_cold_storage(
     nortech_api: NortechAPI,
-    signals: list[SignalInput],
+    signals: Sequence[SignalInput],
     time_window: TimeWindow,
     output_path: str,
     file_format: Format = "parquet",

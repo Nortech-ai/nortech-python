@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Generic, Literal, TypeVar
+from typing import Generic, Literal, Sequence, TypeVar
 from urllib.parse import urljoin
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -81,7 +81,7 @@ class NortechAPI(Session):
 
 def validate_response(
     response: Response,
-    valid_status_codes: list[int] | None = None,
+    valid_status_codes: Sequence[int] | None = None,
     error_message: str = "Fetch failed.",
 ) -> None:
     try:
@@ -111,7 +111,7 @@ Resp = TypeVar("Resp")
 
 class PaginatedResponse(BaseModel, Generic[Resp]):
     size: int
-    data: list[Resp]
+    data: Sequence[Resp]
     next: NextRef | None = None
     pagination_options: PaginationOptions | None = None
 

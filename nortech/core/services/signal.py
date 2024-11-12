@@ -311,7 +311,7 @@ def _get_signals(nortech_api: NortechAPI, signals: Sequence[SignalInput | Signal
 
 
 def parse_signal_input_or_output_or_id_union_to_signal_input(
-    nortech_api: NortechAPI, signals: list[SignalInput | SignalInputDict | SignalOutput | SignalListOutput | int]
+    nortech_api: NortechAPI, signals: Sequence[SignalInput | SignalInputDict | SignalOutput | SignalListOutput | int]
 ):
     signal_ids: List[int] = [
         signal.id if isinstance(signal, SignalListOutput) else signal

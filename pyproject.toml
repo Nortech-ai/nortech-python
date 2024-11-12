@@ -40,6 +40,7 @@ dev-dependencies = [
     "pandas-stubs>=2.2.2.240807",
     "pyarrow-stubs>=17.5",
     "pytest-cov>=6.0.0",
+    "pytest-snapshot>=0.9.0",
     "pytest>=8.3.3",
     "requests-mock>=1.12.1",
     "types-python-dateutil>=2.9.0.20240906",

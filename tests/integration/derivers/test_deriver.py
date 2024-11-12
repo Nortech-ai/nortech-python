@@ -1,13 +1,22 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+from unittest.mock import patch
 
 import pandas as pd
 from pytest import raises
 from requests_mock import Mocker
 
 from nortech import Nortech
-from nortech.derivers import Deriver, DeriverInput, DeriverOutput, physical_units, run_deriver_locally
+from nortech.derivers import (
+    Deriver,
+    DeriverInput,
+    DeriverOutput,
+    physical_units,
+    run_deriver_locally,
+    visualize_deriver,
+    visualize_deriver_schema,
+)
 
 
 def create_test_schema():
@@ -233,3 +242,29 @@ def test_deriver_run_locally():
     print(renamed_df)
 
     assert output_deriver.equals(renamed_df)
+
+
+def test_visualize_deriver(snapshot):
+    with patch("nortech.derivers.handlers.deriver.display") as mock_display:
+        visualize_deriver(deriver=deriver)
+
+        # Verify display was called once
+        assert mock_display.call_count == 1
+
+        # Get the Markdown object that was passed to display
+        markdown_obj = mock_display.call_args[0][0]
+
+        snapshot.assert_match(markdown_obj.data, "markdown_obj.txt")
+
+
+def test_visualize_deriver_schema(snapshot):
+    with patch("nortech.derivers.handlers.deriver.display") as mock_display:
+        visualize_deriver_schema(create_deriver_schema=deriver.create_deriver_schema)
+
+        # Verify display was called once
+        assert mock_display.call_count == 1
+
+        # Get the Markdown object that was passed to display
+        markdown_obj = mock_display.call_args[0][0]
+
+        snapshot.assert_match(markdown_obj.data, "markdown_obj.txt")

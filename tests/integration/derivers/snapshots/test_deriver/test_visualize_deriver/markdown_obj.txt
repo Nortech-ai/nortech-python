@@ -1,0 +1,19 @@
+
+```mermaid
+flowchart LR
+    subgraph "Deriver (Test Deriver)"
+
+        subgraph "DeriverSchema (Test Schema)"
+    
+                    3644306499827952024_input_signal["input_signal<br/>[K]"] --> transform_stream_3644306499827952024["transform_stream"]
+                
+                    transform_stream_3644306499827952024 --> 3644306499827952024_output_signal["output_signal<br/>[K]"]
+                
+        end
+    
+            9189106559205202560_Signal["Signal<br/>[°C]"] --> 3644306499827952024_input_signal
+        
+            3644306499827952024_output_signal --> 9189106559205202560_output_signal["output_signal<br/>[°C]"]
+        
+end
+```

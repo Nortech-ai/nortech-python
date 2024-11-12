@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Sequence
+
 from pandas import DataFrame
 from polars import DataFrame as PolarsDataFrame
 from polars import LazyFrame
@@ -27,7 +29,7 @@ class Download:
 
     def download_data(
         self,
-        signals: list[SignalInput | SignalInputDict | SignalOutput | SignalListOutput | int],
+        signals: Sequence[SignalInput | SignalInputDict | SignalOutput | SignalListOutput | int],
         time_window: TimeWindow,
         output_path: str,
         file_format: Format,
@@ -38,7 +40,7 @@ class Download:
 
         Parameters
         ----------
-        signals : list[SignalInput | SignalInputDict | SignalOutput | int]
+        signals : Sequence[SignalInput | SignalInputDict | SignalOutput | int]
             A list of signals to download, which can be of the following types:
             - SignalInputDict: A dictionary representation of a signal input.
                 Example: {"workspace": "my_workspace", "asset": "my_asset", "division": "my_division", "unit": "my_unit", "signal": "my_signal"}
@@ -109,7 +111,7 @@ class Pandas:
 
     def get_df(
         self,
-        signals: list[SignalInput | SignalInputDict | SignalOutput | SignalListOutput | int],
+        signals: Sequence[SignalInput | SignalInputDict | SignalOutput | SignalListOutput | int],
         time_window: TimeWindow,
         timeout: Timeout | None = None,
     ) -> DataFrame:
@@ -118,7 +120,7 @@ class Pandas:
 
         Parameters
         ----------
-        signals : list[SignalInput | SignalInputDict | SignalOutput | int]
+        signals : Sequence[SignalInput | SignalInputDict | SignalOutput | int]
             A list of signals to retrieve, which can be of the following types:
             - SignalInputDict: A dictionary representation of a signal input.
                 Example: {"workspace": "my_workspace", "asset": "my_asset", "division": "my_division", "unit": "my_unit", "signal": "my_signal"}
@@ -189,9 +191,9 @@ class Polars:
     def __init__(self, nortech_api: NortechAPI):
         self.nortech_api = nortech_api
 
-    def get_lazy_polars_df(
+    def get_lazy_df(
         self,
-        signals: list[SignalInput | SignalInputDict | SignalOutput | SignalListOutput | int],
+        signals: Sequence[SignalInput | SignalInputDict | SignalOutput | SignalListOutput | int],
         time_window: TimeWindow,
         timeout: Timeout | None = None,
     ) -> LazyFrame:
@@ -200,7 +202,7 @@ class Polars:
 
         Parameters
         ----------
-        signals : list[SignalInput | SignalInputDict | SignalOutput | int]
+        signals : Sequence[SignalInput | SignalInputDict | SignalOutput | int]
             A list of signals to retrieve, which can be of the following types:
             - SignalInputDict: A dictionary representation of a signal input.
                 Example: {"workspace": "my_workspace", "asset": "my_asset", "division": "my_division", "unit": "my_unit", "signal": "my_signal"}
@@ -266,9 +268,9 @@ class Polars:
         """
         return polars_handlers.get_lazy_polars_df(self.nortech_api, signals, time_window, timeout)
 
-    def get_polars_df(
+    def get_df(
         self,
-        signals: list[SignalInput | SignalInputDict | SignalOutput | SignalListOutput | int],
+        signals: Sequence[SignalInput | SignalInputDict | SignalOutput | SignalListOutput | int],
         time_window: TimeWindow,
         timeout: Timeout | None = None,
     ) -> PolarsDataFrame:
@@ -277,7 +279,7 @@ class Polars:
 
         Parameters
         ----------
-        signals : list[SignalInput | SignalInputDict | SignalOutput | int]
+        signals : Sequence[SignalInput | SignalInputDict | SignalOutput | int]
             A list of signals to retrieve, which can be of the following types:
             - SignalInputDict: A dictionary representation of a signal input.
                 Example: {"workspace": "my_workspace", "asset": "my_asset", "division": "my_division", "unit": "my_unit", "signal": "my_signal"}
