@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Sequence
+
 from pandas import DataFrame
 from urllib3.util import Timeout
 
@@ -11,7 +13,7 @@ from nortech.datatools.values.windowing import TimeWindow
 
 def get_df(
     nortech_api: NortechAPI,
-    signals: list[SignalInput | SignalInputDict | SignalOutput | SignalListOutput | int],
+    signals: Sequence[SignalInput | SignalInputDict | SignalOutput | SignalListOutput | int],
     time_window: TimeWindow,
     timeout: Timeout | None = None,
 ) -> DataFrame:

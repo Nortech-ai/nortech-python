@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Sequence
+
 from urllib3.util import Timeout
 
 from nortech.core.services.logger import logger
@@ -18,7 +20,7 @@ from nortech.datatools.values.windowing import ColdWindow, HotWindow, TimeWindow
 
 def download_data(
     nortech_api: NortechAPI,
-    signals: list[SignalInput | SignalInputDict | SignalOutput | SignalListOutput | int],
+    signals: Sequence[SignalInput | SignalInputDict | SignalOutput | SignalListOutput | int],
     time_window: TimeWindow,
     output_path: str,
     file_format: Format,

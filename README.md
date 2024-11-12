@@ -146,7 +146,7 @@ print(df.columns)
 
 ##### Polars DataFrame
 
-In order to get a [polars](https://pola-rs.github.io/polars/py-polars/html/reference/) DataFrame use the `get_polars_df`:
+In order to get a [polars](https://pola-rs.github.io/polars/py-polars/html/reference/) DataFrame use the `get_df`:
 
 ```python
 from datetime import datetime
@@ -172,8 +172,8 @@ signal3 = SignalInput(workspace="workspace2", asset="asset2", division="division
 # Define the time window for data download
 my_time_window = TimeWindow(start=datetime(2023, 1, 1), end=datetime(2023, 1, 31))
 
-# Call the get_polars_df function
-polars_df = nortech.datatools.polars.get_polars_df(
+# Call the get_df function
+polars_df = nortech.datatools.polars.get_df(
     signals=[signal1, signal2, signal3],
     time_window=my_time_window,
 )
@@ -190,7 +190,7 @@ print(polars_df.columns)
 
 ##### Polars LazyFrame
 
-In order to get a [polars](https://pola-rs.github.io/polars/py-polars/html/reference/) LazyFrame use the `get_lazy_polars_df`:
+In order to get a [polars](https://pola-rs.github.io/polars/py-polars/html/reference/) LazyFrame use the `get_lazy_df`:
 
 ```python
 from datetime import datetime
@@ -216,8 +216,8 @@ signal3 = SignalInput(workspace="workspace2", asset="asset2", division="division
 # Define the time window for data download
 my_time_window = TimeWindow(start=datetime(2023, 1, 1), end=datetime(2023, 1, 31))
 
-# Call the get_lazy_polars_df function
-lazy_polars_df = nortech.datatools.polars.get_lazy_polars_df(
+# Call the get_lazy_df function
+lazy_polars_df = nortech.datatools.polars.get_lazy_df(
     signals=[signal1, signal2, signal3],
     time_window=my_time_window,
 )
