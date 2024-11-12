@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from hashlib import sha256
 from typing import Callable
 
 import bytewax.operators as op
@@ -83,12 +84,12 @@ flowchart LR
 
     for input_name, deriver_input in deriver.inputs.items():
         mermaid += f"""
-            {deriver.name.__hash__()}_{deriver_input.signal}["{deriver_input.signal}<br/>[{deriver_input.physical_unit.symbol.replace(' ', '')}]"] --> {deriver_schema_dag.name.__hash__()}_{input_name}
+            {sha256(deriver.name.encode()).hexdigest()[:8]}_{deriver_input.signal}["{deriver_input.signal}<br/>[{deriver_input.physical_unit.symbol.replace(' ', '')}]"] --> {sha256(deriver_schema_dag.name.encode()).hexdigest()[:8]}_{input_name}
         """
 
     for output_name, deriver_output in deriver.outputs.items():
         mermaid += f"""
-            {deriver_schema_dag.name.__hash__()}_{output_name} --> {deriver.name.__hash__()}_{output_name}["{output_name}<br/>[{deriver_output.physical_unit.symbol.replace(' ', '')}]"]
+            {sha256(deriver_schema_dag.name.encode()).hexdigest()[:8]}_{output_name} --> {sha256(deriver.name.encode()).hexdigest()[:8]}_{output_name}["{output_name}<br/>[{deriver_output.physical_unit.symbol.replace(' ', '')}]"]
         """
 
     mermaid += """
