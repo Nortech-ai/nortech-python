@@ -116,8 +116,9 @@ def check_create_deriver_schema_imports(
     # Retrieve the source code of the function
     source_code = dedent(getsource(create_deriver_schema))
 
-    pattern = r"suggestedInputs=\[.*?\],?\s*"
+    pattern = r"suggested_inputs=\[.*?\],?\s*"
     source_code_without_suggested_inputs = sub(pattern, "", source_code, flags=DOTALL)
+    print(source_code_without_suggested_inputs)
 
     # Define a clean global environment for execution
     clean_env: dict[str, Any] = {}
