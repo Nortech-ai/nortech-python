@@ -5,9 +5,9 @@ flowchart LR
 
         subgraph "DeriverSchema (Test Schema)"
     
-                    3644306499827952024_input_signal["input_signal<br/>[K]"] --> transform_stream_3644306499827952024["transform_stream"]
+                    4a9b921b_input_signal["input_signal<br/>[K]"] --> transform_stream_4a9b921b["transform_stream"]
                 
-                    transform_stream_3644306499827952024 --> 3644306499827952024_output_signal["output_signal<br/>[K]"]
+                    transform_stream_4a9b921b --> 4a9b921b_output_signal["output_signal<br/>[K]"]
                 
         end
     
