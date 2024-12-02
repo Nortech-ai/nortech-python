@@ -2,14 +2,14 @@ import pytest
 from requests_mock import Mocker
 
 from nortech import Nortech
-from nortech.core import (
+from nortech.metadata import (
     DivisionInput,
     PaginatedResponse,
     UnitInput,
     UnitListOutput,
     UnitOutput,
 )
-from nortech.core.values.division import DivisionListOutput, DivisionOutput
+from nortech.metadata.values.division import DivisionListOutput, DivisionOutput
 
 
 def test_list_workspace_asset_division_units_from_input(

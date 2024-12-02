@@ -17,6 +17,14 @@ class InvalidTimeZoneError(ValueError):
 
 
 class TimeWindow(BaseModel):
+    """Time window model.
+
+    Attributes:
+        start (datetime): Start time.
+        end (datetime): End time.
+
+    """
+
     start: datetime
     end: datetime
 

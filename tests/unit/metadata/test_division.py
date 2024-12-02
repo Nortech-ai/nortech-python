@@ -2,7 +2,7 @@ import pytest
 from requests_mock import Mocker
 
 from nortech import Nortech
-from nortech.core import (
+from nortech.metadata import (
     AssetInput,
     DivisionInput,
     DivisionListOutput,

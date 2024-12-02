@@ -3,7 +3,6 @@ from typing import Any, Callable, Generic, TypeVar
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-from nortech.core.values.signal import SignalInput
 from nortech.derivers.services.physical_units import get_physical_quantity
 from nortech.derivers.services.schema import check_create_deriver_schema_imports
 from nortech.derivers.values.physical_units_schema import PhysicalUnit
@@ -13,6 +12,7 @@ from nortech.derivers.values.schema import (
     InputType,
     OutputType,
 )
+from nortech.metadata.values.signal import SignalInput
 
 
 class DeriverInput(SignalInput):

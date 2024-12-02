@@ -2,7 +2,7 @@ import pytest
 from requests_mock import Mocker
 
 from nortech import Nortech
-from nortech.core import PaginatedResponse, PaginationOptions, WorkspaceInput, WorkspaceListOutput, WorkspaceOutput
+from nortech.metadata import PaginatedResponse, PaginationOptions, WorkspaceInput, WorkspaceListOutput, WorkspaceOutput
 
 
 def test_list_workspaces(

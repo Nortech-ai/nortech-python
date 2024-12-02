@@ -2,20 +2,19 @@ from __future__ import annotations
 
 from typing import Literal
 
-from nortech.core.gateways.nortech_api import (
+from nortech.gateways.nortech_api import (
     NortechAPI,
-    PaginatedResponse,
-    PaginationOptions,
     validate_response,
 )
-from nortech.core.services.division import (
+from nortech.metadata.services.division import (
     DivisionInput,
     DivisionInputDict,
     DivisionListOutput,
     DivisionOutput,
     parse_division_input,
 )
-from nortech.core.values.unit import (
+from nortech.metadata.values.pagination import PaginatedResponse, PaginationOptions
+from nortech.metadata.values.unit import (
     UnitInput,
     UnitInputDict,
     UnitListOutput,

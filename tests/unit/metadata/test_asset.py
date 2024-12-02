@@ -2,8 +2,8 @@ import pytest
 from requests_mock import Mocker
 
 from nortech import Nortech
-from nortech.core import AssetInput, AssetListOutput, AssetOutput, PaginatedResponse, WorkspaceInput
-from nortech.core.values.workspace import WorkspaceListOutput, WorkspaceOutput
+from nortech.metadata import AssetInput, AssetListOutput, AssetOutput, PaginatedResponse, WorkspaceInput
+from nortech.metadata.values.workspace import WorkspaceListOutput, WorkspaceOutput
 
 
 def test_list_workspace_assets_from_id(

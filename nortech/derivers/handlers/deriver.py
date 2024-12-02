@@ -9,9 +9,7 @@ from bytewax.testing import TestingSink, TestingSource, run_main
 from IPython.display import Markdown, display
 from pandas import DataFrame, DatetimeIndex, isna
 from pint import Quantity
-from urllib3.util import Timeout
 
-from nortech.core.gateways.nortech_api import NortechAPI
 from nortech.derivers.services.nortech_api import create_deriver
 from nortech.derivers.services.schema import (
     get_deriver_schema_dag,
@@ -31,6 +29,7 @@ from nortech.derivers.values.schema import (
     InputType,
     OutputType,
 )
+from nortech.gateways.nortech_api import NortechAPI
 
 
 def deploy_deriver(
@@ -38,7 +37,6 @@ def deploy_deriver(
     deriver: Deriver,
     workspace: str | None = None,
     dry_run: bool = True,
-    timeout: Timeout | None = None,
 ):
     deriver_schema_dag = get_deriver_schema_dag(deriver.create_deriver_schema)
 
@@ -48,7 +46,6 @@ def deploy_deriver(
         deriver=deriver,
         deriver_schema_dag=deriver_schema_dag,
         dry_run=dry_run,
-        timeout=timeout,
     )
 
     return deriver_diffs

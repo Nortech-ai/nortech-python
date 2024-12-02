@@ -1,7 +1,7 @@
 import pytest
 
 from nortech import Nortech
-from nortech.core.gateways.nortech_api import (
+from nortech.gateways.nortech_api import (
     NortechAPISettings,
 )
 

@@ -13,11 +13,10 @@ from polars import (
     read_parquet,
 )
 from requests import get
-from urllib3.util import Timeout
 
-from nortech.core.gateways.nortech_api import NortechAPI, validate_response
-from nortech.core.values.signal import SignalInput
 from nortech.datatools.values.windowing import TimeWindow
+from nortech.gateways.nortech_api import NortechAPI, validate_response
+from nortech.metadata.values.signal import SignalInput
 
 
 def serialize_hot_storage_time_window(time_window: TimeWindow):
@@ -31,7 +30,6 @@ def get_lazy_polars_df_from_hot_storage(
     nortech_api: NortechAPI,
     signals: Sequence[SignalInput],
     time_window: TimeWindow,
-    timeout: Timeout | None = None,
 ):
     response = nortech_api.post(
         url="/timescale",
@@ -39,7 +37,6 @@ def get_lazy_polars_df_from_hot_storage(
             "signals": [signal.model_dump(by_alias=True) for signal in signals],
             "time_window": serialize_hot_storage_time_window(time_window),
         },
-        timeout=timeout,  # type: ignore
     )
 
     validate_response(response, valid_status_codes=[200, 404], error_message="Failed to get hot storage data.")
@@ -77,7 +74,6 @@ def get_lazy_polars_df_from_cold_storage(
     nortech_api: NortechAPI,
     signals: Sequence[SignalInput],
     time_window: TimeWindow,
-    timeout: Timeout | None = None,
 ):
     request_json = {
         "signals": [signal.model_dump_with_rename() for signal in signals],
@@ -90,7 +86,6 @@ def get_lazy_polars_df_from_cold_storage(
     response = nortech_api.post(
         url="/api/v1/historical-data/sync",
         json=request_json,
-        timeout=timeout,  # type: ignore
     )
 
     validate_response(response, valid_status_codes=[200, 404], error_message="Failed to get cold storage data.")
@@ -103,7 +98,7 @@ def get_lazy_polars_df_from_cold_storage(
 
     response_json = response.json()
 
-    response = get(response_json["outputFile"], timeout=timeout)  # type: ignore
+    response = get(response_json["outputFile"], timeout=nortech_api.settings.TIMEOUT)  # type: ignore
     response.raise_for_status()
 
     lazy_df = (
@@ -130,9 +125,8 @@ def download_data_from_cold_storage(
     time_window: TimeWindow,
     output_path: str,
     file_format: Format = "parquet",
-    timeout: Timeout | None = None,
 ):
-    df = get_lazy_polars_df_from_cold_storage(nortech_api, signals, time_window, timeout).collect()
+    df = get_lazy_polars_df_from_cold_storage(nortech_api, signals, time_window).collect()
 
     if file_format == "parquet":
         df.write_parquet(output_path)
