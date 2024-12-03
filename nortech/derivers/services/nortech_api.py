@@ -5,20 +5,18 @@ from typing import Generic, Literal
 
 from dateutil.parser import parse
 from pydantic import BaseModel, ConfigDict, Field
-from urllib3.util import Timeout
 
-from nortech.core.gateways.nortech_api import (
-    NortechAPI,
-    PaginatedResponse,
-    PaginationOptions,
-    validate_response,
-)
 from nortech.derivers.values.instance import (
     Deriver,
     DeriverInputType,
     DeriverOutputType,
 )
 from nortech.derivers.values.schema import ConfigurationType, DeriverSchemaDAG
+from nortech.gateways.nortech_api import (
+    NortechAPI,
+    validate_response,
+)
+from nortech.metadata.values.pagination import PaginatedResponse, PaginationOptions
 
 
 class CreateDeriver(BaseModel, Generic[DeriverInputType, DeriverOutputType, ConfigurationType]):
@@ -91,12 +89,10 @@ class LogsPerPod(BaseModel):
 def list_derivers(
     nortech_api: NortechAPI,
     pagination_options: PaginationOptions[Literal["id", "name", "description"]] | None = None,
-    timeout: Timeout | None = None,
 ):
     response = nortech_api.get(
         url="/api/v1/derivers",
         params=pagination_options.model_dump(by_alias=True) if pagination_options else None,
-        timeout=timeout,  # type: ignore
     )
     validate_response(response, [200], "Failed to list Derivers.")
 
@@ -116,7 +112,6 @@ def create_deriver(
     deriver_schema_dag: DeriverSchemaDAG,
     workspace: str | None = None,
     dry_run: bool = True,
-    timeout: Timeout | None = None,
 ):
     create_deriver_request = CreateDeriverRequest(
         workspace=workspace,
@@ -137,7 +132,6 @@ def create_deriver(
     response = nortech_api.post(
         url="/api/v1/derivers",
         json=create_deriver_request.model_dump(by_alias=True),
-        timeout=timeout,  # type: ignore
     )
     validate_response(response, [200], "Failed to create Deriver.")
 

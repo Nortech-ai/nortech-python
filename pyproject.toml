@@ -1,6 +1,6 @@
 [project]
 name = "nortech"
-version = "0.9.0"
+version = "0.9.1"
 description = "The official Python library for Nortech AI"
 authors = [
     { name = "Nortech AI", email = "info@nortech.ai" }
@@ -39,6 +39,7 @@ dev-dependencies = [
     "mypy>=1.11.2",
     "pandas-stubs>=2.2.2.240807",
     "pyarrow-stubs>=17.5",
+    "pydoc-markdown>=4.8.2",
     "pytest-cov>=6.0.0",
     "pytest-snapshot>=0.9.0",
     "pytest>=8.3.3",
@@ -56,6 +57,7 @@ fix = true
 select = [
     "A",  # Flake8 builtin codes
     "B",  # Bugbear codes
+    "D",  # Pydocstyle codes
     "E",  # Pyflakes error codes
     "F",  # Pyflakes warning codes
     "FA", # Pyflakes future annotations codes
@@ -66,8 +68,15 @@ select = [
     "S",  # Security issues
     "W",  # PEP 8 warning codes
 ]
-
 ignore = [
+    "D100",   # Missing docstring in public module
+    "D101",   # Missing docstring in public class	
+    "D102",   # Missing docstring in public method
+    "D103",   # Missing docstring in public function
+    "D104",   # Missing docstring in public package
+    "D105",   # Missing docstring in magic method
+    "D106",   # Missing docstring in public nested class
+    "D107",   # Missing docstring in __init__
     "E501",   # Line too long
     "PD901",  # Using the generic variable name `df` for DataFrames
     "S101"    # Use of `assert` detected

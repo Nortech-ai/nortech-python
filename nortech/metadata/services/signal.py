@@ -2,21 +2,20 @@ from __future__ import annotations
 
 from typing import List, Literal, Sequence
 
-from nortech.core.gateways.nortech_api import (
+from nortech.gateways.nortech_api import (
     NortechAPI,
-    PaginatedResponse,
-    PaginationOptions,
     validate_response,
 )
-from nortech.core.services.device import (
+from nortech.metadata.services.device import (
     DeviceInput,
     DeviceInputDict,
     DeviceListOutput,
     DeviceOutput,
     parse_device_input,
 )
-from nortech.core.services.unit import UnitInput, UnitInputDict, UnitListOutput, UnitOutput, parse_unit_input
-from nortech.core.values.signal import (
+from nortech.metadata.services.unit import UnitInput, UnitInputDict, UnitListOutput, UnitOutput, parse_unit_input
+from nortech.metadata.values.pagination import PaginatedResponse, PaginationOptions
+from nortech.metadata.values.signal import (
     SignalDeviceInput,
     SignalDeviceInputDict,
     SignalInput,

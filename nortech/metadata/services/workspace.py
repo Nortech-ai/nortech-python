@@ -2,13 +2,12 @@ from __future__ import annotations
 
 from typing import Literal
 
-from nortech.core.gateways.nortech_api import (
+from nortech.gateways.nortech_api import (
     NortechAPI,
-    PaginatedResponse,
-    PaginationOptions,
     validate_response,
 )
-from nortech.core.values.workspace import (
+from nortech.metadata.values.pagination import PaginatedResponse, PaginationOptions
+from nortech.metadata.values.workspace import (
     WorkspaceInput,
     WorkspaceInputDict,
     WorkspaceListOutput,
@@ -35,7 +34,7 @@ def list_workspaces(
         next_resp = list_workspaces(nortech_api, resp.next_pagination_options())
         return resp.model_copy(
             update={
-                "data": resp.data + next_resp.data,
+                "data": list(resp.data) + list(next_resp.data),
                 "size": resp.size + next_resp.size,
                 "next": next_resp.next,
             }

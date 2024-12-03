@@ -3,9 +3,7 @@ from __future__ import annotations
 from typing import Callable
 
 from pandas import DataFrame
-from urllib3.util import Timeout
 
-from nortech.core.gateways.nortech_api import NortechAPI
 from nortech.derivers.handlers.deriver import (
     deploy_deriver,
     run_deriver_locally,
@@ -31,16 +29,15 @@ from nortech.derivers.values.schema import (
     OutputField,
     OutputType,
 )
+from nortech.gateways.nortech_api import NortechAPI
 
 
 class Derivers:
     def __init__(self, nortech_api: NortechAPI):
         self.nortech_api = nortech_api
 
-    def deploy_deriver(
-        self, deriver: Deriver, workspace: str | None = None, dry_run: bool = True, timeout: Timeout | None = None
-    ):
-        return deploy_deriver(self.nortech_api, deriver, workspace, dry_run, timeout)
+    def deploy_deriver(self, deriver: Deriver, workspace: str | None = None, dry_run: bool = True):
+        return deploy_deriver(self.nortech_api, deriver, workspace, dry_run)
 
     def visualize_deriver_schema(self, create_deriver_schema: Callable[[], DeriverSchema]):
         return visualize_deriver_schema(create_deriver_schema)

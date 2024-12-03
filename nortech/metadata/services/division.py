@@ -2,20 +2,19 @@ from __future__ import annotations
 
 from typing import Literal
 
-from nortech.core.gateways.nortech_api import (
+from nortech.gateways.nortech_api import (
     NortechAPI,
-    PaginatedResponse,
-    PaginationOptions,
     validate_response,
 )
-from nortech.core.values.asset import AssetInput, AssetInputDict, AssetListOutput, AssetOutput, parse_asset_input
-from nortech.core.values.division import (
+from nortech.metadata.values.asset import AssetInput, AssetInputDict, AssetListOutput, AssetOutput, parse_asset_input
+from nortech.metadata.values.division import (
     DivisionInput,
     DivisionInputDict,
     DivisionListOutput,
     DivisionOutput,
     parse_division_input,
 )
+from nortech.metadata.values.pagination import PaginatedResponse, PaginationOptions
 
 
 def list_workspace_asset_divisions(

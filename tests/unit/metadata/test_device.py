@@ -2,8 +2,8 @@ import pytest
 from requests_mock import Mocker
 
 from nortech import Nortech
-from nortech.core import DeviceInput, DeviceListOutput, DeviceOutput, DivisionInput, PaginatedResponse
-from nortech.core.values.division import DivisionListOutput, DivisionOutput
+from nortech.metadata import DeviceInput, DeviceListOutput, DeviceOutput, DivisionInput, PaginatedResponse
+from nortech.metadata.values.division import DivisionListOutput, DivisionOutput
 
 
 def test_list_workspace_asset_division_devices_from_input(

@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-from nortech.core.values.time_window import TimeWindow
+from nortech.metadata.values.time_window import TimeWindow
 
 
 class HotColdWindow(BaseModel):

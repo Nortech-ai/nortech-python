@@ -3,15 +3,7 @@ from __future__ import annotations
 from typing import Sequence
 
 from polars import DataFrame, LazyFrame, concat, lit
-from urllib3.util import Timeout
 
-from nortech.core.gateways.nortech_api import (
-    NortechAPI,
-)
-from nortech.core.services.signal import (
-    parse_signal_input_or_output_or_id_union_to_signal_input,
-)
-from nortech.core.values.signal import SignalInput, SignalInputDict, SignalListOutput, SignalOutput
 from nortech.datatools.services.nortech_api import (
     get_lazy_polars_df_from_cold_storage,
     get_lazy_polars_df_from_hot_storage,
@@ -21,15 +13,29 @@ from nortech.datatools.services.storage import (
     get_hot_and_cold_time_windows,
 )
 from nortech.datatools.values.windowing import ColdWindow, HotWindow, TimeWindow
+from nortech.gateways.nortech_api import (
+    NortechAPI,
+)
+from nortech.metadata.services.signal import (
+    parse_signal_input_or_output_or_id_union_to_signal_input,
+)
+from nortech.metadata.values.signal import SignalInput, SignalInputDict, SignalListOutput, SignalOutput
 
 
 def get_lazy_polars_df(
     nortech_api: NortechAPI,
     signals: Sequence[SignalInput | SignalInputDict | SignalOutput | SignalListOutput | int],
     time_window: TimeWindow,
-    timeout: Timeout | None = None,
 ) -> LazyFrame:
     signal_inputs = parse_signal_input_or_output_or_id_union_to_signal_input(nortech_api, signals)
+
+    if not nortech_api.settings.EXPERIMENTAL_FEATURES:
+        return get_lazy_polars_df_from_cold_storage(
+            nortech_api=nortech_api,
+            signals=signal_inputs,
+            time_window=time_window,
+        )
+
     time_windows = get_hot_and_cold_time_windows(time_window=time_window)
 
     if isinstance(time_windows, ColdWindow):
@@ -37,7 +43,6 @@ def get_lazy_polars_df(
             nortech_api=nortech_api,
             signals=signal_inputs,
             time_window=time_windows.time_window,
-            timeout=timeout,
         )
 
     if isinstance(time_windows, HotWindow):
@@ -45,21 +50,18 @@ def get_lazy_polars_df(
             nortech_api=nortech_api,
             signals=signal_inputs,
             time_window=time_windows.time_window,
-            timeout=timeout,
         )
 
     hot_lazy_polars_df = get_lazy_polars_df_from_hot_storage(
         nortech_api=nortech_api,
         signals=signal_inputs,
         time_window=time_windows.hot_storage_time_window,
-        timeout=timeout,
     )
 
     cold_lazy_polars_df = get_lazy_polars_df_from_cold_storage(
         nortech_api=nortech_api,
         signals=signal_inputs,
         time_window=time_windows.cold_storage_time_window,
-        timeout=timeout,
     )
 
     hot_lazy_polars_df_casted = cast_hot_schema_to_cold_schema(
@@ -94,9 +96,8 @@ def get_polars_df(
     nortech_api: NortechAPI,
     signals: Sequence[SignalInput | SignalInputDict | SignalOutput | SignalListOutput | int],
     time_window: TimeWindow,
-    timeout: Timeout | None = None,
 ) -> DataFrame:
-    lazy_polars_df = get_lazy_polars_df(nortech_api, signals, time_window, timeout)
+    lazy_polars_df = get_lazy_polars_df(nortech_api, signals, time_window)
     polars_df = lazy_polars_df.collect()
 
     return polars_df

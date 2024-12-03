@@ -7,8 +7,8 @@ import pandas as pd
 from requests_mock import Mocker
 
 from nortech import Nortech
-from nortech.core import SignalInput, SignalOutput
 from nortech.datatools import TimeWindow
+from nortech.metadata import SignalInput, SignalOutput
 
 
 def test_download_data(

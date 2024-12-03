@@ -2,7 +2,7 @@ import pytest
 from requests_mock import Mocker
 
 from nortech import Nortech
-from nortech.core import (
+from nortech.metadata import (
     DeviceInput,
     PaginatedResponse,
     SignalDeviceInput,
@@ -12,9 +12,9 @@ from nortech.core import (
     SignalOutput,
     UnitInput,
 )
-from nortech.core.services.signal import _get_signals, parse_signal_input_or_output_or_id_union_to_signal_input
-from nortech.core.values.device import DeviceOutput
-from nortech.core.values.unit import UnitOutput
+from nortech.metadata.services.signal import _get_signals, parse_signal_input_or_output_or_id_union_to_signal_input
+from nortech.metadata.values.device import DeviceOutput
+from nortech.metadata.values.unit import UnitOutput
 
 
 def test_list_workspace_asset_division_unit_signals_from_input(

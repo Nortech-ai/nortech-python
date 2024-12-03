@@ -2,7 +2,7 @@ from datetime import datetime
 
 import pytest
 
-from nortech.core import MetadataOutput, SignalInput, SignalInputDict, SignalOutput
+from nortech.metadata import MetadataOutput, SignalInput, SignalInputDict, SignalOutput
 
 
 @pytest.fixture(scope="session", name="data_signal_input")

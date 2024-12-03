@@ -2,7 +2,7 @@ from datetime import datetime
 
 import pytest
 
-from nortech.core import (
+from nortech.metadata import (
     AssetInput,
     AssetInputDict,
     AssetListOutput,
