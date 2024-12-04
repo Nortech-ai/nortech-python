@@ -1768,6 +1768,332 @@ print(df.columns)
 
 
 
+## derivers
+
+### Derivers
+
+Client for interacting with the Nortech Derivers API.
+
+**Attributes**:
+
+- `nortech_api` _NortechAPI_ - The Nortech API client.
+
+#### deploy\_deriver
+
+```python
+def deploy_deriver(deriver: Deriver,
+                   workspace: str | None = None,
+                   dry_run: bool = True) -> DeriverDiffs
+```
+
+Deploy a deriver to a workspace.
+
+**Arguments**:
+
+- `deriver` _Deriver_ - The deriver to deploy.
+- `workspace` _str, optional_ - The workspace to deploy to. Defaults to None.
+- `dry_run` _bool, optional_ - Whether to perform a dry run. Defaults to True.
+  
+
+**Returns**:
+
+- `DeriverDiffs` - The deriver diffs.
+  
+
+**Example**:
+
+```python
+from datetime import datetime
+
+from pydantic import Field
+
+from nortech import Nortech
+from nortech.derivers import (
+    Deriver,
+    DeriverInput,
+    DeriverOutput,
+    physical_units,
+)
+
+
+def create_test_schema():
+    import bytewax.operators as op
+    from bytewax.dataflow import Stream
+    from pydantic import BaseModel
+
+    from nortech.derivers import (
+        DeriverInputSchema,
+        DeriverOutputSchema,
+        DeriverSchema,
+        InputField,
+        OutputField,
+        physical_units,
+    )
+
+    class Input(DeriverInputSchema):
+        input_signal: float | None = InputField(
+            description="Input signal description",
+            physical_quantity=physical_units.temperature,
+        )
+
+    class Output(DeriverOutputSchema):
+        output_signal: float | None = OutputField(
+            description="Output signal description",
+            physical_quantity=physical_units.temperature,
+            create_deriver_schema=create_test_schema,
+        )
+
+    class Configurations(BaseModel):
+        configuration_value: float = Field(
+            description="Configuration value description",
+        )
+
+    def transform_stream(
+        stream: Stream[Input],
+        config: Configurations,
+    ) -> Stream[Output]:
+        output_stream = op.map(
+            step_id="map_output",
+            up=stream,
+            mapper=lambda input_message: Output(
+                timestamp=input_message.timestamp,
+                output_signal=input_message.input_signal * config.configuration_value
+                if input_message.input_signal is not None
+                else None,
+            ),
+        )
+
+        return output_stream
+
+    return DeriverSchema(
+        name="Test Schema",
+        description="Test Schema description",
+        inputs=Input,
+        outputs=Output,
+        configurations=Configurations,
+        transform_stream=transform_stream,
+    )
+
+
+deriver_schema = create_test_schema()
+
+inputs = {
+    deriver_schema.inputs.input_signal: DeriverInput(
+        workspace="Workspace",
+        asset="Asset",
+        division="Division",
+        unit="Unit",
+        signal="Signal",
+        physicalUnit=physical_units.celsius,
+    )
+}
+
+outputs = {
+    deriver_schema.outputs.output_signal: DeriverOutput(
+        workspace="Workspace",
+        asset="Asset",
+        division="Division",
+        unit="Unit",
+        signal="Signal",
+        physicalUnit=physical_units.celsius,
+    )
+}
+
+configurations = deriver_schema.configurations(
+    configuration_value=2.0,
+)
+
+deriver = Deriver(
+    name="Test Deriver",
+    description="Test Deriver description",
+    inputs=inputs,
+    outputs=outputs,
+    configurations=configurations,
+    start_at=datetime(2022, 1, 1, 0, 0, 0),
+    create_deriver_schema=create_test_schema,
+)
+
+nortech = Nortech()
+
+diffs = nortech.derivers.deploy_deriver(deriver)
+
+print(diffs)
+# DeriverDiffs(
+#     deriver_schemas={
+#         "Test Schema": SchemaDiff(
+#             old=Schema(
+#                 id=1,
+#                 hash="hash",
+#                 history_id=1,
+#                 created_at=datetime(2022, 1, 1, 0, 0, 0),
+#                 updated_at=datetime(2022, 1, 1, 0, 0, 0),
+#             ),
+#             new=Schema(
+#                 id=1,
+#                 hash="hash",
+#                 history_id=1,
+#                 created_at=datetime(2022, 1, 1, 0, 0, 0),
+#                 updated_at=datetime(2022, 1, 1, 0, 0, 0),
+#             ),
+#         )
+#     },
+#     derivers={
+#         "Test Deriver": SchemaDiff(
+#             old=Schema(
+#                 id=1,
+#                 hash="hash",
+#                 history_id=1,
+#                 created_at=datetime(2022, 1, 1, 0, 0, 0),
+#                 updated_at=datetime(2022, 1, 1, 0, 0, 0),
+#             ),
+#             new=Schema(
+#                 id=1,
+#                 hash="hash",
+#                 history_id=1,
+#                 created_at=datetime(2022, 1, 1, 0, 0, 0),
+#                 updated_at=datetime(2022, 1, 1, 0, 0, 0),
+#             ),
+#         )
+#     },
+# )
+```
+
+#### visualize\_deriver\_schema
+
+```python
+def visualize_deriver_schema(
+        create_deriver_schema: Callable[[], DeriverSchema]) -> None
+```
+
+Visualize a deriver schema as a mermaid diagram rendered as markdown in all frontends.
+
+By default all representations will be computed and sent to the frontends.
+Frontends can decide which representation is used and how.
+
+In terminal IPython this will be similar to using :func:`print`, for use in richer
+frontends see Jupyter notebook examples with rich display logic.
+
+**Arguments**:
+
+- `create_deriver_schema` _Callable[[], DeriverSchema]_ - A function that creates a deriver schema.
+  
+
+**Example**:
+
+```python
+from nortech import Nortech
+
+nortech = Nortech()
+
+# Define a function that creates a Deriver Schema
+def create_test_schema():
+    ...
+    return DeriverSchema(...)
+
+# Visualize the schema
+nortech.derivers.visualize_deriver_schema(create_test_schema)
+```
+
+#### visualize\_deriver
+
+```python
+def visualize_deriver(deriver: Deriver) -> None
+```
+
+Visualize a deriver as a mermaid diagram rendered as markdown in all frontends.
+
+By default all representations will be computed and sent to the frontends.
+Frontends can decide which representation is used and how.
+
+In terminal IPython this will be similar to using :func:`print`, for use in richer
+frontends see Jupyter notebook examples with rich display logic.
+
+**Arguments**:
+
+- `deriver` _Deriver_ - The deriver to visualize.
+  
+
+**Example**:
+
+```python
+from nortech import Nortech
+
+nortech = Nortech()
+
+# Create Deriver
+deriver = ...
+
+# Visualize the deriver
+nortech.derivers.visualize_deriver(deriver)
+```
+
+#### run\_deriver\_locally
+
+```python
+def run_deriver_locally(df: DataFrame,
+                        deriver: Deriver[InputType, OutputType,
+                                         ConfigurationType, DeriverInputType,
+                                         DeriverOutputType],
+                        batch_size: int = 10000) -> DataFrame
+```
+
+Run a deriver locally on a DataFrame.
+
+**Arguments**:
+
+- `df` _DataFrame_ - The input DataFrame.
+- `deriver` _Deriver_ - The deriver to run.
+- `batch_size` _int, optional_ - The batch size for processing. Defaults to 10000.
+  
+
+**Returns**:
+
+- `DataFrame` - The processed DataFrame with derived signals.
+  
+
+**Example**:
+
+```python
+from datetime import timezone
+
+import pandas as pd
+
+from nortech import Nortech
+
+nortech = Nortech()
+
+# Create Deriver
+deriver = ...
+
+# Create input DataFrame or use nortech.datatools to get data
+df = pd.DataFrame(
+    {
+        "timestamp": pd.date_range(start="2023-01-01", periods=100, freq="s", tz=timezone.utc),
+        "input_signal": [float(i) for i in range(100)],
+    }
+).set_index("timestamp")
+
+# Run the deriver locally
+result_df = nortech.derivers.run_deriver_locally(df, deriver, batch_size=5000)
+
+print(result_df)
+#                            output_signal
+# timestamp
+# 2023-01-01 00:00:00+00:00            0.0
+# 2023-01-01 00:00:01+00:00            2.0
+# 2023-01-01 00:00:02+00:00            4.0
+# 2023-01-01 00:00:03+00:00            6.0
+# 2023-01-01 00:00:04+00:00            8.0
+# ...                                  ...
+# 2023-01-01 00:01:35+00:00          190.0
+# 2023-01-01 00:01:36+00:00          192.0
+# 2023-01-01 00:01:37+00:00          194.0
+# 2023-01-01 00:01:38+00:00          196.0
+# 2023-01-01 00:01:39+00:00          198.0
+```
+
+
+
 ## metadata.values.time\_window
 
 ### TimeWindow
@@ -2170,4 +2496,229 @@ Detailed output model for a single signal.
 - `device` - Metadata about the Device containing the Signal.
   - id (int): Id of the Device.
   - name (str): Name of the Device.
+
+
+
+## derivers.values.schema
+
+### DataTypeEnum
+
+Enumeration of supported data types.
+
+**Attributes**:
+
+- `float` - Floating point number type
+- `boolean` - Boolean type
+- `string` - String type
+- `json` - JSON type
+
+### DeriverSchemaConfiguration
+
+Pydantic model for deriver schema configuration data.
+
+**Attributes**:
+
+- `name` _str_ - The name of the configuration parameter.
+- `description` _str_ - A description of the configuration parameter.
+- `data_type` _DataTypeEnum_ - The data type of the configuration parameter.
+
+### DeriverSchemaOutput
+
+Pydantic model for deriver schema output data.
+
+**Attributes**:
+
+- `name` _str_ - The name of the output.
+- `description` _str_ - A description of the output.
+- `data_type` _DataTypeEnum_ - The data type of the output.
+- `physical_quantity` _PhysicalQuantity | None_ - The physical quantity of the output, if applicable.
+
+### SuggestedInput
+
+Pydantic model for suggested input data.
+
+**Attributes**:
+
+- `name` _str_ - The name of the suggested input.
+- `description` _str_ - A description of the suggested input.
+- `data_type` _DataTypeEnum_ - The data type of the suggested input.
+- `physical_quantity` _PhysicalQuantity | None_ - The physical quantity of the suggested input, if applicable.
+- `create_deriver_schema` _Callable[[], DeriverSchema]_ - Function that creates the deriver schema for this input.
+
+#### InputField
+
+```python
+def InputField(description: str,
+               physical_quantity: PhysicalQuantity | None,
+               suggested_inputs: list[Any] | None = None)
+```
+
+Create an input field with metadata.
+
+**Arguments**:
+
+- `description` _str_ - Description of the input field.
+- `physical_quantity` _PhysicalQuantity | None_ - Physical quantity of the input field.
+- `suggested_inputs` _list[Any] | None, optional_ - List of suggested inputs. Defaults to None.
+  
+
+**Returns**:
+
+- `Field` - A pydantic Field with the specified metadata.
+
+### DeriverInputSchema
+
+Schema for deriver input data.
+
+**Attributes**:
+
+- `timestamp` _datetime_ - The timestamp for the input.
+
+### DeriverOutputSchema
+
+Schema for deriver output data.
+
+**Attributes**:
+
+- `timestamp` _datetime_ - The timestamp for the output.
+
+### DeriverSchema
+
+Schema for a deriver.
+
+**Attributes**:
+
+- `name` _str_ - The name of the deriver.
+- `description` _str_ - A description of the deriver.
+- `inputs` _Type[InputType]_ - The input schema type.
+- `outputs` _Type[OutputType]_ - The output schema type.
+- `configurations` _Type[ConfigurationType]_ - The configuration schema type.
+- `transform_stream` _Callable_ - Function that transforms input stream to output stream given a configuration.
+
+#### OutputField
+
+```python
+def OutputField(description: str, physical_quantity: PhysicalQuantity | None,
+                create_deriver_schema: Callable[[], DeriverSchema])
+```
+
+Create an output field with metadata.
+
+**Arguments**:
+
+- `description` _str_ - Description of the output field.
+- `physical_quantity` _PhysicalQuantity | None_ - Physical quantity of the output field.
+- `create_deriver_schema` _Callable[[], DeriverSchema]_ - Function that creates the deriver schema.
+  
+
+**Returns**:
+
+- `Field` - A pydantic Field with the specified metadata.
+
+### DeriverSchemaOutputWithDAG
+
+Deriver schema output with DAG information.
+
+**Attributes**:
+
+- `name` _str_ - The name of the output.
+- `description` _str_ - A description of the output.
+- `data_type` _DataTypeEnum_ - The data type of the output.
+- `physical_quantity` _PhysicalQuantity | None_ - The physical quantity of the output, if applicable.
+- `deriver_schema_dag` _DeriverSchemaDAG_ - The DAG associated with this output.
+
+### DeriverSchemaInput
+
+Schema for deriver input with suggested inputs.
+
+**Attributes**:
+
+- `name` _str_ - The name of the input.
+- `description` _str_ - A description of the input.
+- `data_type` _DataTypeEnum_ - The data type of the input.
+- `physical_quantity` _PhysicalQuantity | None_ - The physical quantity of the input.
+- `suggested_inputs_from_other_derivers` _list[DeriverSchemaOutputWithDAG]_ - List of suggested inputs.
+
+### DeriverSchemaDAG
+
+Schema for a deriver schema DAG.
+
+**Attributes**:
+
+- `name` _str_ - The name of the deriver schema.
+- `description` _str_ - A description of the deriver schema.
+- `inputs` _list[DeriverSchemaInput]_ - List of inputs in the deriver schema.
+- `outputs` _list[DeriverSchemaOutput]_ - List of outputs in the deriver schema.
+- `configurations` _list[DeriverSchemaConfiguration]_ - List of configurations in the deriver schema.
+- `script` _str_ - The script associated with this deriver schema.
+
+
+
+## derivers.values.instance
+
+### DeriverInput
+
+Pydantic model for deriver input data.
+
+**Attributes**:
+
+- `workspace` _str_ - The name of the Workspace.
+- `asset` _str_ - The name of the Asset.
+- `division` _str_ - The name of the Division.
+- `unit` _str_ - The name of the Unit.
+- `signal` _str_ - The name of the Signal.
+- `physical_unit` _PhysicalUnit_ - The physical unit of the input signal.
+
+### DeriverOutput
+
+Pydantic model for deriver output data.
+
+**Attributes**:
+
+- `workspace` _str_ - The name of the Workspace.
+- `asset` _str_ - The name of the Asset.
+- `division` _str_ - The name of the Division.
+- `unit` _str_ - The name of the Unit.
+- `signal` _str_ - The name of the Signal.
+- `physical_unit` _PhysicalUnit_ - The physical unit of the output signal.
+
+### Deriver
+
+Pydantic model for a deriver.
+
+**Attributes**:
+
+- `name` _str_ - The name of the deriver.
+- `description` _str_ - A description of the deriver.
+- `inputs` _dict[Any, DeriverInputType]_ - Dictionary mapping deriver schema inputs to their input signals.
+- `outputs` _dict[Any, DeriverOutputType]_ - Dictionary mapping deriver schema outputs to their output signals.
+- `configurations` _ConfigurationType_ - Configuration parameters for the deriver.
+- `start_at` _datetime_ - Start time for the deriver.
+- `create_deriver_schema` _Callable[[], DeriverSchema[InputType, OutputType, ConfigurationType]]_ - Function that creates the deriver schema.
+
+
+
+## derivers.values.physical\_units\_schema
+
+### PhysicalQuantity
+
+Pydantic model for physical quantity data.
+
+**Attributes**:
+
+- `name` _str_ - The name of the physical quantity.
+- `description` _str_ - A description of the physical quantity.
+- `si_unit` _str_ - The SI unit for this physical quantity.
+- `si_unit_symbol` _str_ - The symbol for the SI unit.
+
+### PhysicalUnit
+
+Pydantic model for physical unit data.
+
+**Attributes**:
+
+- `name` _str_ - The name of the physical unit.
+- `description` _str_ - A description of the physical unit.
+- `symbol` _str_ - The symbol for this physical unit.
+- `physical_quantity` _PhysicalQuantity_ - The physical quantity this unit measures.
 

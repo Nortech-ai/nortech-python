@@ -16,12 +16,36 @@ from nortech.metadata.values.signal import SignalInput
 
 
 class DeriverInput(SignalInput):
+    """Pydantic model for deriver input data.
+
+    Attributes:
+        workspace (str): The name of the Workspace.
+        asset (str): The name of the Asset.
+        division (str): The name of the Division.
+        unit (str): The name of the Unit.
+        signal (str): The name of the Signal.
+        physical_unit (PhysicalUnit): The physical unit of the input signal.
+
+    """
+
     model_config = ConfigDict(populate_by_name=True)
 
     physical_unit: PhysicalUnit = Field(alias="physicalUnit")
 
 
 class DeriverOutput(SignalInput):
+    """Pydantic model for deriver output data.
+
+    Attributes:
+        workspace (str): The name of the Workspace.
+        asset (str): The name of the Asset.
+        division (str): The name of the Division.
+        unit (str): The name of the Unit.
+        signal (str): The name of the Signal.
+        physical_unit (PhysicalUnit): The physical unit of the output signal.
+
+    """
+
     model_config = ConfigDict(populate_by_name=True)
 
     physical_unit: PhysicalUnit = Field(alias="physicalUnit")
@@ -35,6 +59,19 @@ class Deriver(
     BaseModel,
     Generic[InputType, OutputType, ConfigurationType, DeriverInputType, DeriverOutputType],
 ):
+    """Pydantic model for a deriver.
+
+    Attributes:
+        name (str): The name of the deriver.
+        description (str): A description of the deriver.
+        inputs (dict[Any, DeriverInputType]): Dictionary mapping deriver schema inputs to their input signals.
+        outputs (dict[Any, DeriverOutputType]): Dictionary mapping deriver schema outputs to their output signals.
+        configurations (ConfigurationType): Configuration parameters for the deriver.
+        start_at (datetime): Start time for the deriver.
+        create_deriver_schema (Callable[[], DeriverSchema[InputType, OutputType, ConfigurationType]]): Function that creates the deriver schema.
+
+    """
+
     name: str
     description: str
 
