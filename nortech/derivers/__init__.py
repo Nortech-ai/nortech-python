@@ -10,6 +10,7 @@ from nortech.derivers.handlers.deriver import (
     visualize_deriver,
     visualize_deriver_schema,
 )
+from nortech.derivers.services import operators as operators
 from nortech.derivers.services.physical_units import get_physical_quantity
 from nortech.derivers.values import physical_units
 from nortech.derivers.values.instance import (
@@ -65,4 +66,5 @@ __all__ = [
     "InputField",
     "OutputField",
     "get_physical_quantity",
+    "operators",
 ]

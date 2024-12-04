@@ -7,8 +7,8 @@ import pandas as pd
 from bytewax.dataflow import Dataflow
 from bytewax.testing import TestingSink, TestingSource, run_main
 
-from nortech.derivers.services import operators as internal_op
-from nortech.derivers.values.schema import DeriverInputSchema
+from nortech.derivers import DeriverInputSchema
+from nortech.derivers import operators as internal_op
 
 
 def test_key_all():
