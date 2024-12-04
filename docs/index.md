@@ -2568,7 +2568,7 @@ Create an input field with metadata.
 
 ### DeriverInputSchema
 
-Schema for deriver input data.
+Pydantic model for deriver schema input data.
 
 **Attributes**:
 
@@ -2576,7 +2576,7 @@ Schema for deriver input data.
 
 ### DeriverOutputSchema
 
-Schema for deriver output data.
+Pydantic model for deriver schema output data.
 
 **Attributes**:
 
@@ -2584,7 +2584,7 @@ Schema for deriver output data.
 
 ### DeriverSchema
 
-Schema for a deriver.
+Pydantic model for a deriver schema.
 
 **Attributes**:
 
@@ -2617,7 +2617,7 @@ Create an output field with metadata.
 
 ### DeriverSchemaOutputWithDAG
 
-Deriver schema output with DAG information.
+Pydantic model for deriver schema output with DAG information.
 
 **Attributes**:
 
@@ -2629,7 +2629,7 @@ Deriver schema output with DAG information.
 
 ### DeriverSchemaInput
 
-Schema for deriver input with suggested inputs.
+Pydantic model for deriver schema input with suggested inputs.
 
 **Attributes**:
 
@@ -2641,7 +2641,7 @@ Schema for deriver input with suggested inputs.
 
 ### DeriverSchemaDAG
 
-Schema for a deriver schema DAG.
+Pydantic model for a deriver schema DAG.
 
 **Attributes**:
 
