@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Generic, Literal
+from typing import Generic, Literal, Mapping
 
 from dateutil.parser import parse
 from pydantic import BaseModel, ConfigDict, Field
@@ -86,6 +86,26 @@ class LogsPerPod(BaseModel):
         return str_representation
 
 
+class Schema(BaseModel):
+    id: int
+    hash: str
+    history_id: int = Field(..., alias="historyId")
+    created_at: datetime = Field(..., alias="createdAt")
+    updated_at: datetime = Field(..., alias="updatedAt")
+
+
+class SchemaDiff(BaseModel):
+    old: Schema = Field(..., alias="previousSchema")
+    new: Schema = Field(..., alias="newSchema")
+
+
+class DeriverDiffs(BaseModel):
+    deriver_schemas: Mapping[str, SchemaDiff] = Field(..., alias="deriverSchemas")
+    derivers: Mapping[str, SchemaDiff]
+
+    model_config = ConfigDict(populate_by_name=True)
+
+
 def list_derivers(
     nortech_api: NortechAPI,
     pagination_options: PaginationOptions[Literal["id", "name", "description"]] | None = None,
@@ -135,7 +155,7 @@ def create_deriver(
     )
     validate_response(response, [200], "Failed to create Deriver.")
 
-    return response.json()
+    return DeriverDiffs.model_validate(response.json())
 
 
 def get_logs_from_response_logs(response_logs: str) -> LogList:

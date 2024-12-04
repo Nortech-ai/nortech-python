@@ -10,6 +10,7 @@ from requests_mock import Mocker
 from nortech import Nortech
 from nortech.derivers import (
     Deriver,
+    DeriverDiffs,
     DeriverInput,
     DeriverOutput,
     physical_units,
@@ -266,8 +267,8 @@ def test_deriver_schema_fail():
 
 def test_deriver_deploy(nortech: Nortech, requests_mock: Mocker):
     mock_response_data = {
-        "status": "success",
-        "data": {"message": "Deriver deployed successfully"},
+        "deriverSchemas": {},
+        "derivers": {},
     }
 
     requests_mock.post(
@@ -282,7 +283,7 @@ def test_deriver_deploy(nortech: Nortech, requests_mock: Mocker):
 
     assert requests_mock.call_count == 1
 
-    assert deriver_diff == mock_response_data
+    assert deriver_diff == DeriverDiffs.model_validate(mock_response_data)
 
 
 def test_deriver_run_locally():
@@ -290,7 +291,7 @@ def test_deriver_run_locally():
     df = pd.DataFrame(
         {
             "timestamp": pd.date_range(start="2023-01-01", periods=size, freq="s", tz=timezone.utc),
-            "input_signal": [float(i) for i in range(100)],
+            "input_signal": [float(i) for i in range(size)],
         }
     ).set_index("timestamp")
 

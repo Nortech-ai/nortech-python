@@ -125,6 +125,7 @@ def main():
         [
             "metadata/index.md",
             "datatools/index.md",
+            "derivers/index.md",
             "metadata/values/time_window.md",
             "metadata/values/pagination.md",
             "metadata/values/workspace.md",
@@ -133,6 +134,9 @@ def main():
             "metadata/values/unit.md",
             "metadata/values/device.md",
             "metadata/values/signal.md",
+            "derivers/values/schema.md",
+            "derivers/values/instance.md",
+            "derivers/values/physical_units_schema.md",
         ],
     )
     delete_extra_files(docs_path)
