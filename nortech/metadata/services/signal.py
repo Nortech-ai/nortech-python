@@ -317,7 +317,7 @@ def parse_signal_input_or_output_or_id_union_to_signal_input(
         for signal in signals
         if isinstance(signal, int) or isinstance(signal, SignalListOutput)
     ]
-    signal_list_from_ids = _get_signals(nortech_api, signal_ids)
+    signal_list_from_ids = _get_signals(nortech_api, signal_ids) if len(signal_ids) > 0 else []
 
     signal_inputs: list[SignalInput] = [
         parse_signal_input(signal)
