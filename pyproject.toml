@@ -1,6 +1,6 @@
 [project]
 name = "nortech"
-version = "0.9.2"
+version = "0.9.3"
 description = "The official Python library for Nortech AI"
 authors = [
     { name = "Nortech AI", email = "info@nortech.ai" }
@@ -69,6 +69,7 @@ select = [
     "W",  # PEP 8 warning codes
 ]
 ignore = [
+    "A005",   # Module `signal` shadows a Python standard-library module
     "D100",   # Missing docstring in public module
     "D101",   # Missing docstring in public class	
     "D102",   # Missing docstring in public method

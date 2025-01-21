@@ -267,8 +267,8 @@ def test_deriver_schema_fail():
 
 def test_deriver_deploy(nortech: Nortech, requests_mock: Mocker):
     mock_response_data = {
-        "deriverSchemas": {},
-        "derivers": {},
+        "DeriverSchemas": {},
+        "Derivers": {},
     }
 
     requests_mock.post(
