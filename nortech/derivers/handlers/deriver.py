@@ -81,12 +81,12 @@ flowchart LR
 
     for input_name, deriver_input in deriver.inputs.items():
         mermaid += f"""
-            {sha256(deriver.name.encode()).hexdigest()[:8]}_{deriver_input.signal}["{deriver_input.signal}<br/>[{deriver_input.physical_unit.symbol.replace(' ', '')}]"] --> {sha256(deriver_schema_dag.name.encode()).hexdigest()[:8]}_{input_name}
+            {sha256(deriver.name.encode()).hexdigest()[:8]}_{deriver_input.signal}["{deriver_input.signal}<br/>[{deriver_input.physical_unit.symbol.replace(" ", "")}]"] --> {sha256(deriver_schema_dag.name.encode()).hexdigest()[:8]}_{input_name}
         """
 
     for output_name, deriver_output in deriver.outputs.items():
         mermaid += f"""
-            {sha256(deriver_schema_dag.name.encode()).hexdigest()[:8]}_{output_name} --> {sha256(deriver.name.encode()).hexdigest()[:8]}_{output_name}["{output_name}<br/>[{deriver_output.physical_unit.symbol.replace(' ', '')}]"]
+            {sha256(deriver_schema_dag.name.encode()).hexdigest()[:8]}_{output_name} --> {sha256(deriver.name.encode()).hexdigest()[:8]}_{output_name}["{output_name}<br/>[{deriver_output.physical_unit.symbol.replace(" ", "")}]"]
         """
 
     mermaid += """

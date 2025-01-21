@@ -95,13 +95,13 @@ class Schema(BaseModel):
 
 
 class SchemaDiff(BaseModel):
-    old: Schema = Field(..., alias="previousSchema")
+    old: Schema | None = Field(None, alias="previousSchema")
     new: Schema = Field(..., alias="newSchema")
 
 
 class DeriverDiffs(BaseModel):
-    deriver_schemas: Mapping[str, SchemaDiff] = Field(..., alias="deriverSchemas")
-    derivers: Mapping[str, SchemaDiff]
+    deriver_schemas: Mapping[str, SchemaDiff] = Field(..., alias="DeriverSchemas")
+    derivers: Mapping[str, SchemaDiff] = Field(..., alias="Derivers")
 
     model_config = ConfigDict(populate_by_name=True)
 

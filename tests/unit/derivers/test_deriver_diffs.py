@@ -12,12 +12,13 @@ def test_deriver_diffs():
         "updatedAt": datetime(2023, 1, 2),
     }
     test_deriver_diffs_dict = {
-        "deriverSchemas": {"schema1": {"previousSchema": test_schema, "newSchema": test_schema}},
-        "derivers": {"deriver1": {"previousSchema": test_schema, "newSchema": test_schema}},
+        "DeriverSchemas": {"schema1": {"previousSchema": test_schema, "newSchema": test_schema}},
+        "Derivers": {"deriver1": {"previousSchema": test_schema, "newSchema": test_schema}},
     }
 
     deriver_diffs = DeriverDiffs.model_validate(test_deriver_diffs_dict)
 
+    assert deriver_diffs.deriver_schemas["schema1"].old is not None
     assert deriver_diffs.deriver_schemas["schema1"].old.id == 123
     assert deriver_diffs.deriver_schemas["schema1"].old.hash == "abc123"
     assert deriver_diffs.deriver_schemas["schema1"].old.history_id == 456

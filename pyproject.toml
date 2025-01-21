@@ -69,6 +69,7 @@ select = [
     "W",  # PEP 8 warning codes
 ]
 ignore = [
+    "A005",   # Module `signal` shadows a Python standard-library module
     "D100",   # Missing docstring in public module
     "D101",   # Missing docstring in public class	
     "D102",   # Missing docstring in public method
