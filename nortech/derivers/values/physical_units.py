@@ -644,3 +644,25 @@ candela = PhysicalUnit(
 )
 
 # This list can be further extended with more quantities and units as needed.
+# Boolean values can occur, just as dimensionless values:
+
+dimensionless = PhysicalQuantity(
+    name="Dimensionless",
+    description="A dimensionless quantity is a quantity that has no units.",
+    SIUnit=str(unit_registry.dimensionless),
+    SIUnitSymbol=f"{unit_registry.dimensionless:~}",
+)
+
+boolean = PhysicalUnit(
+    name="Boolean",
+    description="Boolean is a physical quantity that represents a binary value of true or false.",
+    symbol=f"{unit_registry.dimensionless:~}",
+    physicalQuantity=dimensionless,
+)
+
+dimensionless_unit = PhysicalUnit(
+    name=str(unit_registry.dimensionless),
+    description="The dimensionless unit is a unit of measurement that has no units.",
+    symbol=f"{unit_registry.dimensionless:~}",
+    physicalQuantity=dimensionless,
+)
