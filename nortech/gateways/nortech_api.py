@@ -16,7 +16,7 @@ class NortechAPISettings(BaseSettings):
 
     URL: str = Field(default="https://api.apps.nor.tech")
     KEY: str = Field(default=...)
-    USER_AGENT: str = Field(default="nortech-python/0.9.3")
+    USER_AGENT: str = Field(default="nortech-python/0.9.4")
     IGNORE_PAGINATION: bool = True
     EXPERIMENTAL_FEATURES: bool = False
     TIMEOUT: float | Timeout = Field(default=Timeout(connect=10, read=60))
