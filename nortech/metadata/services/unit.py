@@ -13,7 +13,10 @@ from nortech.metadata.services.division import (
     DivisionOutput,
     parse_division_input,
 )
-from nortech.metadata.values.pagination import PaginatedResponse, PaginationOptions
+from nortech.metadata.values.pagination import (
+    PaginatedResponse,
+    PaginationOptions,
+)
 from nortech.metadata.values.unit import (
     UnitInput,
     UnitInputDict,
@@ -58,7 +61,8 @@ def list_workspace_asset_division_units(
 
 
 def get_workspace_asset_division_unit(
-    nortech_api: NortechAPI, unit: int | UnitInputDict | UnitInput | UnitOutput | UnitListOutput
+    nortech_api: NortechAPI,
+    unit: int | UnitInputDict | UnitInput | UnitOutput | UnitListOutput,
 ):
     if isinstance(unit, int):
         return get_unit(nortech_api, unit)

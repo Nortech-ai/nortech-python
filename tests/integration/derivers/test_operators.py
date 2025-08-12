@@ -7,8 +7,8 @@ import pandas as pd
 from bytewax.dataflow import Dataflow
 from bytewax.testing import TestingSink, TestingSource, run_main
 
-from nortech.derivers import DeriverInputSchema
 from nortech.derivers import operators as internal_op
+from nortech.derivers.values.deriver import DeriverInputs
 
 
 def test_key_all():
@@ -73,12 +73,10 @@ def test_unkey_all():
 
 
 def test_filter_none():
-    class TestInput(DeriverInputSchema):
-        timestamp: datetime
+    class TestInput(DeriverInputs):
         value: float | None
 
-    class FilteredInput(DeriverInputSchema):
-        timestamp: datetime
+    class FilteredInput(DeriverInputs):
         value: float
 
     input_messages = [
@@ -112,8 +110,7 @@ def test_filter_none():
 
 
 def test_ffill():
-    class TestInput(DeriverInputSchema):
-        timestamp: datetime
+    class TestInput(DeriverInputs):
         value: float | None
 
     input_messages = [
@@ -148,8 +145,7 @@ def test_ffill():
 
 
 def test_resample():
-    class TestInput(DeriverInputSchema):
-        timestamp: datetime
+    class TestInput(DeriverInputs):
         value: float
 
     input_messages = [
@@ -188,8 +184,7 @@ def test_resample():
 
 
 def test_list_to_dataframe():
-    class TestInput(DeriverInputSchema):
-        timestamp: datetime
+    class TestInput(DeriverInputs):
         value: float
 
     test_data = [

@@ -6,7 +6,13 @@ from nortech.gateways.nortech_api import (
     NortechAPI,
     validate_response,
 )
-from nortech.metadata.values.asset import AssetInput, AssetInputDict, AssetListOutput, AssetOutput, parse_asset_input
+from nortech.metadata.values.asset import (
+    AssetInput,
+    AssetInputDict,
+    AssetListOutput,
+    AssetOutput,
+    parse_asset_input,
+)
 from nortech.metadata.values.division import (
     DivisionInput,
     DivisionInputDict,
@@ -14,7 +20,10 @@ from nortech.metadata.values.division import (
     DivisionOutput,
     parse_division_input,
 )
-from nortech.metadata.values.pagination import PaginatedResponse, PaginationOptions
+from nortech.metadata.values.pagination import (
+    PaginatedResponse,
+    PaginationOptions,
+)
 
 
 def list_workspace_asset_divisions(
@@ -52,7 +61,8 @@ def list_workspace_asset_divisions(
 
 
 def get_workspace_asset_division(
-    nortech_api: NortechAPI, division: int | DivisionInputDict | DivisionInput | DivisionOutput | DivisionListOutput
+    nortech_api: NortechAPI,
+    division: int | DivisionInputDict | DivisionInput | DivisionOutput | DivisionListOutput,
 ):
     if isinstance(division, int):
         return get_division(nortech_api, division)

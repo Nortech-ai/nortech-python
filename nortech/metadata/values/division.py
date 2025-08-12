@@ -8,7 +8,8 @@ from .common import MetadataOutput, MetadataTimestamps
 
 
 class DivisionInputDict(AssetInputDict):
-    """Dictionary representation of Division input data.
+    """
+    Dictionary representation of Division input data.
 
     Attributes:
         workspace (str): The name of the Workspace.
@@ -21,7 +22,8 @@ class DivisionInputDict(AssetInputDict):
 
 
 class DivisionInput(AssetInput):
-    """Pydantic model for Division input data.
+    """
+    Pydantic model for Division input data.
 
     Attributes:
         workspace (str): The name of the Workspace.
@@ -41,7 +43,8 @@ def parse_division_input(division_input: DivisionInput | DivisionInputDict):  # 
 
 
 class DivisionListOutput(MetadataOutput):
-    """Output model for division list entries.
+    """
+    Output model for division list entries.
 
     Attributes:
         id (int): Id of the Division.
@@ -54,7 +57,8 @@ class DivisionListOutput(MetadataOutput):
 
 
 class DivisionOutput(DivisionListOutput, MetadataTimestamps):
-    """Detailed output model for a single division.
+    """
+    Detailed output model for a single division.
 
     Attributes:
         id (int): Id of the Division.

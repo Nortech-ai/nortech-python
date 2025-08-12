@@ -9,7 +9,8 @@ from .common import MetadataOutput, MetadataTimestamps
 
 
 class WorkspaceInputDict(TypedDict):
-    """Dictionary representation of Workspace input data.
+    """
+    Dictionary representation of Workspace input data.
 
     Attributes:
         workspace (str): The name of the Workspace.
@@ -20,7 +21,8 @@ class WorkspaceInputDict(TypedDict):
 
 
 class WorkspaceInput(BaseModel):
-    """Pydantic model for Workspace input data.
+    """
+    Pydantic model for Workspace input data.
 
     Attributes:
         workspace (str): The name of the Workspace.
@@ -45,7 +47,8 @@ def parse_workspace_input(  # noqa: D103
 
 
 class WorkspaceListOutput(MetadataOutput):
-    """Output model for workspace list entries.
+    """
+    Output model for workspace list entries.
 
     Attributes:
         id (int): Id of the Workspace.
@@ -58,7 +61,8 @@ class WorkspaceListOutput(MetadataOutput):
 
 
 class WorkspaceOutput(WorkspaceListOutput, MetadataTimestamps):
-    """Detailed output model for a single workspace.
+    """
+    Detailed output model for a single workspace.
 
     Attributes:
         id (int): Id of the Workspace.

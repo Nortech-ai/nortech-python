@@ -6,7 +6,10 @@ from nortech.gateways.nortech_api import (
     NortechAPI,
     validate_response,
 )
-from nortech.metadata.values.pagination import PaginatedResponse, PaginationOptions
+from nortech.metadata.values.pagination import (
+    PaginatedResponse,
+    PaginationOptions,
+)
 from nortech.metadata.values.workspace import (
     WorkspaceInput,
     WorkspaceInputDict,

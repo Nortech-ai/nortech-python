@@ -13,7 +13,10 @@ from nortech.metadata.values.asset import (
     AssetOutput,
     parse_asset_input,
 )
-from nortech.metadata.values.pagination import PaginatedResponse, PaginationOptions
+from nortech.metadata.values.pagination import (
+    PaginatedResponse,
+    PaginationOptions,
+)
 from nortech.metadata.values.workspace import (
     WorkspaceInput,
     WorkspaceInputDict,
@@ -53,7 +56,8 @@ def list_workspace_assets(
 
 
 def get_workspace_asset(
-    nortech_api: NortechAPI, asset: int | AssetInputDict | AssetInput | AssetOutput | AssetListOutput
+    nortech_api: NortechAPI,
+    asset: int | AssetInputDict | AssetInput | AssetOutput | AssetListOutput,
 ):
     if isinstance(asset, int):
         return get_asset(nortech_api, asset)

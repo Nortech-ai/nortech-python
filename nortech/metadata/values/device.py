@@ -2,16 +2,14 @@
 
 from __future__ import annotations
 
-from nortech.metadata.values.division import (
-    DivisionInput,
-    DivisionInputDict,
-)
+from nortech.metadata.values.division import DivisionInput, DivisionInputDict
 
 from .common import MetadataOutput, MetadataTimestamps
 
 
 class DeviceInputDict(DivisionInputDict):
-    """Dictionary representation of Device input data.
+    """
+    Dictionary representation of Device input data.
 
     Attributes:
         workspace (str): The name of the Workspace.
@@ -25,7 +23,8 @@ class DeviceInputDict(DivisionInputDict):
 
 
 class DeviceInput(DivisionInput):
-    """Pydantic model for Device input data.
+    """
+    Pydantic model for Device input data.
 
     Attributes:
         workspace (str): The name of the Workspace.
@@ -46,7 +45,8 @@ def parse_device_input(device_input: DeviceInput | DeviceInputDict):  # noqa: D1
 
 
 class DeviceListOutput(MetadataOutput):
-    """Output model for device list entries.
+    """
+    Output model for device list entries.
 
     Attributes:
         id (int): Id of the Device.
@@ -61,7 +61,8 @@ class DeviceListOutput(MetadataOutput):
 
 
 class DeviceOutput(DeviceListOutput, MetadataTimestamps):
-    """Detailed output model for a single device.
+    """
+    Detailed output model for a single device.
 
     Attributes:
         id (int): Id of the Device.

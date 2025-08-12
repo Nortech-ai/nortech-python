@@ -10,13 +10,15 @@ from requests.adapters import HTTPAdapter
 from urllib3.util import Timeout
 from urllib3.util.retry import Retry
 
+from nortech.__version__ import __version__
+
 
 class NortechAPISettings(BaseSettings):
-    model_config = SettingsConfigDict(env_prefix="NORTECH_API_", env_file=(".env", ".env.prod"))
+    model_config = SettingsConfigDict(env_prefix="NORTECH_API_", env_file=(".env", ".env.prod"), extra="ignore")
 
     URL: str = Field(default="https://api.apps.nor.tech")
     KEY: str = Field(default=...)
-    USER_AGENT: str = Field(default="nortech-python/0.9.4")
+    USER_AGENT: str = Field(default=f"nortech-python/{__version__}")
     IGNORE_PAGINATION: bool = True
     EXPERIMENTAL_FEATURES: bool = False
     TIMEOUT: float | Timeout = Field(default=Timeout(connect=10, read=60))
@@ -36,7 +38,10 @@ class NortechAPI(Session):
         super().__init__()
         self.settings = settings or NortechAPISettings()
         self.mount(self.settings.URL, HTTPAdapter(max_retries=self.settings.RETRY))
-        self.headers = {"Authorization": f"Bearer {self.settings.KEY}", "User-Agent": self.settings.USER_AGENT}
+        self.headers = {
+            "Authorization": f"Bearer {self.settings.KEY}",
+            "User-Agent": self.settings.USER_AGENT,
+        }
         self.ignore_pagination = self.settings.IGNORE_PAGINATION
 
     def request(

@@ -39,7 +39,11 @@ def get_lazy_polars_df_from_hot_storage(
         },
     )
 
-    validate_response(response, valid_status_codes=[200, 404], error_message="Failed to get hot storage data.")
+    validate_response(
+        response,
+        valid_status_codes=[200, 404],
+        error_message="Failed to get hot storage data.",
+    )
 
     if response.status_code == 404:
         df = DataFrame({"timestamp": [], **{signal.path: [] for signal in signals}}).astype(
@@ -88,7 +92,11 @@ def get_lazy_polars_df_from_cold_storage(
         json=request_json,
     )
 
-    validate_response(response, valid_status_codes=[200, 404], error_message="Failed to get cold storage data.")
+    validate_response(
+        response,
+        valid_status_codes=[200, 404],
+        error_message="Failed to get cold storage data.",
+    )
 
     if response.status_code == 404:
         df = DataFrame({"timestamp": [], **{signal.path: [] for signal in signals}}).astype(

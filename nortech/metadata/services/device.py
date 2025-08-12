@@ -20,7 +20,10 @@ from nortech.metadata.values.device import (
     DeviceOutput,
     parse_device_input,
 )
-from nortech.metadata.values.pagination import PaginatedResponse, PaginationOptions
+from nortech.metadata.values.pagination import (
+    PaginatedResponse,
+    PaginationOptions,
+)
 
 
 def list_workspace_asset_division_devices(
@@ -58,7 +61,8 @@ def list_workspace_asset_division_devices(
 
 
 def get_workspace_asset_division_device(
-    nortech_api: NortechAPI, device: int | DeviceInputDict | DeviceInput | DeviceOutput | DeviceListOutput
+    nortech_api: NortechAPI,
+    device: int | DeviceInputDict | DeviceInput | DeviceOutput | DeviceListOutput,
 ):
     if isinstance(device, int):
         return get_device(nortech_api, device)
