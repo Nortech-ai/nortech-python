@@ -85,7 +85,7 @@ def create_deriver(
             "createParents": create_parents,
         },
     )
-    validate_response(response, [200], "Failed to create Deriver.")
+    validate_response(response, [201], "Failed to create Deriver.")
 
     return DeployedDeriver.model_validate(response.json())
 
