@@ -1900,7 +1900,7 @@ print(derivers)
 #### get
 
 ```python
-def get(deriver: type[Deriver])
+def get(deriver: str | type[Deriver])
 ```
 
 Get a deriver.

@@ -171,7 +171,7 @@ def validate_deriver(deriver: type) -> type[Deriver]:
     for name, typ in deriver_outputs:
         if typ not in [float, str, bool, dict, list]:
             raise InvalidDeriverError(
-                f"Deriver output '{name}' has type '{typ}', which is not allowed. Allowed types: float, str, bool, dict, list."
+                f"Deriver output '{name}' has type '{typ.__name__}', which is not allowed. Allowed types: float, str, bool, dict, list."
             )
 
     try:
