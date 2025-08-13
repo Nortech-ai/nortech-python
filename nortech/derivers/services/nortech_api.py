@@ -22,6 +22,7 @@ class DeployedDeriverList(BaseModel):
     deriver: type[Deriver] = Field(alias="definition")
     description: str | None = None
     start_at: datetime | None = Field(alias="startAt")
+    status: Literal["STARTING", "RUNNING", "STOPPED", "ERROR"]
 
     @field_validator("deriver", mode="before")
     @classmethod
