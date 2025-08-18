@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+from typing import Any
+
 from urllib3 import Retry, Timeout
 
+from nortech.__version__ import __version__
 from nortech.datatools import Datatools
 from nortech.derivers import Derivers
 from nortech.gateways.nortech_api import NortechAPI, NortechAPISettings
@@ -9,7 +12,8 @@ from nortech.metadata import Metadata
 
 
 class Nortech:
-    """Main class for interacting with the Nortech SDK.
+    """
+    Main class for interacting with the Nortech SDK.
 
     Attributes:
         metadata (Metadata): Client for interacting with the Nortech Metadata API.
@@ -28,7 +32,8 @@ class Nortech:
         timeout: float | Timeout | None = None,
         retry: int | Retry | None = None,
     ):
-        """Initialize the Nortech class.
+        """
+        Initialize the Nortech class.
 
         Args:
         url (str): The URL of the Nortech API. Defaults to "https://api.apps.nor.tech".
@@ -68,7 +73,7 @@ class Nortech:
         ```
 
         """
-        api_settings = {}
+        api_settings: dict[str, Any] = {}
         if api_key is not None:
             api_settings["KEY"] = api_key
         if ignore_pagination is not None:
@@ -89,3 +94,6 @@ class Nortech:
         self.metadata = Metadata(self.api)
         self.datatools = Datatools(self.api)
         self.derivers = Derivers(self.api)
+
+
+__all__ = ["__version__", "Nortech"]

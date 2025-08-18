@@ -1,44 +1,38 @@
 from __future__ import annotations
 
-from datetime import datetime
-from typing import Generic, Literal, Mapping
+from datetime import datetime, timezone
+from inspect import getsource
+from typing import Literal
 
-from dateutil.parser import parse
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, Field, field_validator
 
-from nortech.derivers.values.instance import (
-    Deriver,
-    DeriverInputType,
-    DeriverOutputType,
-)
-from nortech.derivers.values.schema import ConfigurationType, DeriverSchemaDAG
+from nortech.derivers.values.deriver import Deriver, get_deriver_from_script
 from nortech.gateways.nortech_api import (
     NortechAPI,
     validate_response,
 )
-from nortech.metadata.values.pagination import PaginatedResponse, PaginationOptions
+from nortech.metadata.values.pagination import (
+    PaginatedResponse,
+    PaginationOptions,
+)
+from nortech.metadata.values.signal import SignalOutputNoDevice
 
 
-class CreateDeriver(BaseModel, Generic[DeriverInputType, DeriverOutputType, ConfigurationType]):
-    model_config = ConfigDict(populate_by_name=True)
+class DeployedDeriverList(BaseModel):
+    deriver: type[Deriver] = Field(alias="definition")
+    description: str | None = None
+    start_at: datetime | None = Field(alias="startAt")
+    status: Literal["STARTING", "RUNNING", "STOPPED", "ERROR"]
 
-    name: str
-    description: str
-
-    inputs: dict[str, DeriverInputType]
-    outputs: dict[str, DeriverOutputType]
-    configurations: ConfigurationType
-
-    start_at: str = Field(alias="startAt")
+    @field_validator("deriver", mode="before")
+    @classmethod
+    def convert_deriver_string(cls, v: str):
+        return get_deriver_from_script(v)
 
 
-class CreateDeriverRequest(BaseModel, Generic[DeriverInputType, DeriverOutputType, ConfigurationType]):
-    model_config = ConfigDict(populate_by_name=True)
-
-    workspace: str | None
-    deriver: CreateDeriver[DeriverInputType, DeriverOutputType, ConfigurationType]
-    deriver_schema_dag: DeriverSchemaDAG = Field(alias="deriverSchemaDAG")
-    dry_run: bool = Field(alias="dryRun")
+class DeployedDeriver(DeployedDeriverList):
+    inputs: list[SignalOutputNoDevice]
+    outputs: list[SignalOutputNoDevice]
 
 
 class Log(BaseModel):
@@ -53,57 +47,7 @@ class LogList(BaseModel):
     logs: list[Log]
 
     def __str__(self) -> str:
-        str_representation = "\n".join([str(log) for log in self.logs])
-        return str_representation
-
-
-class DeriverLogs(BaseModel):
-    name: str
-    flow: LogList
-    processor: LogList
-
-    def __str__(self) -> str:
-        str_representation = f"Pod: {self.name}\n"
-        str_representation += "\nFlow logs:\n"
-        for log in self.flow.logs:
-            str_representation += f"{log}\n"
-
-        str_representation += "\nProcessor logs:\n"
-        for log in self.processor.logs:
-            str_representation += f"{log}\n"
-
-        return str_representation
-
-
-class LogsPerPod(BaseModel):
-    pods: list[DeriverLogs]
-
-    def __str__(self) -> str:
-        str_representation = "Pods:\n"
-        for pod in self.pods:
-            str_representation += f"{pod}\n"
-
-        return str_representation
-
-
-class Schema(BaseModel):
-    id: int
-    hash: str
-    history_id: int = Field(..., alias="historyId")
-    created_at: datetime = Field(..., alias="createdAt")
-    updated_at: datetime = Field(..., alias="updatedAt")
-
-
-class SchemaDiff(BaseModel):
-    old: Schema | None = Field(None, alias="previousSchema")
-    new: Schema = Field(..., alias="newSchema")
-
-
-class DeriverDiffs(BaseModel):
-    deriver_schemas: Mapping[str, SchemaDiff] = Field(..., alias="DeriverSchemas")
-    derivers: Mapping[str, SchemaDiff] = Field(..., alias="Derivers")
-
-    model_config = ConfigDict(populate_by_name=True)
+        return "\n".join([str(log) for log in self.logs])
 
 
 def list_derivers(
@@ -116,77 +60,67 @@ def list_derivers(
     )
     validate_response(response, [200], "Failed to list Derivers.")
 
-    return PaginatedResponse[Deriver](**response.json())
+    return PaginatedResponse[DeployedDeriverList].model_validate(response.json())
 
 
-def get_deriver(nortech_api: NortechAPI, deriver_id: int):
-    response = nortech_api.get(url=f"/api/v1/derivers/{deriver_id}")
+def get_deriver(nortech_api: NortechAPI, deriver: str):
+    response = nortech_api.get(url=f"/api/v1/derivers/{deriver}")
     validate_response(response, [200], "Failed to get Deriver.")
 
-    return Deriver(**response.json())
+    return DeployedDeriver.model_validate(response.json())
 
 
 def create_deriver(
     nortech_api: NortechAPI,
-    deriver: Deriver,
-    deriver_schema_dag: DeriverSchemaDAG,
-    workspace: str | None = None,
-    dry_run: bool = True,
+    deriver: type[Deriver],
+    start_at: datetime | None = None,
+    description: str | None = None,
+    create_parents: bool = False,
 ):
-    create_deriver_request = CreateDeriverRequest(
-        workspace=workspace,
-        deriver=CreateDeriver(
-            name=deriver.name,
-            description=deriver.description,
-            inputs=deriver.inputs,
-            outputs=deriver.outputs,
-            configurations=deriver.configurations,
-            startAt=str(deriver.start_at),
-        ),
-        deriverSchemaDAG=deriver_schema_dag,
-        dryRun=dry_run,
-    )
-
-    print(create_deriver_request.model_dump_json(by_alias=True))
-
     response = nortech_api.post(
         url="/api/v1/derivers",
-        json=create_deriver_request.model_dump(by_alias=True),
+        json={
+            "definition": getsource(deriver),
+            "startAt": start_at.astimezone(timezone.utc).isoformat().replace("+00:00", "Z") if start_at else None,
+            "description": description,
+            "createParents": create_parents,
+        },
+    )
+    validate_response(response, [201], "Failed to create Deriver.")
+
+    return DeployedDeriver.model_validate(response.json())
+
+
+def update_deriver(
+    nortech_api: NortechAPI,
+    deriver: type[Deriver],
+    start_at: datetime | None = None,
+    description: str | None = None,
+    create_parents: bool = False,
+    keep_data: bool = False,
+):
+    response = nortech_api.post(
+        url="/api/v1/derivers",
+        json={
+            "definition": getsource(deriver),
+            "startAt": start_at.astimezone(timezone.utc).isoformat().replace("+00:00", "Z") if start_at else None,
+            "description": description,
+            "createParents": create_parents,
+            "keepData": keep_data,
+        },
     )
     validate_response(response, [200], "Failed to create Deriver.")
 
-    return DeriverDiffs.model_validate(response.json())
-
-
-def get_logs_from_response_logs(response_logs: str) -> LogList:
-    logs = [
-        Log(
-            timestamp=parse(log.split(" ", 1)[0]),
-            message=log.split(" ", 1)[1],
-        )
-        for log in response_logs.split("\n")
-        if log != ""
-    ]
-
-    return LogList(logs=logs)
+    return DeployedDeriver.model_validate(response.json())
 
 
 def get_deriver_logs(
     nortech_api: NortechAPI,
-    deriver_id: int,
+    deriver: type[Deriver],
 ):
     response = nortech_api.get(
-        url=f"/api/v1/derivers/{deriver_id}/logs",
+        url=f"/api/v1/derivers/{deriver.__name__}/logs",
     )
     validate_response(response, [200], "Failed to get Deriver logs.")
 
-    return LogsPerPod(
-        pods=[
-            DeriverLogs(
-                name=pod["podName"],
-                flow=get_logs_from_response_logs(pod["flowLogs"]),
-                processor=get_logs_from_response_logs(pod["processorLogs"]),
-            )
-            for pod in response.json()["logsPerPod"]
-        ]
-    )
+    return LogList.model_validate(response.json())

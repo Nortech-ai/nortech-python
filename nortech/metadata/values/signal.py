@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import hashlib
-from typing import Literal
+from typing import Literal, Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -14,7 +14,8 @@ from .common import MetadataOutput, MetadataTimestamps
 
 
 class SignalInputDict(UnitInputDict):
-    """Dictionary representation of Signal input data.
+    """
+    Dictionary representation of Signal input data.
 
     Attributes:
         workspace (str): The name of the Workspace.
@@ -29,7 +30,8 @@ class SignalInputDict(UnitInputDict):
 
 
 class SignalInput(UnitInput):
-    """Pydantic model for Signal input data.
+    """
+    Pydantic model for Signal input data.
 
     Attributes:
         workspace (str): The name of the Workspace.
@@ -64,7 +66,8 @@ def parse_signal_input(signal_input: SignalInput | SignalInputDict) -> SignalInp
 
 
 class SignalDeviceInputDict(DeviceInputDict):
-    """Dictionary representation of SignalDevice input data.
+    """
+    Dictionary representation of SignalDevice input data.
 
     Attributes:
         workspace (str): The name of the Workspace.
@@ -79,7 +82,8 @@ class SignalDeviceInputDict(DeviceInputDict):
 
 
 class SignalDeviceInput(DeviceInput):
-    """Pydantic model for SignalDevice input data.
+    """
+    Pydantic model for SignalDevice input data.
 
     Attributes:
         workspace (str): The name of the Workspace.
@@ -101,8 +105,18 @@ def parse_signal_device_input(  # noqa: D103
     return SignalDeviceInput.model_validate(signal_device_input)
 
 
-class SignalListOutput(BaseModel):
-    """Output model for signal list entries.
+class SignalSpecs(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
+    physical_unit: Optional[str] = Field(alias="physicalUnit", default=None)
+    description: Optional[str] = Field(default=None)
+    long_description: Optional[str] = Field(alias="longDescription", default=None)
+    data_type: Literal["float", "boolean", "string", "json"] = Field(alias="dataType", default="float")
+
+
+class SignalListOutput(SignalSpecs):
+    """
+    Output model for signal list entries.
 
     Attributes:
         id (int): Id of the Signal.
@@ -118,14 +132,27 @@ class SignalListOutput(BaseModel):
 
     id: int
     name: str
-    physical_unit: str = Field(alias="physicalUnit")
-    data_type: Literal["float", "boolean", "string", "json"] = Field(alias="dataType")
-    description: str
-    long_description: str = Field(alias="longDescription")
 
 
-class SignalOutput(SignalListOutput, MetadataTimestamps):
-    """Detailed output model for a single signal.
+class SignalOutputNoDevice(SignalListOutput, MetadataTimestamps):
+    workspace: MetadataOutput
+    asset: MetadataOutput
+    division: MetadataOutput
+    unit: MetadataOutput
+
+    def to_signal_input(self) -> SignalInput:
+        return SignalInput(
+            workspace=self.workspace.name,
+            asset=self.asset.name,
+            division=self.division.name,
+            unit=self.unit.name,
+            signal=self.name,
+        )
+
+
+class SignalOutput(SignalOutputNoDevice):
+    """
+    Detailed output model for a single signal.
 
     Attributes:
         id (int): Id of the Signal.
@@ -150,17 +177,8 @@ class SignalOutput(SignalListOutput, MetadataTimestamps):
 
     """
 
-    workspace: MetadataOutput
-    asset: MetadataOutput
-    division: MetadataOutput
-    unit: MetadataOutput
     device: MetadataOutput
 
-    def to_signal_input(self) -> SignalInput:  # noqa: D102
-        return SignalInput(
-            workspace=self.workspace.name,
-            asset=self.asset.name,
-            division=self.division.name,
-            unit=self.unit.name,
-            signal=self.name,
-        )
+
+class CreateSignalInput(SignalInput, SignalSpecs):
+    group_key: Optional[str] = Field(alias="groupKey", default=None)

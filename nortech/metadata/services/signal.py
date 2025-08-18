@@ -13,8 +13,17 @@ from nortech.metadata.services.device import (
     DeviceOutput,
     parse_device_input,
 )
-from nortech.metadata.services.unit import UnitInput, UnitInputDict, UnitListOutput, UnitOutput, parse_unit_input
-from nortech.metadata.values.pagination import PaginatedResponse, PaginationOptions
+from nortech.metadata.services.unit import (
+    UnitInput,
+    UnitInputDict,
+    UnitListOutput,
+    UnitOutput,
+    parse_unit_input,
+)
+from nortech.metadata.values.pagination import (
+    PaginatedResponse,
+    PaginationOptions,
+)
 from nortech.metadata.values.signal import (
     SignalDeviceInput,
     SignalDeviceInputDict,
@@ -31,7 +40,14 @@ def list_workspace_asset_division_unit_signals(
     nortech_api: NortechAPI,
     unit: int | UnitInputDict | UnitInput | UnitOutput | UnitListOutput,
     pagination_options: PaginationOptions[
-        Literal["id", "name", "physical_unit", "data_type", "description", "long_description"]
+        Literal[
+            "id",
+            "name",
+            "physical_unit",
+            "data_type",
+            "description",
+            "long_description",
+        ]
     ]
     | None = None,
 ):
@@ -65,7 +81,8 @@ def list_workspace_asset_division_unit_signals(
 
 
 def get_workspace_asset_division_unit_signal(
-    nortech_api: NortechAPI, signal: int | SignalInputDict | SignalInput | SignalOutput | SignalListOutput
+    nortech_api: NortechAPI,
+    signal: int | SignalInputDict | SignalInput | SignalOutput | SignalListOutput,
 ):
     if isinstance(signal, int):
         return get_signal(nortech_api, signal)
@@ -84,7 +101,14 @@ def list_workspace_asset_division_device_signals(
     nortech_api: NortechAPI,
     device: DeviceInputDict | DeviceInput | DeviceOutput | DeviceListOutput,
     pagination_options: PaginationOptions[
-        Literal["id", "name", "physical_unit", "data_type", "description", "long_description"]
+        Literal[
+            "id",
+            "name",
+            "physical_unit",
+            "data_type",
+            "description",
+            "long_description",
+        ]
     ]
     | None = None,
 ):
@@ -116,7 +140,8 @@ def list_workspace_asset_division_device_signals(
 
 
 def get_workspace_asset_division_device_signal(
-    nortech_api: NortechAPI, signal: SignalDeviceInputDict | SignalDeviceInput | SignalOutput | SignalListOutput
+    nortech_api: NortechAPI,
+    signal: SignalDeviceInputDict | SignalDeviceInput | SignalOutput | SignalListOutput,
 ):
     if isinstance(signal, SignalListOutput):
         return get_signal(nortech_api, signal.id)
@@ -133,7 +158,14 @@ def list_workspace_signals(
     nortech_api: NortechAPI,
     workspace_id: int,
     pagination_options: PaginationOptions[
-        Literal["id", "name", "physical_unit", "data_type", "description", "long_description"]
+        Literal[
+            "id",
+            "name",
+            "physical_unit",
+            "data_type",
+            "description",
+            "long_description",
+        ]
     ]
     | None = None,
 ):
@@ -164,7 +196,14 @@ def list_asset_signals(
     nortech_api: NortechAPI,
     asset_id: int,
     pagination_options: PaginationOptions[
-        Literal["id", "name", "physical_unit", "data_type", "description", "long_description"]
+        Literal[
+            "id",
+            "name",
+            "physical_unit",
+            "data_type",
+            "description",
+            "long_description",
+        ]
     ]
     | None = None,
 ):
@@ -195,7 +234,14 @@ def list_division_signals(
     nortech_api: NortechAPI,
     division_id: int,
     pagination_options: PaginationOptions[
-        Literal["id", "name", "physical_unit", "data_type", "description", "long_description"]
+        Literal[
+            "id",
+            "name",
+            "physical_unit",
+            "data_type",
+            "description",
+            "long_description",
+        ]
     ]
     | None = None,
 ):
@@ -226,7 +272,14 @@ def list_unit_signals(
     nortech_api: NortechAPI,
     unit_id: int,
     pagination_options: PaginationOptions[
-        Literal["id", "name", "physical_unit", "data_type", "description", "long_description"]
+        Literal[
+            "id",
+            "name",
+            "physical_unit",
+            "data_type",
+            "description",
+            "long_description",
+        ]
     ]
     | None = None,
 ):
@@ -257,7 +310,14 @@ def list_device_signals(
     nortech_api: NortechAPI,
     device_id: int,
     pagination_options: PaginationOptions[
-        Literal["id", "name", "physical_unit", "data_type", "description", "long_description"]
+        Literal[
+            "id",
+            "name",
+            "physical_unit",
+            "data_type",
+            "description",
+            "long_description",
+        ]
     ]
     | None = None,
 ):
@@ -292,8 +352,13 @@ def get_signal(nortech_api: NortechAPI, signal_id: int):
     return SignalOutput.model_validate(response.json())
 
 
-def _get_signals(nortech_api: NortechAPI, signals: Sequence[SignalInput | SignalInputDict | SignalListOutput | int]):
-    def signal_to_api_input(signal: SignalInput | SignalInputDict | SignalListOutput | int):
+def _get_signals(
+    nortech_api: NortechAPI,
+    signals: Sequence[SignalInput | SignalInputDict | SignalListOutput | int],
+):
+    def signal_to_api_input(
+        signal: SignalInput | SignalInputDict | SignalListOutput | int,
+    ):
         if isinstance(signal, SignalListOutput):
             return signal.id
         elif isinstance(signal, SignalInput):
@@ -310,7 +375,8 @@ def _get_signals(nortech_api: NortechAPI, signals: Sequence[SignalInput | Signal
 
 
 def parse_signal_input_or_output_or_id_union_to_signal_input(
-    nortech_api: NortechAPI, signals: Sequence[SignalInput | SignalInputDict | SignalOutput | SignalListOutput | int]
+    nortech_api: NortechAPI,
+    signals: Sequence[SignalInput | SignalInputDict | SignalOutput | SignalListOutput | int],
 ):
     signal_ids: List[int] = [
         signal.id if isinstance(signal, SignalListOutput) else signal

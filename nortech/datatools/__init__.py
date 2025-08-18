@@ -38,7 +38,8 @@ class Download:
         output_path: str,
         file_format: Format,
     ):
-        """Download data for the specified signals within the given time window. If experimental features are enabled, live data will also be downloaded.
+        """
+        Download data for the specified signals within the given time window. If experimental features are enabled, live data will also be downloaded.
 
         Args:
             signals (Sequence[int | SignalInput | SignalInputDict | SignalOutput | SignalListOutput]): A list of signals to download, which can be of the following types:
@@ -110,7 +111,8 @@ class Pandas:
         signals: Sequence[int | SignalInput | SignalInputDict | SignalOutput | SignalListOutput],
         time_window: TimeWindow,
     ) -> DataFrame:
-        """Retrieve a pandas DataFrame for the specified signals within the given time window. If experimental features are enabled, live data will also be retrieved.
+        """
+        Retrieve a pandas DataFrame for the specified signals within the given time window. If experimental features are enabled, live data will also be retrieved.
 
         Args:
             signals (Sequence[int | SignalInput | SignalInputDict | SignalOutput | SignalListOutput]): A list of signals to download, which can be of the following types:
@@ -188,7 +190,8 @@ class Polars:
         signals: Sequence[int | SignalInput | SignalInputDict | SignalOutput | SignalListOutput],
         time_window: TimeWindow,
     ) -> LazyFrame:
-        """Retrieve a polars LazyFrame for the specified signals within the given time window. If experimental features are enabled, live data will also be retrieved.
+        """
+        Retrieve a polars LazyFrame for the specified signals within the given time window. If experimental features are enabled, live data will also be retrieved.
 
         Args:
             signals (Sequence[int | SignalInput | SignalInputDict | SignalOutput | SignalListOutput]): A list of signals to download, which can be of the following types:
@@ -261,7 +264,8 @@ class Polars:
         signals: Sequence[int | SignalInput | SignalInputDict | SignalOutput | SignalListOutput],
         time_window: TimeWindow,
     ) -> PolarsDataFrame:
-        """Retrieve a polars DataFrame for the specified signals within the given time window. If experimental features are enabled, live data will also be retrieved.
+        """
+        Retrieve a polars DataFrame for the specified signals within the given time window. If experimental features are enabled, live data will also be retrieved.
 
         Args:
             signals (Sequence[int | SignalInput | SignalInputDict | SignalOutput | SignalListOutput]): A list of signals to download, which can be of the following types:

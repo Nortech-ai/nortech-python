@@ -7,7 +7,8 @@ from .workspace import WorkspaceInput, WorkspaceInputDict
 
 
 class AssetInputDict(WorkspaceInputDict):
-    """Dictionary representation of Asset input data.
+    """
+    Dictionary representation of Asset input data.
 
     Attributes:
         workspace (str): The name of the Workspace.
@@ -19,7 +20,8 @@ class AssetInputDict(WorkspaceInputDict):
 
 
 class AssetInput(WorkspaceInput):
-    """Pydantic model for asset input data.
+    """
+    Pydantic model for asset input data.
 
     Attributes:
         workspace (str): The name of the Workspace.
@@ -38,7 +40,8 @@ def parse_asset_input(asset_input: AssetInput | AssetInputDict):  # noqa: D103
 
 
 class AssetListOutput(MetadataOutput):
-    """Output model for asset list entries.
+    """
+    Output model for asset list entries.
 
     Attributes:
         id (int): Id of the Asset.
@@ -51,7 +54,8 @@ class AssetListOutput(MetadataOutput):
 
 
 class AssetOutput(AssetListOutput, MetadataTimestamps):
-    """Detailed output model for a single asset.
+    """
+    Detailed output model for a single asset.
 
     Attributes:
         id (int): Id of the Asset.

@@ -1,15 +1,10 @@
 [project]
 name = "nortech"
-version = "0.9.4"
-description = "The official Python library for Nortech AI"
-authors = [
-    { name = "Nortech AI", email = "info@nortech.ai" }
-]
-license = "Apache-2.0"
-homepage = "https://nortech.ai/"
-repository = "https://github.com/Nortech-ai/nortech-python"
+version = "0.10.0"
+description = "Nortech Python SDK"
 readme = "README.md"
 requires-python = ">=3.9"
+
 dependencies = [
     "bytewax>=0.21.0",
     "eval-type-backport>=0.2.0",
@@ -22,16 +17,10 @@ dependencies = [
     "pydantic-settings>=2.5.2",
     "python-dotenv>=1.0.1",
     "requests>=2.32.3",
+    "structlog>=25.4.0",
     "tzlocal>=5.2",
     "urllib3<2.0",
 ]
-
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
-
-[tool.hatch.build.targets.wheel]
-packages = ["nortech"]
 
 [tool.uv]
 dev-dependencies = [
@@ -78,6 +67,8 @@ ignore = [
     "D105",   # Missing docstring in magic method
     "D106",   # Missing docstring in public nested class
     "D107",   # Missing docstring in __init__
+    "D203",   # Incorrect black line before class
+    "D212",   # Multi line summary first line
     "E501",   # Line too long
     "PD901",  # Using the generic variable name `df` for DataFrames
     "S101"    # Use of `assert` detected

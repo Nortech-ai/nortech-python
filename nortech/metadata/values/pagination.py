@@ -8,7 +8,8 @@ SortBy = TypeVar("SortBy")
 
 
 class PaginationOptions(BaseModel, Generic[SortBy]):
-    """Pagination options for list endpoints.
+    """
+    Pagination options for list endpoints.
 
     Attributes:
         size (int | None, default=100, le=100): The number of items to return.
@@ -34,7 +35,8 @@ Resp = TypeVar("Resp")
 
 
 class PaginatedResponse(BaseModel, Generic[Resp]):
-    """Paginated response from list endpoints.
+    """
+    Paginated response from list endpoints.
 
     Attributes:
         size (int): The number of items returned.

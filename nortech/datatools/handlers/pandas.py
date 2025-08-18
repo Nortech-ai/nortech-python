@@ -7,7 +7,12 @@ from pandas import DataFrame
 from nortech.datatools.handlers.polars import get_polars_df
 from nortech.datatools.values.windowing import TimeWindow
 from nortech.gateways.nortech_api import NortechAPI
-from nortech.metadata.values.signal import SignalInput, SignalInputDict, SignalListOutput, SignalOutput
+from nortech.metadata.values.signal import (
+    SignalInput,
+    SignalInputDict,
+    SignalListOutput,
+    SignalOutput,
+)
 
 
 def get_df(

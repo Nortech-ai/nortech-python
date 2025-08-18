@@ -4,7 +4,12 @@ from datetime import datetime, timedelta, timezone
 
 from polars import LazyFrame, col
 
-from nortech.datatools.values.windowing import ColdWindow, HotColdWindow, HotWindow, TimeWindow
+from nortech.datatools.values.windowing import (
+    ColdWindow,
+    HotColdWindow,
+    HotWindow,
+    TimeWindow,
+)
 
 
 def get_hot_and_cold_time_windows(

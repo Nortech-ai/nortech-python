@@ -9,11 +9,30 @@ import nortech.metadata.services.signal as signal_service
 import nortech.metadata.services.unit as unit_service
 import nortech.metadata.services.workspace as workspace_service
 from nortech.gateways.nortech_api import NortechAPI
-from nortech.metadata.values.asset import AssetInput, AssetInputDict, AssetListOutput, AssetOutput
+from nortech.metadata.values.asset import (
+    AssetInput,
+    AssetInputDict,
+    AssetListOutput,
+    AssetOutput,
+)
 from nortech.metadata.values.common import MetadataOutput
-from nortech.metadata.values.device import DeviceInput, DeviceInputDict, DeviceListOutput, DeviceOutput
-from nortech.metadata.values.division import DivisionInput, DivisionInputDict, DivisionListOutput, DivisionOutput
-from nortech.metadata.values.pagination import NextRef, PaginatedResponse, PaginationOptions
+from nortech.metadata.values.device import (
+    DeviceInput,
+    DeviceInputDict,
+    DeviceListOutput,
+    DeviceOutput,
+)
+from nortech.metadata.values.division import (
+    DivisionInput,
+    DivisionInputDict,
+    DivisionListOutput,
+    DivisionOutput,
+)
+from nortech.metadata.values.pagination import (
+    NextRef,
+    PaginatedResponse,
+    PaginationOptions,
+)
 from nortech.metadata.values.signal import (
     SignalDeviceInput,
     SignalDeviceInputDict,
@@ -22,12 +41,23 @@ from nortech.metadata.values.signal import (
     SignalListOutput,
     SignalOutput,
 )
-from nortech.metadata.values.unit import UnitInput, UnitInputDict, UnitListOutput, UnitOutput
-from nortech.metadata.values.workspace import WorkspaceInput, WorkspaceInputDict, WorkspaceListOutput, WorkspaceOutput
+from nortech.metadata.values.unit import (
+    UnitInput,
+    UnitInputDict,
+    UnitListOutput,
+    UnitOutput,
+)
+from nortech.metadata.values.workspace import (
+    WorkspaceInput,
+    WorkspaceInputDict,
+    WorkspaceListOutput,
+    WorkspaceOutput,
+)
 
 
 class Metadata:
-    """Client for interacting with the Nortech Metadata API.
+    """
+    Client for interacting with the Nortech Metadata API.
 
     Attributes:
         workspace (Workspace): Client for interacting with the Nortech Metadata Workspace API.
@@ -55,9 +85,11 @@ class Workspace:
         self.nortech_api = nortech_api
 
     def get(
-        self, workspace: int | str | WorkspaceInputDict | WorkspaceInput | WorkspaceOutput | WorkspaceListOutput
+        self,
+        workspace: int | str | WorkspaceInputDict | WorkspaceInput | WorkspaceOutput | WorkspaceListOutput,
     ) -> WorkspaceOutput:
-        """Get a workspace by ID or name.
+        """
+        Get a workspace by ID or name.
 
         Args:
             workspace (int | str | WorkspaceInputDict | WorkspaceInput | WorkspaceOutput | WorkspaceListOutput): The workspace identifier, which can be:
@@ -105,9 +137,11 @@ class Workspace:
         return workspace_service.get_workspace(self.nortech_api, workspace)
 
     def list(
-        self, pagination_options: PaginationOptions[Literal["id", "name", "description"]] | None = None
+        self,
+        pagination_options: PaginationOptions[Literal["id", "name", "description"]] | None = None,
     ) -> PaginatedResponse[WorkspaceListOutput]:
-        """List all workspaces.
+        """
+        List all workspaces.
 
         Args:
             pagination_options (PaginationOptions, optional): Pagination settings.
@@ -157,7 +191,8 @@ class Asset:
         self.nortech_api = nortech_api
 
     def get(self, asset: int | AssetInputDict | AssetInput | AssetOutput | AssetListOutput) -> AssetOutput:
-        """Get an asset by ID or input.
+        """
+        Get an asset by ID or input.
 
         Args:
             asset (int | AssetInputDict | AssetInput | AssetOutput | AssetListOutput): The asset identifier, which can be:
@@ -209,7 +244,8 @@ class Asset:
         workspace: int | str | WorkspaceInputDict | WorkspaceInput | WorkspaceOutput | WorkspaceListOutput,
         pagination_options: PaginationOptions[Literal["id", "name", "description"]] | None = None,
     ) -> PaginatedResponse[AssetListOutput]:
-        """List all assets in a workspace.
+        """
+        List all assets in a workspace.
 
         Args:
             workspace (int | str | WorkspaceInputDict | WorkspaceInput | WorkspaceOutput | WorkspaceListOutput): The workspace identifier, which can be:
@@ -276,9 +312,11 @@ class Division:
         self.nortech_api = nortech_api
 
     def get(
-        self, division: int | DivisionInputDict | DivisionInput | DivisionOutput | DivisionListOutput
+        self,
+        division: int | DivisionInputDict | DivisionInput | DivisionOutput | DivisionListOutput,
     ) -> DivisionOutput:
-        """Get a division by ID or input.
+        """
+        Get a division by ID or input.
 
         Args:
             division (int | DivisionInputDict | DivisionInput | DivisionOutput | DivisionListOutput): The division identifier, which can be:
@@ -336,7 +374,8 @@ class Division:
         asset: int | AssetInputDict | AssetInput | AssetOutput | AssetListOutput,
         pagination_options: PaginationOptions[Literal["id", "name", "description"]] | None = None,
     ) -> PaginatedResponse[DivisionListOutput]:
-        """List all divisions in an asset.
+        """
+        List all divisions in an asset.
 
         Args:
             asset (int | AssetInputDict | AssetInput | AssetOutput | AssetListOutput): The asset identifier, which can be:
@@ -398,7 +437,8 @@ class Division:
         workspace_id: int,
         pagination_options: PaginationOptions[Literal["id", "name", "description"]] | None = None,
     ) -> PaginatedResponse[DivisionListOutput]:
-        """List all divisions in a workspace.
+        """
+        List all divisions in a workspace.
 
         Args:
             workspace_id (int): The workspace ID.
@@ -449,7 +489,8 @@ class Unit:
         self.nortech_api = nortech_api
 
     def get(self, unit: int | UnitInputDict | UnitInput | UnitOutput | UnitListOutput) -> UnitOutput:
-        """Get a unit by ID or input.
+        """
+        Get a unit by ID or input.
 
         Args:
             unit (int | UnitInputDict | UnitInput | UnitOutput | UnitListOutput): The unit identifier, which can be:
@@ -512,7 +553,8 @@ class Unit:
         division: int | DivisionInputDict | DivisionInput | DivisionOutput | DivisionListOutput,
         pagination_options: PaginationOptions[Literal["id", "name"]] | None = None,
     ) -> PaginatedResponse[UnitListOutput]:
-        """List all units in a division.
+        """
+        List all units in a division.
 
         Args:
             division (int | DivisionInputDict | DivisionInput | DivisionOutput | DivisionListOutput): The division identifier, which can be:
@@ -572,7 +614,8 @@ class Unit:
         workspace_id: int,
         pagination_options: PaginationOptions[Literal["id", "name"]] | None = None,
     ) -> PaginatedResponse[UnitListOutput]:
-        """List all units in a workspace.
+        """
+        List all units in a workspace.
 
         Args:
             workspace_id (int): The workspace ID.
@@ -620,7 +663,8 @@ class Unit:
         asset_id: int,
         pagination_options: PaginationOptions[Literal["id", "name"]] | None = None,
     ) -> PaginatedResponse[UnitListOutput]:
-        """List all units in an asset.
+        """
+        List all units in an asset.
 
         Args:
             asset_id (int): The asset ID.
@@ -667,8 +711,12 @@ class Device:
     def __init__(self, nortech_api: NortechAPI):
         self.nortech_api = nortech_api
 
-    def get(self, device: int | DeviceInputDict | DeviceInput | DeviceOutput | DeviceListOutput) -> DeviceOutput:
-        """Get a device by ID or input.
+    def get(
+        self,
+        device: int | DeviceInputDict | DeviceInput | DeviceOutput | DeviceListOutput,
+    ) -> DeviceOutput:
+        """
+        Get a device by ID or input.
 
         Args:
             device (int | DeviceInputDict | DeviceInput | DeviceOutput | DeviceListOutput): The device identifier, which can be:
@@ -733,7 +781,8 @@ class Device:
         division: int | DivisionInputDict | DivisionInput | DivisionOutput | DivisionListOutput,
         pagination_options: PaginationOptions[Literal["id", "name", "type", "onboarded"]] | None = None,
     ) -> PaginatedResponse[DeviceListOutput]:
-        """List all devices in a division.
+        """
+        List all devices in a division.
 
         Args:
             division (int | DivisionInputDict | DivisionInput | DivisionOutput | DivisionListOutput): The division identifier, which can be:
@@ -799,7 +848,8 @@ class Device:
         workspace_id: int,
         pagination_options: PaginationOptions[Literal["id", "name", "type", "onboarded"]] | None = None,
     ) -> PaginatedResponse[DeviceListOutput]:
-        """List all devices in a workspace.
+        """
+        List all devices in a workspace.
 
         Args:
             workspace_id (int): The workspace ID.
@@ -851,7 +901,8 @@ class Device:
         asset_id: int,
         pagination_options: PaginationOptions[Literal["id", "name", "type", "onboarded"]] | None = None,
     ) -> PaginatedResponse[DeviceListOutput]:
-        """List all devices in an asset.
+        """
+        List all devices in an asset.
 
         Args:
             asset_id (int): The asset ID.
@@ -913,7 +964,8 @@ class Signal:
         | SignalDeviceInputDict
         | SignalDeviceInput,
     ) -> SignalOutput:
-        """Get a signal by ID or input.
+        """
+        Get a signal by ID or input.
 
         Args:
             signal (int | SignalInputDict | SignalInput | SignalOutput | SignalListOutput | SignalDeviceInputDict | SignalDeviceInput): The signal identifier, which can be:
@@ -1024,11 +1076,19 @@ class Signal:
         self,
         unit_or_device: int | UnitInputDict | UnitInput | UnitOutput | DeviceInputDict | DeviceInput | DeviceOutput,
         pagination_options: PaginationOptions[
-            Literal["id", "name", "physical_unit", "data_type", "description", "long_description"]
+            Literal[
+                "id",
+                "name",
+                "physical_unit",
+                "data_type",
+                "description",
+                "long_description",
+            ]
         ]
         | None = None,
     ) -> PaginatedResponse[SignalListOutput]:
-        """List all signals in a unit or device.
+        """
+        List all signals in a unit or device.
 
         Args:
             unit_or_device (int | UnitInputDict | UnitInput | UnitOutput | DeviceInputDict | DeviceInput | DeviceOutput): The unit or device identifier, which can be:
@@ -1124,11 +1184,19 @@ class Signal:
         self,
         workspace_id: int,
         pagination_options: PaginationOptions[
-            Literal["id", "name", "physical_unit", "data_type", "description", "long_description"]
+            Literal[
+                "id",
+                "name",
+                "physical_unit",
+                "data_type",
+                "description",
+                "long_description",
+            ]
         ]
         | None = None,
     ) -> PaginatedResponse[SignalListOutput]:
-        """List all signals in a workspace.
+        """
+        List all signals in a workspace.
 
         Args:
             workspace_id (int): The workspace ID.
@@ -1183,11 +1251,19 @@ class Signal:
         self,
         asset_id: int,
         pagination_options: PaginationOptions[
-            Literal["id", "name", "physical_unit", "data_type", "description", "long_description"]
+            Literal[
+                "id",
+                "name",
+                "physical_unit",
+                "data_type",
+                "description",
+                "long_description",
+            ]
         ]
         | None = None,
     ) -> PaginatedResponse[SignalListOutput]:
-        """List all signals in an asset.
+        """
+        List all signals in an asset.
 
         Args:
             asset_id (int): The asset ID.
@@ -1243,11 +1319,19 @@ class Signal:
         self,
         division_id: int,
         pagination_options: PaginationOptions[
-            Literal["id", "name", "physical_unit", "data_type", "description", "long_description"]
+            Literal[
+                "id",
+                "name",
+                "physical_unit",
+                "data_type",
+                "description",
+                "long_description",
+            ]
         ]
         | None = None,
     ) -> PaginatedResponse[SignalListOutput]:
-        """List all signals in a division.
+        """
+        List all signals in a division.
 
         Args:
             division_id (int): The division ID.

@@ -4,16 +4,14 @@ from __future__ import annotations
 
 from pydantic import BaseModel
 
-from nortech.metadata.values.division import (
-    DivisionInput,
-    DivisionInputDict,
-)
+from nortech.metadata.values.division import DivisionInput, DivisionInputDict
 
 from .common import MetadataOutput, MetadataTimestamps
 
 
 class UnitInputDict(DivisionInputDict):
-    """Dictionary representation of Unit input data.
+    """
+    Dictionary representation of Unit input data.
 
     Attributes:
         workspace (str): The name of the Workspace.
@@ -27,7 +25,8 @@ class UnitInputDict(DivisionInputDict):
 
 
 class UnitInput(DivisionInput):
-    """Pydantic model for Unit input data.
+    """
+    Pydantic model for Unit input data.
 
     Attributes:
         workspace (str): The name of the Workspace.
@@ -48,7 +47,8 @@ def parse_unit_input(unit_input: UnitInput | UnitInputDict):  # noqa: D103
 
 
 class UnitListOutput(BaseModel):
-    """Output model for unit list entries.
+    """
+    Output model for unit list entries.
 
     Attributes:
         id (int): Id of the Unit.
@@ -61,7 +61,8 @@ class UnitListOutput(BaseModel):
 
 
 class UnitDivision(BaseModel):
-    """Output model for unit division entries.
+    """
+    Output model for unit division entries.
 
     Attributes:
         id (int): Id of the Division.
@@ -74,7 +75,8 @@ class UnitDivision(BaseModel):
 
 
 class UnitOutput(UnitListOutput, MetadataTimestamps):
-    """Detailed output model for a single unit.
+    """
+    Detailed output model for a single unit.
 
     Attributes:
         id (int): Id of the Unit.
