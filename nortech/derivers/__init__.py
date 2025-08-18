@@ -143,7 +143,7 @@ class Derivers:
         Get a deriver.
 
         Args:
-            deriver (type[Deriver]): Deriver class to fetch.
+            deriver (type[Deriver]): Deriver class to fetch or deriver class name.
 
         Returns:
             DeployedDeriver: Deployed deriver.
@@ -420,7 +420,7 @@ class Derivers:
         batch_size: int = 10000,
     ) -> DataFrame:
         """
-        Run a deriver locally on a DataFrame or fetching the inputs for a time window.
+        Run a deriver locally on a DataFrame. The dataframe must have a timestamp index and columns equal to the input names in the deriver definition.
 
         Args:
             deriver (Deriver): The deriver to run.
@@ -484,7 +484,7 @@ class Derivers:
         batch_size: int = 10000,
     ) -> DataFrame:
         """
-        Run a deriver locally on a DataFrame or fetching the inputs for a time window.
+        Run a deriver locally by fetching its inputs signal data for a given time window.
 
         Args:
             deriver (Deriver): The deriver to run.

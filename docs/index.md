@@ -1907,7 +1907,7 @@ Get a deriver.
 
 **Arguments**:
 
-- `deriver` _type[Deriver]_ - Deriver class to fetch.
+- `deriver` _type[Deriver]_ - Deriver class to fetch or deriver class name.
   
 
 **Returns**:
@@ -2192,7 +2192,7 @@ def run_locally_with_df(deriver: type[Deriver],
                         batch_size: int = 10000) -> DataFrame
 ```
 
-Run a deriver locally on a DataFrame or fetching the inputs for a time window.
+Run a deriver locally on a DataFrame. The dataframe must have a timestamp index and columns equal to the input names in the deriver definition.
 
 **Arguments**:
 
@@ -2254,7 +2254,7 @@ def run_locally_with_source_data(deriver: type[Deriver],
                                  batch_size: int = 10000) -> DataFrame
 ```
 
-Run a deriver locally on a DataFrame or fetching the inputs for a time window.
+Run a deriver locally by fetching its inputs signal data for a given time window.
 
 **Arguments**:
 
