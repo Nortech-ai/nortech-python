@@ -1,6 +1,6 @@
 [project]
 name = "nortech"
-version = "0.10.0"
+version = "0.11.0"
 description = "Nortech Python SDK"
 readme = "README.md"
 requires-python = ">=3.9"
@@ -70,6 +70,5 @@ ignore = [
     "D203",   # Incorrect black line before class
     "D212",   # Multi line summary first line
     "E501",   # Line too long
-    "PD901",  # Using the generic variable name `df` for DataFrames
     "S101"    # Use of `assert` detected
 ]

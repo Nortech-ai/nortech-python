@@ -1,3 +1,5 @@
+from typing import Literal
+
 import pytest
 from requests_mock import Mocker
 
@@ -14,7 +16,7 @@ from nortech.metadata import (
 def test_list_workspace_asset_divisions_from_input(
     nortech: Nortech,
     division_list_output: DivisionListOutput,
-    paginated_division_list_output: PaginatedResponse[DivisionOutput],
+    paginated_division_list_output: PaginatedResponse[DivisionListOutput, Literal["id", "name", "description"]],
     requests_mock: Mocker,
 ):
     requests_mock.get(
@@ -31,7 +33,7 @@ def test_list_workspace_asset_divisions_from_input(
 def test_list_workspace_asset_divisions_from_input_dict(
     nortech: Nortech,
     division_list_output: DivisionListOutput,
-    paginated_division_list_output: PaginatedResponse[DivisionOutput],
+    paginated_division_list_output: PaginatedResponse[DivisionListOutput, Literal["id", "name", "description"]],
     requests_mock: Mocker,
 ):
     requests_mock.get(
@@ -63,7 +65,7 @@ def test_list_workspace_asset_division_error(
 def test_get_workspace_asset_division_with_input(
     nortech: Nortech,
     division_output: DivisionOutput,
-    requests_mock,
+    requests_mock: Mocker,
 ):
     requests_mock.get(
         f"{nortech.settings.URL}/api/v1/workspaces/test_workspace/assets/test_asset/divisions/test_division",
@@ -79,7 +81,7 @@ def test_get_workspace_asset_division_with_input(
 def test_get_workspace_asset_division_with_input_dict(
     nortech: Nortech,
     division_output: DivisionOutput,
-    requests_mock,
+    requests_mock: Mocker,
 ):
     requests_mock.get(
         f"{nortech.settings.URL}/api/v1/workspaces/test_workspace/assets/test_asset/divisions/test_division",
@@ -95,7 +97,7 @@ def test_get_workspace_asset_division_with_input_dict(
 def test_get_workspace_asset_division_with_output(
     nortech: Nortech,
     division_output: DivisionOutput,
-    requests_mock,
+    requests_mock: Mocker,
 ):
     requests_mock.get(
         f"{nortech.settings.URL}/api/v1/divisions/1",
@@ -110,7 +112,7 @@ def test_get_workspace_asset_division_with_list_output(
     nortech: Nortech,
     division_output: DivisionOutput,
     division_list_output: DivisionListOutput,
-    requests_mock,
+    requests_mock: Mocker,
 ):
     requests_mock.get(
         f"{nortech.settings.URL}/api/v1/divisions/1",
@@ -140,7 +142,7 @@ def test_get_workspace_asset_division_error(
 def test_list_workspace_divisions(
     nortech: Nortech,
     division_list_output: DivisionListOutput,
-    paginated_division_list_output: PaginatedResponse[DivisionOutput],
+    paginated_division_list_output: PaginatedResponse[DivisionListOutput, Literal["id", "name", "description"]],
     requests_mock: Mocker,
 ):
     requests_mock.get(
@@ -166,7 +168,7 @@ def test_list_workspace_divisions_error(
 def test_list_asset_divisions(
     nortech: Nortech,
     division_list_output: DivisionListOutput,
-    paginated_division_list_output: PaginatedResponse[DivisionOutput],
+    paginated_division_list_output: PaginatedResponse[DivisionListOutput, Literal["id", "name", "description"]],
     requests_mock: Mocker,
 ):
     requests_mock.get(
@@ -192,7 +194,7 @@ def test_list_asset_divisions_error(
 def test_get_division(
     nortech: Nortech,
     division_output: DivisionOutput,
-    requests_mock,
+    requests_mock: Mocker,
 ):
     requests_mock.get(
         f"{nortech.settings.URL}/api/v1/divisions/1",
@@ -205,7 +207,7 @@ def test_get_division(
 
 def test_get_division_error(
     nortech: Nortech,
-    requests_mock,
+    requests_mock: Mocker,
 ):
     requests_mock.get(f"{nortech.settings.URL}/api/v1/divisions/1", status_code=404)
 

@@ -15,7 +15,7 @@ from nortech.metadata.values.pagination import (
     PaginatedResponse,
     PaginationOptions,
 )
-from nortech.metadata.values.signal import SignalOutputNoDevice
+from nortech.metadata.values.signal import SignalOutput
 
 
 class DeployedDeriverList(BaseModel):
@@ -31,8 +31,8 @@ class DeployedDeriverList(BaseModel):
 
 
 class DeployedDeriver(DeployedDeriverList):
-    inputs: list[SignalOutputNoDevice]
-    outputs: list[SignalOutputNoDevice]
+    inputs: list[SignalOutput]
+    outputs: list[SignalOutput]
 
 
 class Log(BaseModel):
@@ -53,14 +53,14 @@ class LogList(BaseModel):
 def list_derivers(
     nortech_api: NortechAPI,
     pagination_options: PaginationOptions[Literal["id", "name", "description"]] | None = None,
-):
+) -> PaginatedResponse[DeployedDeriverList, Literal["id", "name", "description"]]:
     response = nortech_api.get(
         url="/api/v1/derivers",
         params=pagination_options.model_dump(by_alias=True) if pagination_options else None,
     )
     validate_response(response, [200], "Failed to list Derivers.")
 
-    return PaginatedResponse[DeployedDeriverList].model_validate(response.json())
+    return PaginatedResponse[DeployedDeriverList, Literal["id", "name", "description"]].model_validate(response.json())
 
 
 def get_deriver(nortech_api: NortechAPI, deriver: str):

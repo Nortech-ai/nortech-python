@@ -1,3 +1,5 @@
+from typing import Literal
+
 import pytest
 from requests_mock import Mocker
 
@@ -9,7 +11,7 @@ from nortech.metadata.values.workspace import WorkspaceListOutput, WorkspaceOutp
 def test_list_workspace_assets_from_id(
     nortech: Nortech,
     asset_list_output: AssetListOutput,
-    paginated_asset_list_output: PaginatedResponse[AssetListOutput],
+    paginated_asset_list_output: PaginatedResponse[AssetListOutput, Literal["id", "name", "description"]],
     requests_mock: Mocker,
 ):
     requests_mock.get(
@@ -24,7 +26,7 @@ def test_list_workspace_assets_from_id(
 def test_list_workspace_assets_from_name(
     nortech: Nortech,
     asset_list_output: AssetListOutput,
-    paginated_asset_list_output: PaginatedResponse[AssetListOutput],
+    paginated_asset_list_output: PaginatedResponse[AssetListOutput, Literal["id", "name", "description"]],
     requests_mock: Mocker,
 ):
     requests_mock.get(
@@ -39,7 +41,7 @@ def test_list_workspace_assets_from_name(
 def test_list_workspace_assets_from_input(
     nortech: Nortech,
     asset_list_output: AssetListOutput,
-    paginated_asset_list_output: PaginatedResponse[AssetListOutput],
+    paginated_asset_list_output: PaginatedResponse[AssetListOutput, Literal["id", "name", "description"]],
     requests_mock: Mocker,
 ):
     requests_mock.get(
@@ -54,7 +56,7 @@ def test_list_workspace_assets_from_input(
 def test_list_workspace_assets_from_input_dict(
     nortech: Nortech,
     asset_list_output: AssetListOutput,
-    paginated_asset_list_output: PaginatedResponse[AssetListOutput],
+    paginated_asset_list_output: PaginatedResponse[AssetListOutput, Literal["id", "name", "description"]],
     requests_mock: Mocker,
 ):
     requests_mock.get(
@@ -70,7 +72,7 @@ def test_list_workspace_assets_from_output(
     nortech: Nortech,
     workspace_output: WorkspaceOutput,
     asset_list_output: AssetListOutput,
-    paginated_asset_list_output: PaginatedResponse[AssetListOutput],
+    paginated_asset_list_output: PaginatedResponse[AssetListOutput, Literal["id", "name", "description"]],
     requests_mock: Mocker,
 ):
     requests_mock.get(
@@ -86,7 +88,7 @@ def test_list_workspace_assets_from_list_output(
     nortech: Nortech,
     workspace_list_output: list[WorkspaceListOutput],
     asset_list_output: AssetListOutput,
-    paginated_asset_list_output: PaginatedResponse[AssetListOutput],
+    paginated_asset_list_output: PaginatedResponse[AssetListOutput, Literal["id", "name", "description"]],
     requests_mock: Mocker,
 ):
     requests_mock.get(
@@ -101,7 +103,7 @@ def test_list_workspace_assets_from_list_output(
 def test_list_workspace_assets_from_int(
     nortech: Nortech,
     asset_list_output: AssetListOutput,
-    paginated_asset_list_output: PaginatedResponse[AssetListOutput],
+    paginated_asset_list_output: PaginatedResponse[AssetListOutput, Literal["id", "name", "description"]],
     requests_mock: Mocker,
 ):
     requests_mock.get(
@@ -116,7 +118,7 @@ def test_list_workspace_assets_from_int(
 def test_list_workspace_assets_from_str(
     nortech: Nortech,
     asset_list_output: AssetListOutput,
-    paginated_asset_list_output: PaginatedResponse[AssetListOutput],
+    paginated_asset_list_output: PaginatedResponse[AssetListOutput, Literal["id", "name", "description"]],
     requests_mock: Mocker,
 ):
     requests_mock.get(
@@ -142,7 +144,7 @@ def test_list_workspace_assets_error(
 def test_get_workspace_asset_with_input(
     nortech: Nortech,
     asset_output: AssetOutput,
-    requests_mock,
+    requests_mock: Mocker,
 ):
     requests_mock.get(
         f"{nortech.settings.URL}/api/v1/workspaces/test_workspace/assets/test_asset",
@@ -156,7 +158,7 @@ def test_get_workspace_asset_with_input(
 def test_get_workspace_asset_with_input_dict(
     nortech: Nortech,
     asset_output: AssetOutput,
-    requests_mock,
+    requests_mock: Mocker,
 ):
     requests_mock.get(
         f"{nortech.settings.URL}/api/v1/workspaces/test_workspace/assets/test_asset",
@@ -170,7 +172,7 @@ def test_get_workspace_asset_with_input_dict(
 def test_get_workspace_asset_with_output(
     nortech: Nortech,
     asset_output: AssetOutput,
-    requests_mock,
+    requests_mock: Mocker,
 ):
     requests_mock.get(
         f"{nortech.settings.URL}/api/v1/assets/1",
@@ -185,7 +187,7 @@ def test_get_workspace_asset_with_list_output(
     nortech: Nortech,
     asset_output: AssetOutput,
     asset_list_output: AssetListOutput,
-    requests_mock,
+    requests_mock: Mocker,
 ):
     requests_mock.get(f"{nortech.settings.URL}/api/v1/assets/1", text=asset_output.model_dump_json(by_alias=True))
 
@@ -210,7 +212,7 @@ def test_get_workspace_asset_error(
 def test_get_asset(
     nortech: Nortech,
     asset_output: AssetOutput,
-    requests_mock,
+    requests_mock: Mocker,
 ):
     requests_mock.get(
         f"{nortech.settings.URL}/api/v1/assets/1",
@@ -223,7 +225,7 @@ def test_get_asset(
 
 def test_get_asset_error(
     nortech: Nortech,
-    requests_mock,
+    requests_mock: Mocker,
 ):
     requests_mock.get(f"{nortech.settings.URL}/api/v1/assets/1", status_code=404)
 

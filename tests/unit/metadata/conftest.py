@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Literal
 
 import pytest
 
@@ -7,10 +8,6 @@ from nortech.metadata import (
     AssetInputDict,
     AssetListOutput,
     AssetOutput,
-    DeviceInput,
-    DeviceInputDict,
-    DeviceListOutput,
-    DeviceOutput,
     DivisionInput,
     DivisionInputDict,
     DivisionListOutput,
@@ -56,8 +53,8 @@ def workspace_list_output_fixture() -> list[WorkspaceListOutput]:
 @pytest.fixture(scope="session", name="paginated_workspace_list_output")
 def paginated_workspace_list_output_fixture(
     workspace_list_output: list[WorkspaceListOutput],
-) -> PaginatedResponse[WorkspaceListOutput]:
-    return PaginatedResponse[WorkspaceListOutput](
+) -> PaginatedResponse[WorkspaceListOutput, Literal["id", "name", "description"]]:
+    return PaginatedResponse[WorkspaceListOutput, Literal["id", "name", "description"]](
         size=len(workspace_list_output),
         data=workspace_list_output,
         next=None,
@@ -67,8 +64,8 @@ def paginated_workspace_list_output_fixture(
 @pytest.fixture(scope="session", name="paginated_workspace_list_output_first_page")
 def paginated_workspace_list_output_first_page_fixture(
     workspace_list_output: list[WorkspaceListOutput],
-) -> PaginatedResponse[WorkspaceListOutput]:
-    return PaginatedResponse[WorkspaceListOutput](
+) -> PaginatedResponse[WorkspaceListOutput, Literal["id", "name", "description"]]:
+    return PaginatedResponse[WorkspaceListOutput, Literal["id", "name", "description"]](
         size=2,
         data=workspace_list_output[:2],
         next=NextRef(token="test_token"),  # noqa: S106
@@ -78,8 +75,8 @@ def paginated_workspace_list_output_first_page_fixture(
 @pytest.fixture(scope="session", name="paginated_workspace_list_output_second_page")
 def paginated_workspace_list_output_second_page_fixture(
     workspace_list_output: list[WorkspaceListOutput],
-) -> PaginatedResponse[WorkspaceListOutput]:
-    return PaginatedResponse[WorkspaceListOutput](
+) -> PaginatedResponse[WorkspaceListOutput, Literal["id", "name", "description"]]:
+    return PaginatedResponse[WorkspaceListOutput, Literal["id", "name", "description"]](
         size=2,
         data=workspace_list_output[2:],
         next=None,
@@ -115,8 +112,8 @@ def asset_list_output_fixture() -> AssetListOutput:
 @pytest.fixture(scope="session", name="paginated_asset_list_output")
 def paginated_asset_list_output_fixture(
     asset_list_output: AssetListOutput,
-) -> PaginatedResponse[AssetListOutput]:
-    return PaginatedResponse[AssetListOutput](
+) -> PaginatedResponse[AssetListOutput, Literal["id", "name", "description"]]:
+    return PaginatedResponse[AssetListOutput, Literal["id", "name", "description"]](
         size=1,
         data=[asset_list_output],
         next=None,
@@ -153,8 +150,8 @@ def division_list_output_fixture() -> DivisionListOutput:
 @pytest.fixture(scope="session", name="paginated_division_list_output")
 def paginated_division_list_output_fixture(
     division_list_output: DivisionListOutput,
-) -> PaginatedResponse[DivisionListOutput]:
-    return PaginatedResponse[DivisionListOutput](
+) -> PaginatedResponse[DivisionListOutput, Literal["id", "name", "description"]]:
+    return PaginatedResponse[DivisionListOutput, Literal["id", "name", "description"]](
         size=1,
         data=[division_list_output],
         next=None,
@@ -197,8 +194,8 @@ def unit_list_output_fixture() -> UnitListOutput:
 @pytest.fixture(scope="session", name="paginated_unit_list_output")
 def paginated_unit_list_output_fixture(
     unit_list_output: UnitListOutput,
-) -> PaginatedResponse[UnitListOutput]:
-    return PaginatedResponse[UnitListOutput](
+) -> PaginatedResponse[UnitListOutput, Literal["id", "name"]]:
+    return PaginatedResponse[UnitListOutput, Literal["id", "name"]](
         size=1,
         data=[unit_list_output],
         next=None,
@@ -210,57 +207,6 @@ def unit_output_fixture() -> UnitOutput:
     return UnitOutput(
         id=1,
         name="test_unit",
-        workspace=MetadataOutput(id=1, name="test_workspace"),
-        asset=MetadataOutput(id=1, name="test_asset"),
-        division=MetadataOutput(id=1, name="test_division"),
-        created_at=datetime.now(),  # type: ignore
-        updated_at=datetime.now(),  # type: ignore
-    )
-
-
-@pytest.fixture(scope="session", name="device_input")
-def device_input_fixture() -> DeviceInput:
-    return DeviceInput(
-        device="test_device",
-        division="test_division",
-        asset="test_asset",
-        workspace="test_workspace",
-    )
-
-
-@pytest.fixture(scope="session", name="device_input_dict")
-def device_input_dict_fixture() -> DeviceInputDict:
-    return {
-        "device": "test_device",
-        "division": "test_division",
-        "asset": "test_asset",
-        "workspace": "test_workspace",
-    }
-
-
-@pytest.fixture(scope="session", name="device_list_output")
-def device_list_output_fixture() -> DeviceListOutput:
-    return DeviceListOutput(id=1, name="test_device", type="test_type", onboarded=True)
-
-
-@pytest.fixture(scope="session", name="paginated_device_list_output")
-def paginated_device_list_output_fixture(
-    device_list_output: DeviceListOutput,
-) -> PaginatedResponse[DeviceListOutput]:
-    return PaginatedResponse[DeviceListOutput](
-        size=1,
-        data=[device_list_output],
-        next=None,
-    )
-
-
-@pytest.fixture(scope="session", name="device_output")
-def device_output_fixture() -> DeviceOutput:
-    return DeviceOutput(
-        id=1,
-        name="test_device",
-        type="test_type",
-        onboarded=True,
         workspace=MetadataOutput(id=1, name="test_workspace"),
         asset=MetadataOutput(id=1, name="test_asset"),
         division=MetadataOutput(id=1, name="test_division"),
@@ -306,8 +252,12 @@ def signal_list_output_fixture() -> SignalListOutput:
 @pytest.fixture(scope="session", name="paginated_signal_list_output")
 def paginated_signal_list_output_fixture(
     signal_list_output: SignalListOutput,
-) -> PaginatedResponse[SignalListOutput]:
-    return PaginatedResponse[SignalListOutput](
+) -> PaginatedResponse[
+    SignalListOutput, Literal["id", "name", "physical_unit", "data_type", "description", "long_description"]
+]:
+    return PaginatedResponse[
+        SignalListOutput, Literal["id", "name", "physical_unit", "data_type", "description", "long_description"]
+    ](
         size=1,
         data=[signal_list_output],
         next=None,
@@ -327,7 +277,6 @@ def signal_output_fixture() -> SignalOutput:
         asset=MetadataOutput(id=1, name="test_asset"),
         division=MetadataOutput(id=1, name="test_division"),
         unit=MetadataOutput(id=1, name="test_unit"),
-        device=MetadataOutput(id=1, name="test_device"),
         createdAt=datetime.now(),
         updatedAt=datetime.now(),
     )

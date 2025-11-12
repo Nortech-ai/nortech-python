@@ -1,26 +1,30 @@
+from typing import Literal
+
 import pytest
 from requests_mock import Mocker
 
 from nortech import Nortech
 from nortech.metadata import (
-    DeviceInput,
     PaginatedResponse,
-    SignalDeviceInput,
     SignalInput,
     SignalInputDict,
     SignalListOutput,
     SignalOutput,
     UnitInput,
 )
-from nortech.metadata.services.signal import _get_signals, parse_signal_input_or_output_or_id_union_to_signal_input
-from nortech.metadata.values.device import DeviceOutput
+from nortech.metadata.services.signal import (
+    _get_signals,  # type: ignore
+    parse_signal_input_or_output_or_id_union_to_signal_input,
+)
 from nortech.metadata.values.unit import UnitOutput
 
 
 def test_list_workspace_asset_division_unit_signals_from_input(
     nortech: Nortech,
     signal_list_output: SignalListOutput,
-    paginated_signal_list_output: PaginatedResponse[SignalOutput],
+    paginated_signal_list_output: PaginatedResponse[
+        SignalListOutput, Literal["id", "name", "physical_unit", "data_type", "description", "long_description"]
+    ],
     requests_mock: Mocker,
 ):
     requests_mock.get(
@@ -42,7 +46,9 @@ def test_list_workspace_asset_division_unit_signals_from_input(
 def test_list_workspace_asset_division_unit_signals_from_input_dict(
     nortech: Nortech,
     signal_list_output: SignalListOutput,
-    paginated_signal_list_output: PaginatedResponse[SignalOutput],
+    paginated_signal_list_output: PaginatedResponse[
+        SignalListOutput, Literal["id", "name", "physical_unit", "data_type", "description", "long_description"]
+    ],
     requests_mock: Mocker,
 ):
     requests_mock.get(
@@ -65,7 +71,9 @@ def test_list_workspace_asset_division_unit_signals_from_output(
     nortech: Nortech,
     signal_list_output: SignalListOutput,
     unit_output: UnitOutput,
-    paginated_signal_list_output: PaginatedResponse[SignalOutput],
+    paginated_signal_list_output: PaginatedResponse[
+        SignalListOutput, Literal["id", "name", "physical_unit", "data_type", "description", "long_description"]
+    ],
     requests_mock: Mocker,
 ):
     requests_mock.get(
@@ -81,7 +89,9 @@ def test_list_workspace_asset_division_unit_signals_from_output_list(
     nortech: Nortech,
     signal_list_output: SignalListOutput,
     unit_output: UnitOutput,
-    paginated_signal_list_output: PaginatedResponse[SignalOutput],
+    paginated_signal_list_output: PaginatedResponse[
+        SignalListOutput, Literal["id", "name", "physical_unit", "data_type", "description", "long_description"]
+    ],
     requests_mock: Mocker,
 ):
     requests_mock.get(
@@ -96,7 +106,7 @@ def test_list_workspace_asset_division_unit_signals_from_output_list(
 def test_list_workspace_asset_division_unit_signals_error(
     nortech: Nortech,
     unit_output: UnitOutput,
-    requests_mock,
+    requests_mock: Mocker,
 ):
     requests_mock.get(f"{nortech.settings.URL}/api/v1/units/1/signals", status_code=404)
 
@@ -105,98 +115,10 @@ def test_list_workspace_asset_division_unit_signals_error(
     assert "Fetch failed." in str(err.value)
 
 
-def test_list_workspace_asset_division_device_signals_from_input(
-    nortech: Nortech,
-    signal_list_output: SignalListOutput,
-    paginated_signal_list_output: PaginatedResponse[SignalOutput],
-    requests_mock: Mocker,
-):
-    requests_mock.get(
-        f"{nortech.settings.URL}/api/v1/workspaces/test_workspace/assets/test_asset/divisions/test_division/devices/test_device/signals",
-        text=paginated_signal_list_output.model_dump_json(by_alias=True),
-    )
-
-    signals = nortech.metadata.signal.list(
-        DeviceInput(
-            workspace="test_workspace",
-            asset="test_asset",
-            division="test_division",
-            device="test_device",
-        ),
-    )
-    assert signals.data == [signal_list_output]
-
-
-def test_list_workspace_asset_division_device_signals_from_input_dict(
-    nortech: Nortech,
-    signal_list_output: SignalListOutput,
-    paginated_signal_list_output: PaginatedResponse[SignalOutput],
-    requests_mock: Mocker,
-):
-    requests_mock.get(
-        f"{nortech.settings.URL}/api/v1/workspaces/test_workspace/assets/test_asset/divisions/test_division/devices/test_device/signals",
-        text=paginated_signal_list_output.model_dump_json(by_alias=True),
-    )
-
-    signals = nortech.metadata.signal.list(
-        {
-            "workspace": "test_workspace",
-            "asset": "test_asset",
-            "division": "test_division",
-            "device": "test_device",
-        },
-    )
-    assert signals.data == [signal_list_output]
-
-
-def test_list_workspace_asset_division_device_signals_from_output(
-    nortech: Nortech,
-    signal_list_output: SignalListOutput,
-    device_output: DeviceOutput,
-    paginated_signal_list_output: PaginatedResponse[SignalOutput],
-    requests_mock: Mocker,
-):
-    requests_mock.get(
-        f"{nortech.settings.URL}/api/v1/devices/1/signals",
-        text=paginated_signal_list_output.model_dump_json(by_alias=True),
-    )
-
-    signals = nortech.metadata.signal.list(device_output)
-    assert signals.data == [signal_list_output]
-
-
-def test_list_workspace_asset_division_device_signals_from_output_list(
-    nortech: Nortech,
-    signal_list_output: SignalListOutput,
-    device_output: DeviceOutput,
-    paginated_signal_list_output: PaginatedResponse[SignalOutput],
-    requests_mock: Mocker,
-):
-    requests_mock.get(
-        f"{nortech.settings.URL}/api/v1/devices/1/signals",
-        text=paginated_signal_list_output.model_dump_json(by_alias=True),
-    )
-
-    signals = nortech.metadata.signal.list(device_output)
-    assert signals.data == [signal_list_output]
-
-
-def test_list_workspace_asset_division_device_signals_error(
-    nortech: Nortech,
-    device_output: DeviceOutput,
-    requests_mock,
-):
-    requests_mock.get(f"{nortech.settings.URL}/api/v1/devices/1/signals", status_code=404)
-
-    with pytest.raises(AssertionError) as err:
-        nortech.metadata.signal.list(device_output)
-    assert "Fetch failed." in str(err.value)
-
-
 def test_get_workspace_asset_division_unit_signal_with_input(
     nortech: Nortech,
     signal_output: SignalOutput,
-    requests_mock,
+    requests_mock: Mocker,
 ):
     requests_mock.get(
         f"{nortech.settings.URL}/api/v1/workspaces/test_workspace/assets/test_asset/divisions/test_division/units/test_unit/signals/test_signal",
@@ -218,7 +140,7 @@ def test_get_workspace_asset_division_unit_signal_with_input(
 def test_get_workspace_asset_division_unit_signal_with_input_dict(
     nortech: Nortech,
     signal_output: SignalOutput,
-    requests_mock,
+    requests_mock: Mocker,
 ):
     requests_mock.get(
         f"{nortech.settings.URL}/api/v1/workspaces/test_workspace/assets/test_asset/divisions/test_division/units/test_unit/signals/test_signal",
@@ -240,7 +162,7 @@ def test_get_workspace_asset_division_unit_signal_with_input_dict(
 def test_get_workspace_asset_division_unit_signal_with_output(
     nortech: Nortech,
     signal_output: SignalOutput,
-    requests_mock,
+    requests_mock: Mocker,
 ):
     requests_mock.get(f"{nortech.settings.URL}/api/v1/signals/1", text=signal_output.model_dump_json(by_alias=True))
 
@@ -251,7 +173,7 @@ def test_get_workspace_asset_division_unit_signal_with_output(
 def test_get_workspace_asset_division_unit_signal_with_output_list(
     nortech: Nortech,
     signal_output: SignalOutput,
-    requests_mock,
+    requests_mock: Mocker,
 ):
     requests_mock.get(f"{nortech.settings.URL}/api/v1/signals/1", text=signal_output.model_dump_json(by_alias=True))
 
@@ -281,98 +203,12 @@ def test_get_workspace_asset_division_unit_signal_error(
     assert "Fetch failed." in str(err.value)
 
 
-def test_get_workspace_asset_division_device_signal_with_input(
-    nortech: Nortech,
-    signal_output: SignalOutput,
-    requests_mock,
-):
-    requests_mock.get(
-        f"{nortech.settings.URL}/api/v1/workspaces/test_workspace/assets/test_asset/divisions/test_division/devices/test_device/signals/test_signal",
-        text=signal_output.model_dump_json(by_alias=True),
-    )
-
-    signal = nortech.metadata.signal.get(
-        SignalDeviceInput(
-            workspace="test_workspace",
-            asset="test_asset",
-            division="test_division",
-            device="test_device",
-            signal="test_signal",
-        ),
-    )
-    assert signal == signal_output
-
-
-def test_get_workspace_asset_division_device_signal_with_input_dict(
-    nortech: Nortech,
-    signal_output: SignalOutput,
-    requests_mock,
-):
-    requests_mock.get(
-        f"{nortech.settings.URL}/api/v1/workspaces/test_workspace/assets/test_asset/divisions/test_division/devices/test_device/signals/test_signal",
-        text=signal_output.model_dump_json(by_alias=True),
-    )
-
-    signal = nortech.metadata.signal.get(
-        {
-            "workspace": "test_workspace",
-            "asset": "test_asset",
-            "division": "test_division",
-            "device": "test_device",
-            "signal": "test_signal",
-        },
-    )
-    assert signal == signal_output
-
-
-def test_get_workspace_asset_division_device_signal_with_output(
-    nortech: Nortech,
-    signal_output: SignalOutput,
-    requests_mock,
-):
-    requests_mock.get(f"{nortech.settings.URL}/api/v1/signals/1", text=signal_output.model_dump_json(by_alias=True))
-
-    signal = nortech.metadata.signal.get(signal_output)
-    assert signal == signal_output
-
-
-def test_get_workspace_asset_division_device_signal_with_output_list(
-    nortech: Nortech,
-    signal_output: SignalOutput,
-    requests_mock,
-):
-    requests_mock.get(f"{nortech.settings.URL}/api/v1/signals/1", text=signal_output.model_dump_json(by_alias=True))
-
-    signal = nortech.metadata.signal.get(signal_output)
-    assert signal == signal_output
-
-
-def test_get_workspace_asset_division_device_signal_error(
-    nortech: Nortech,
-    requests_mock,
-):
-    requests_mock.get(
-        f"{nortech.settings.URL}/api/v1/workspaces/test_workspace/assets/test_asset/divisions/test_division/devices/test_device/signals/test_signal",
-        status_code=404,
-    )
-
-    with pytest.raises(AssertionError) as err:
-        nortech.metadata.signal.get(
-            SignalDeviceInput(
-                workspace="test_workspace",
-                asset="test_asset",
-                division="test_division",
-                device="test_device",
-                signal="test_signal",
-            ),
-        )
-    assert "Fetch failed." in str(err.value)
-
-
 def test_list_workspace_signals(
     nortech: Nortech,
     signal_list_output: SignalListOutput,
-    paginated_signal_list_output: PaginatedResponse[SignalOutput],
+    paginated_signal_list_output: PaginatedResponse[
+        SignalListOutput, Literal["id", "name", "physical_unit", "data_type", "description", "long_description"]
+    ],
     requests_mock: Mocker,
 ):
     requests_mock.get(
@@ -386,7 +222,7 @@ def test_list_workspace_signals(
 
 def test_list_workspace_signals_error(
     nortech: Nortech,
-    requests_mock,
+    requests_mock: Mocker,
 ):
     requests_mock.get(f"{nortech.settings.URL}/api/v1/workspaces/1/signals", status_code=404)
 
@@ -398,7 +234,9 @@ def test_list_workspace_signals_error(
 def test_list_asset_signals(
     nortech: Nortech,
     signal_list_output: SignalListOutput,
-    paginated_signal_list_output: PaginatedResponse[SignalOutput],
+    paginated_signal_list_output: PaginatedResponse[
+        SignalListOutput, Literal["id", "name", "physical_unit", "data_type", "description", "long_description"]
+    ],
     requests_mock: Mocker,
 ):
     requests_mock.get(
@@ -412,7 +250,7 @@ def test_list_asset_signals(
 
 def test_list_asset_signals_error(
     nortech: Nortech,
-    requests_mock,
+    requests_mock: Mocker,
 ):
     requests_mock.get(f"{nortech.settings.URL}/api/v1/assets/1/signals", status_code=404)
 
@@ -424,7 +262,9 @@ def test_list_asset_signals_error(
 def test_list_division_signals(
     nortech: Nortech,
     signal_list_output: SignalListOutput,
-    paginated_signal_list_output: PaginatedResponse[SignalOutput],
+    paginated_signal_list_output: PaginatedResponse[
+        SignalListOutput, Literal["id", "name", "physical_unit", "data_type", "description", "long_description"]
+    ],
     requests_mock: Mocker,
 ):
     requests_mock.get(
@@ -438,7 +278,7 @@ def test_list_division_signals(
 
 def test_list_division_signals_error(
     nortech: Nortech,
-    requests_mock,
+    requests_mock: Mocker,
 ):
     requests_mock.get(f"{nortech.settings.URL}/api/v1/divisions/1/signals", status_code=404)
 
@@ -450,7 +290,9 @@ def test_list_division_signals_error(
 def test_list_signals(
     nortech: Nortech,
     signal_list_output: SignalListOutput,
-    paginated_signal_list_output: PaginatedResponse[SignalOutput],
+    paginated_signal_list_output: PaginatedResponse[
+        SignalListOutput, Literal["id", "name", "physical_unit", "data_type", "description", "long_description"]
+    ],
     requests_mock: Mocker,
 ):
     requests_mock.get(
@@ -464,7 +306,7 @@ def test_list_signals(
 
 def test_list_signals_error(
     nortech: Nortech,
-    requests_mock,
+    requests_mock: Mocker,
 ):
     requests_mock.get(f"{nortech.settings.URL}/api/v1/units/1/signals", status_code=404)
 
@@ -476,7 +318,7 @@ def test_list_signals_error(
 def test_get_signal(
     nortech: Nortech,
     signal_output: SignalOutput,
-    requests_mock,
+    requests_mock: Mocker,
 ):
     requests_mock.get(
         f"{nortech.settings.URL}/api/v1/signals/1",
@@ -489,7 +331,7 @@ def test_get_signal(
 
 def test_get_signal_error(
     nortech: Nortech,
-    requests_mock,
+    requests_mock: Mocker,
 ):
     requests_mock.get(f"{nortech.settings.URL}/api/v1/signals/1", status_code=404)
 

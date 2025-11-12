@@ -1,3 +1,5 @@
+from typing import Literal
+
 import pytest
 from requests_mock import Mocker
 
@@ -8,7 +10,7 @@ from nortech.metadata import PaginatedResponse, PaginationOptions, WorkspaceInpu
 def test_list_workspaces(
     nortech: Nortech,
     workspace_list_output: list[WorkspaceListOutput],
-    paginated_workspace_list_output: PaginatedResponse[WorkspaceListOutput],
+    paginated_workspace_list_output: PaginatedResponse[WorkspaceListOutput, Literal["id", "name", "description"]],
     requests_mock: Mocker,
 ):
     requests_mock.get(
@@ -23,8 +25,12 @@ def test_list_workspaces(
 def test_list_workspaces_ignore_pagination(
     nortech: Nortech,
     workspace_list_output: list[WorkspaceListOutput],
-    paginated_workspace_list_output_first_page: PaginatedResponse[WorkspaceListOutput],
-    paginated_workspace_list_output_second_page: PaginatedResponse[WorkspaceListOutput],
+    paginated_workspace_list_output_first_page: PaginatedResponse[
+        WorkspaceListOutput, Literal["id", "name", "description"]
+    ],
+    paginated_workspace_list_output_second_page: PaginatedResponse[
+        WorkspaceListOutput, Literal["id", "name", "description"]
+    ],
     requests_mock: Mocker,
 ):
     requests_mock.register_uri(
@@ -51,7 +57,9 @@ def test_list_workspaces_ignore_pagination(
 def test_list_workspaces_with_pagination(
     nortech: Nortech,
     workspace_list_output: list[WorkspaceListOutput],
-    paginated_workspace_list_output_first_page: PaginatedResponse[WorkspaceListOutput],
+    paginated_workspace_list_output_first_page: PaginatedResponse[
+        WorkspaceListOutput, Literal["id", "name", "description"]
+    ],
     requests_mock: Mocker,
 ):
     nortech.api.ignore_pagination = False

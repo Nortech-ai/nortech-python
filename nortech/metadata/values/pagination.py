@@ -34,7 +34,7 @@ class NextRef(BaseModel):
 Resp = TypeVar("Resp")
 
 
-class PaginatedResponse(BaseModel, Generic[Resp]):
+class PaginatedResponse(BaseModel, Generic[Resp, SortBy]):
     """
     Paginated response from list endpoints.
 
@@ -48,9 +48,9 @@ class PaginatedResponse(BaseModel, Generic[Resp]):
     size: int
     data: list[Resp]
     next: NextRef | None = None
-    pagination_options: PaginationOptions | None = None
+    pagination_options: PaginationOptions[SortBy] | None = None
 
-    def next_pagination_options(self) -> PaginationOptions | None:
+    def next_pagination_options(self) -> PaginationOptions[SortBy] | None:
         if not self.next:
             return None
         if self.pagination_options:

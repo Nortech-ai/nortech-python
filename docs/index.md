@@ -78,7 +78,6 @@ Client for interacting with the Nortech Metadata API.
 - `asset` _Asset_ - Client for interacting with the Nortech Metadata Asset API.
 - `division` _Division_ - Client for interacting with the Nortech Metadata Division API.
 - `unit` _Unit_ - Client for interacting with the Nortech Metadata Unit API.
-- `device` _Device_ - Client for interacting with the Nortech Metadata Device API.
 - `signal` _Signal_ - Client for interacting with the Nortech Metadata Signal API.
 
 ### Workspace
@@ -110,13 +109,12 @@ Get a workspace by ID or name.
 **Returns**:
 
 - `WorkspaceOutput` - The workspace details.
-  
 
 **Example**:
 
 ```python
 from nortech import Nortech
-from nortech.core.values.workspace import WorkspaceInput
+from nortech.metadata.values.workspace import WorkspaceInput
 
 nortech = Nortech()
 
@@ -149,7 +147,8 @@ print(workspace)
 def list(
     pagination_options: PaginationOptions[Literal["id", "name", "description"]]
     | None = None
-) -> PaginatedResponse[WorkspaceListOutput]
+) -> PaginatedResponse[WorkspaceListOutput, Literal["id", "name",
+                                                    "description"]]
 ```
 
 List all workspaces.
@@ -162,13 +161,12 @@ List all workspaces.
 **Returns**:
 
 - `PaginatedResponse[WorkspaceListOutput]` - A paginated list of workspaces.
-  
 
 **Example**:
 
 ```python
 from nortech import Nortech
-from nortech.gateways.nortech_api import PaginationOptions
+from nortech.metadata.values.pagination import PaginationOptions
 
 nortech = Nortech()
 
@@ -223,13 +221,12 @@ Get an asset by ID or input.
 **Returns**:
 
 - `AssetOutput` - The asset details.
-  
 
 **Example**:
 
 ```python
 from nortech import Nortech
-from nortech.core.values.asset import AssetInput
+from nortech.metadata.values.asset import AssetInput
 
 nortech = Nortech()
 
@@ -265,7 +262,7 @@ def list(
     | WorkspaceOutput | WorkspaceListOutput,
     pagination_options: PaginationOptions[Literal["id", "name", "description"]]
     | None = None
-) -> PaginatedResponse[AssetListOutput]
+) -> PaginatedResponse[AssetListOutput, Literal["id", "name", "description"]]
 ```
 
 List all assets in a workspace.
@@ -285,14 +282,13 @@ List all assets in a workspace.
 **Returns**:
 
 - `PaginatedResponse[AssetListOutput]` - A paginated list of assets.
-  
 
 **Example**:
 
 ```python
 from nortech import Nortech
-from nortech.gateways.nortech_api import PaginationOptions
-from nortech.core.values.workspace import WorkspaceInput
+from nortech.metadata.values.pagination import PaginationOptions
+from nortech.metadata.values.workspace import WorkspaceInput
 
 nortech = Nortech()
 
@@ -357,13 +353,12 @@ Get a division by ID or input.
 **Returns**:
 
 - `DivisionOutput` - The division details.
-  
 
 **Example**:
 
 ```python
 from nortech import Nortech
-from nortech.core.values.division import DivisionInput
+from nortech.metadata.values.division import DivisionInput
 
 nortech = Nortech()
 
@@ -404,7 +399,8 @@ def list(
     asset: int | AssetInputDict | AssetInput | AssetOutput | AssetListOutput,
     pagination_options: PaginationOptions[Literal["id", "name", "description"]]
     | None = None
-) -> PaginatedResponse[DivisionListOutput]
+) -> PaginatedResponse[DivisionListOutput, Literal["id", "name",
+                                                   "description"]]
 ```
 
 List all divisions in an asset.
@@ -423,14 +419,13 @@ List all divisions in an asset.
 **Returns**:
 
 - `PaginatedResponse[DivisionListOutput]` - A paginated list of divisions.
-  
 
 **Example**:
 
 ```python
 from nortech import Nortech
-from nortech.gateways.nortech_api import PaginationOptions
-from nortech.core.values.asset import AssetInput
+from nortech.metadata.values.asset import AssetInput
+from nortech.metadata.values.pagination import PaginationOptions
 
 nortech = Nortech()
 
@@ -473,7 +468,8 @@ def list_by_workspace_id(
     workspace_id: int,
     pagination_options: PaginationOptions[Literal["id", "name", "description"]]
     | None = None
-) -> PaginatedResponse[DivisionListOutput]
+) -> PaginatedResponse[DivisionListOutput, Literal["id", "name",
+                                                   "description"]]
 ```
 
 List all divisions in a workspace.
@@ -487,13 +483,12 @@ List all divisions in a workspace.
 **Returns**:
 
 - `PaginatedResponse[DivisionListOutput]` - A paginated list of divisions.
-  
 
 **Example**:
 
 ```python
 from nortech import Nortech
-from nortech.gateways.nortech_api import PaginationOptions
+from nortech.metadata.values.pagination import PaginationOptions
 
 nortech = Nortech()
 
@@ -548,13 +543,12 @@ Get a unit by ID or input.
 **Returns**:
 
 - `UnitOutput` - The unit details.
-  
 
 **Example**:
 
 ```python
 from nortech import Nortech
-from nortech.core.values.unit import UnitInput
+from nortech.metadata.values.unit import UnitInput
 
 nortech = Nortech()
 
@@ -600,7 +594,7 @@ def list(
     division: int | DivisionInputDict | DivisionInput | DivisionOutput
     | DivisionListOutput,
     pagination_options: PaginationOptions[Literal["id", "name"]] | None = None
-) -> PaginatedResponse[UnitListOutput]
+) -> PaginatedResponse[UnitListOutput, Literal["id", "name"]]
 ```
 
 List all units in a division.
@@ -619,14 +613,13 @@ List all units in a division.
 **Returns**:
 
 - `PaginatedResponse[UnitListOutput]` - A paginated list of units.
-  
 
 **Example**:
 
 ```python
 from nortech import Nortech
-from nortech.gateways.nortech_api import PaginationOptions
-from nortech.core.values.division import DivisionInput
+from nortech.metadata.values.division import DivisionInput
+from nortech.metadata.values.pagination import PaginationOptions
 
 nortech = Nortech()
 
@@ -666,7 +659,7 @@ print(units)
 def list_by_workspace_id(
     workspace_id: int,
     pagination_options: PaginationOptions[Literal["id", "name"]] | None = None
-) -> PaginatedResponse[UnitListOutput]
+) -> PaginatedResponse[UnitListOutput, Literal["id", "name"]]
 ```
 
 List all units in a workspace.
@@ -680,13 +673,12 @@ List all units in a workspace.
 **Returns**:
 
 - `PaginatedResponse[UnitListOutput]` - A paginated list of units.
-  
 
 **Example**:
 
 ```python
 from nortech import Nortech
-from nortech.gateways.nortech_api import PaginationOptions
+from nortech.metadata.values.pagination import PaginationOptions
 
 nortech = Nortech()
 
@@ -720,7 +712,7 @@ print(units)
 def list_by_asset_id(
     asset_id: int,
     pagination_options: PaginationOptions[Literal["id", "name"]] | None = None
-) -> PaginatedResponse[UnitListOutput]
+) -> PaginatedResponse[UnitListOutput, Literal["id", "name"]]
 ```
 
 List all units in an asset.
@@ -734,13 +726,12 @@ List all units in an asset.
 **Returns**:
 
 - `PaginatedResponse[UnitListOutput]` - A paginated list of units.
-  
 
 **Example**:
 
 ```python
 from nortech import Nortech
-from nortech.gateways.nortech_api import PaginationOptions
+from nortech.metadata.values.pagination import PaginationOptions
 
 nortech = Nortech()
 
@@ -765,270 +756,6 @@ print(units)
 #         )
 #     ]
 # )
-```
-
-### Device
-
-#### get
-
-```python
-def get(
-    device: int | DeviceInputDict | DeviceInput | DeviceOutput
-    | DeviceListOutput
-) -> DeviceOutput
-```
-
-Get a device by ID or input.
-
-**Arguments**:
-
-- `device` _int | DeviceInputDict | DeviceInput | DeviceOutput | DeviceListOutput_ - The device identifier, which can be:
-  - *int*: The device "ID".
-  - [DeviceInputDict](#deviceinputdict): A dictionary representation of a device input.
-  - [DeviceInput](#deviceinput): A pydantic model representing a device input.
-  - [DeviceOutput](#deviceoutput): A pydantic model representing a device output. Obtained from requesting a device metadata.
-  - [DeviceListOutput](#devicelistoutput): A pydantic model representing a listed device output. Obtained from requesting devices metadata.
-  
-
-**Returns**:
-
-- `DeviceOutput` - The device details.
-  
-
-**Example**:
-
-```python
-from nortech import Nortech
-from nortech.core.values.device import DeviceInput
-
-nortech = Nortech()
-
-# Get by ID
-device = nortech.metadata.device.get(123)
-
-# Get by input dict
-device = nortech.metadata.device.get(
-    {"workspace": "my-workspace", "asset": "my-asset", "division": "my-division", "device": "my-device"}
-)
-
-# Get by DeviceInput pydantic object
-device = nortech.metadata.device.get(
-    DeviceInput(workspace="my-workspace", asset="my-asset", division="my-division", device="my-device")
-)
-
-print(device)
-# DeviceOutput(
-#     id=123,
-#     name="my-device",
-#     type="my-type",
-#     onboarded=True,
-#     created_at=datetime.datetime(2024, 1, 1, 0, 0, 0, 0),
-#     updated_at=datetime.datetime(2024, 1, 1, 0, 0, 0, 0),
-#     workspace=MetadataOutput(
-#         id=123,
-#         name="my-workspace"
-#     ),
-#     asset=MetadataOutput(
-#         id=456,
-#         name="my-asset"
-#     ),
-#     division=MetadataOutput(
-#         id=789,
-#         name="my-division"
-#     )
-# )
-
-```
-
-#### list
-
-```python
-def list(
-    division: int | DivisionInputDict | DivisionInput | DivisionOutput
-    | DivisionListOutput,
-    pagination_options: PaginationOptions[Literal["id", "name", "type",
-                                                  "onboarded"]] | None = None
-) -> PaginatedResponse[DeviceListOutput]
-```
-
-List all devices in a division.
-
-**Arguments**:
-
-- `division` _int | DivisionInputDict | DivisionInput | DivisionOutput | DivisionListOutput_ - The division identifier, which can be:
-  - *int*: The division "ID".
-  - [DivisionInputDict](#divisioninputdict): A dictionary representation of a division input.
-  - [DivisionInput](#divisioninput): A pydantic model representing a division input.
-  - [DivisionOutput](#divisionoutput): A pydantic model representing a division output.
-  - [DivisionListOutput](#divisionlistoutput): A pydantic model representing a listed division output.
-- `pagination_options` _PaginationOptions, optional_ - Pagination settings.
-  
-
-**Returns**:
-
-- `PaginatedResponse[DeviceListOutput]` - A paginated list of devices.
-  
-
-**Example**:
-
-```python
-from nortech import Nortech
-from nortech.gateways.nortech_api import PaginationOptions
-from nortech.core.values.division import DivisionInput
-
-nortech = Nortech()
-
-# List all devices in a division
-devices = nortech.metadata.device.list(123)  # using division ID
-
-# List with pagination
-devices = nortech.metadata.device.list(
-    {"workspace": "my-workspace", "asset": "my-asset", "division": "my-division"},  # using DivisionInputDict
-    PaginationOptions(size=10, sortBy="name"),
-)
-
-# Using DivisionInput pydantic object
-devices = nortech.metadata.device.list(
-    DivisionInput(workspace="my-workspace", asset="my-asset", division="my-division")
-)
-
-print(devices)
-# PaginatedResponse(
-#     size=2,
-#     next=None,
-#     data=[
-#         DeviceListOutput(
-#             id=1,
-#             name="my-device",
-#             type="my-type",
-#             onboarded=True
-#         ),
-#         DeviceListOutput(
-#             id=2,
-#             name="another-device",
-#             type="another-type",
-#             onboarded=False
-#         )
-#     ]
-# )
-
-```
-
-#### list\_by\_workspace\_id
-
-```python
-def list_by_workspace_id(
-    workspace_id: int,
-    pagination_options: PaginationOptions[Literal["id", "name", "type",
-                                                  "onboarded"]] | None = None
-) -> PaginatedResponse[DeviceListOutput]
-```
-
-List all devices in a workspace.
-
-**Arguments**:
-
-- `workspace_id` _int_ - The workspace ID.
-- `pagination_options` _PaginationOptions, optional_ - Pagination settings.
-  
-
-**Returns**:
-
-- `PaginatedResponse[DeviceListOutput]` - A paginated list of devices.
-  
-
-**Example**:
-
-```python
-from nortech import Nortech
-from nortech.gateways.nortech_api import PaginationOptions
-
-nortech = Nortech()
-
-# List all devices in a workspace
-devices = nortech.metadata.device.list_by_workspace_id(123)
-
-# List with pagination
-devices = nortech.metadata.device.list_by_workspace_id(123, PaginationOptions(size=10, sortBy="name"))
-
-print(devices)
-# PaginatedResponse(
-#     size=2,
-#     next=None,
-#     data=[
-#         DeviceListOutput(
-#             id=1,
-#             name="my-device",
-#             type="my-type",
-#             onboarded=True
-#         ),
-#         DeviceListOutput(
-#             id=2,
-#             name="another-device",
-#             type="another-type",
-#             onboarded=False
-#         )
-#     ]
-# )
-
-```
-
-#### list\_by\_asset\_id
-
-```python
-def list_by_asset_id(
-    asset_id: int,
-    pagination_options: PaginationOptions[Literal["id", "name", "type",
-                                                  "onboarded"]] | None = None
-) -> PaginatedResponse[DeviceListOutput]
-```
-
-List all devices in an asset.
-
-**Arguments**:
-
-- `asset_id` _int_ - The asset ID.
-- `pagination_options` _PaginationOptions, optional_ - Pagination settings.
-  
-
-**Returns**:
-
-- `PaginatedResponse[DeviceListOutput]` - A paginated list of devices.
-  
-
-**Example**:
-
-```python
-from nortech import Nortech
-from nortech.gateways.nortech_api import PaginationOptions
-
-nortech = Nortech()
-
-# List all devices in an asset
-devices = nortech.metadata.device.list_by_asset_id(123)
-
-# List with pagination
-devices = nortech.metadata.device.list_by_asset_id(123, PaginationOptions(size=10, sortBy="name"))
-
-print(devices)
-# PaginatedResponse(
-#     size=2,
-#     next=None,
-#     data=[
-#         DeviceListOutput(
-#             id=1,
-#             name="my-device",
-#             type="my-type",
-#             onboarded=True
-#         ),
-#         DeviceListOutput(
-#             id=2,
-#             name="another-device",
-#             type="another-type",
-#             onboarded=False
-#         )
-#     ]
-# )
 
 ```
 
@@ -1038,13 +765,8 @@ print(devices)
 
 ```python
 def get(
-    signal: int
-    | SignalInputDict
-    | SignalInput
-    | SignalOutput
+    signal: int | SignalInputDict | SignalInput | SignalOutput
     | SignalListOutput
-    | SignalDeviceInputDict
-    | SignalDeviceInput
 ) -> SignalOutput
 ```
 
@@ -1052,26 +774,23 @@ Get a signal by ID or input.
 
 **Arguments**:
 
-- `signal` _int | SignalInputDict | SignalInput | SignalOutput | SignalListOutput | SignalDeviceInputDict | SignalDeviceInput_ - The signal identifier, which can be:
+- `signal` _int | SignalInputDict | SignalInput | SignalOutput | SignalListOutput_ - The signal identifier, which can be:
   - *int*: The signal "ID".
   - [SignalInputDict](#signalinputdict): A dictionary representation of a signal input.
   - [SignalInput](#signalinput): A pydantic model representing a signal input.
   - [SignalOutput](#signaloutput): A pydantic model representing a signal output. Obtained from requesting a signal metadata.
   - [SignalListOutput](#signallistoutput): A pydantic model representing a listed signal output. Obtained from requesting signals metadata.
-  - [SignalDeviceInputDict](#signaldeviceinputdict): A dictionary representation of a device signal input.
-  - [SignalDeviceInput](#signaldeviceinput): A pydantic model representing a device signal input.
   
 
 **Returns**:
 
 - `SignalOutput` - The signal details.
-  
 
 **Example**:
 
 ```python
 from nortech import Nortech
-from nortech.core.values.signal import SignalDeviceInput, SignalInput
+from nortech.metadata.values.signal import SignalInput
 
 nortech = Nortech()
 
@@ -1089,29 +808,10 @@ signal = nortech.metadata.signal.get(
     }
 )
 
-# Get device signal by input dict
-signal = nortech.metadata.signal.get(
-    {
-        "workspace": "my-workspace",
-        "asset": "my-asset",
-        "division": "my-division",
-        "device": "my-device",
-        "signal": "my-signal",
-    }
-)
 
 # Get by SignalInput pydantic object
 signal = nortech.metadata.signal.get(
-    SignalInput(
-        workspace="my-workspace", asset="my-asset", division="my-division", unit="my-unit", signal="my-signal"
-    )
-)
-
-# Get by SignalDeviceInput pydantic object
-signal = nortech.metadata.signal.get(
-SignalDeviceInput(
-        workspace="my-workspace", asset="my-asset", division="my-division", device="my-device", signal="my-signal"
-    )
+    SignalInput(workspace="my-workspace", asset="my-asset", division="my-division", unit="my-unit", signal="my-signal")
 )
 
 print(signal)
@@ -1140,10 +840,6 @@ print(signal)
 #         id=101,
 #         name="my-unit"
 #     )
-#     device=MetadataOutput(
-#         id=101,
-#         name="my-device"
-#     )
 # )
 
 ```
@@ -1152,8 +848,7 @@ print(signal)
 
 ```python
 def list(
-    unit_or_device: int | UnitInputDict | UnitInput | UnitOutput
-    | DeviceInputDict | DeviceInput | DeviceOutput,
+    unit: int | UnitInputDict | UnitInput | UnitOutput,
     pagination_options: PaginationOptions[Literal[
         "id",
         "name",
@@ -1163,36 +858,33 @@ def list(
         "long_description",
     ]]
     | None = None
-) -> PaginatedResponse[SignalListOutput]
+) -> PaginatedResponse[SignalListOutput,
+                       Literal["id", "name", "physical_unit", "data_type",
+                               "description", "long_description"]]
 ```
 
-List all signals in a unit or device.
+List all signals in a unit.
 
 **Arguments**:
 
-- `unit_or_device` _int | UnitInputDict | UnitInput | UnitOutput | DeviceInputDict | DeviceInput | DeviceOutput_ - The unit or device identifier, which can be:
-  - *int*: The unit/device "ID".
+- `unit` _int | UnitInputDict | UnitInput | UnitOutput_ - The unit identifier, which can be:
+  - *int*: The unit "ID".
   - [UnitInputDict](#unitinputdict): A dictionary representation of a unit input.
   - [UnitInput](#unitinput): A pydantic model representing a unit input.
   - [UnitOutput](#unitoutput): A pydantic model representing a unit output.
-  - [DeviceInputDict](#deviceinputdict): A dictionary representation of a device input.
-  - [DeviceInput](#deviceinput): A pydantic model representing a device input.
-  - [DeviceOutput](#deviceoutput): A pydantic model representing a device output.
 - `pagination_options` _PaginationOptions, optional_ - Pagination settings.
   
 
 **Returns**:
 
 - `PaginatedResponse[SignalListOutput]` - A paginated list of signals.
-  
 
 **Example**:
 
 ```python
 from nortech import Nortech
-from nortech.gateways.nortech_api import PaginationOptions
-from nortech.core.values.device import DeviceInput
-from nortech.core.values.unit import UnitInput
+from nortech.metadata.values.pagination import PaginationOptions
+from nortech.metadata.values.unit import UnitInput
 
 nortech = Nortech()
 
@@ -1205,20 +897,9 @@ signals = nortech.metadata.signal.list(
     PaginationOptions(size=10, sortBy="name"),
 )
 
-# List device signals with pagination
-signals = nortech.metadata.signal.list(
-    {"workspace": "my-workspace", "asset": "my-asset", "division": "my-division", "device": "my-device"},
-    PaginationOptions(size=10, sortBy="name"),
-)
-
 # Using UnitInput pydantic object
 signals = nortech.metadata.signal.list(
     UnitInput(workspace="my-workspace", asset="my-asset", division="my-division", unit="my-unit")
-)
-
-# Using DeviceInput pydantic object
-signals = nortech.metadata.signal.list(
-    DeviceInput(workspace="my-workspace", asset="my-asset", division="my-division", device="my-device")
 )
 
 print(signals)
@@ -1261,7 +942,9 @@ def list_by_workspace_id(
         "long_description",
     ]]
     | None = None
-) -> PaginatedResponse[SignalListOutput]
+) -> PaginatedResponse[SignalListOutput,
+                       Literal["id", "name", "physical_unit", "data_type",
+                               "description", "long_description"]]
 ```
 
 List all signals in a workspace.
@@ -1275,13 +958,12 @@ List all signals in a workspace.
 **Returns**:
 
 - `PaginatedResponse[SignalListOutput]` - A paginated list of signals.
-  
 
 **Example**:
 
 ```python
 from nortech import Nortech
-from nortech.gateways.nortech_api import PaginationOptions
+from nortech.metadata.values.pagination import PaginationOptions
 
 nortech = Nortech()
 
@@ -1331,7 +1013,9 @@ def list_by_asset_id(
         "long_description",
     ]]
     | None = None
-) -> PaginatedResponse[SignalListOutput]
+) -> PaginatedResponse[SignalListOutput,
+                       Literal["id", "name", "physical_unit", "data_type",
+                               "description", "long_description"]]
 ```
 
 List all signals in an asset.
@@ -1345,13 +1029,12 @@ List all signals in an asset.
 **Returns**:
 
 - `PaginatedResponse[SignalListOutput]` - A paginated list of signals.
-  
 
 **Example**:
 
 ```python
 from nortech import Nortech
-from nortech.gateways.nortech_api import PaginationOptions
+from nortech.metadata.values.pagination import PaginationOptions
 
 nortech = Nortech()
 
@@ -1385,7 +1068,6 @@ print(signals)
 #     ]
 # )
 
-
 ```
 
 #### list\_by\_division\_id
@@ -1402,7 +1084,9 @@ def list_by_division_id(
         "long_description",
     ]]
     | None = None
-) -> PaginatedResponse[SignalListOutput]
+) -> PaginatedResponse[SignalListOutput,
+                       Literal["id", "name", "physical_unit", "data_type",
+                               "description", "long_description"]]
 ```
 
 List all signals in a division.
@@ -1416,13 +1100,12 @@ List all signals in a division.
 **Returns**:
 
 - `PaginatedResponse[SignalListOutput]` - A paginated list of signals.
-  
 
 **Example**:
 
 ```python
 from nortech import Nortech
-from nortech.gateways.nortech_api import PaginationOptions
+from nortech.metadata.values.pagination import PaginationOptions
 
 nortech = Nortech()
 
@@ -1455,7 +1138,6 @@ print(signals)
 #         )
 #     ]
 # )
-
 
 ```
 
@@ -1492,7 +1174,6 @@ Download data for the specified signals within the given time window. If experim
 **Raises**:
 
 - `NotImplementedError` - If the time window corresponds to hot storage, which is not yet supported.
-  
 
 **Example**:
 
@@ -1500,8 +1181,8 @@ Download data for the specified signals within the given time window. If experim
 from datetime import datetime
 
 from nortech import Nortech
-from nortech.core.values.signal import SignalInput, SignalInputDict
 from nortech.datatools.values.windowing import TimeWindow
+from nortech.metadata.values.signal import SignalInput, SignalInputDict
 
 # Initialize the Nortech client
 nortech = Nortech()
@@ -1570,7 +1251,6 @@ Retrieve a pandas DataFrame for the specified signals within the given time wind
 
 - `NoSignalsRequestedError` - Raised when no signals are requested.
 - `InvalidTimeWindow` - Raised when the start date is after the end date.
-  
 
 **Example**:
 
@@ -1578,8 +1258,8 @@ Retrieve a pandas DataFrame for the specified signals within the given time wind
 from datetime import datetime
 
 from nortech import Nortech
-from nortech.core.values.signal import SignalInput, SignalInputDict
 from nortech.datatools.values.windowing import TimeWindow
+from nortech.metadata.values.signal import SignalInput, SignalInputDict
 
 # Initialize the Nortech client
 nortech = Nortech()
@@ -1652,7 +1332,6 @@ Retrieve a polars LazyFrame for the specified signals within the given time wind
 
 - `NoSignalsRequestedError` - Raised when no signals are requested.
 - `InvalidTimeWindow` - Raised when the start date is after the end date.
-  
 
 **Example**:
 
@@ -1660,8 +1339,8 @@ Retrieve a polars LazyFrame for the specified signals within the given time wind
 from datetime import datetime
 
 from nortech import Nortech
-from nortech.core.values.signal import SignalInput, SignalInputDict
 from nortech.datatools.values.windowing import TimeWindow
+from nortech.metadata.values.signal import SignalInput, SignalInputDict
 
 # Initialize the Nortech client
 nortech = Nortech()
@@ -1732,7 +1411,6 @@ Retrieve a polars DataFrame for the specified signals within the given time wind
 
 - `NoSignalsRequestedError` - Raised when no signals are requested.
 - `InvalidTimeWindow` - Raised when the start date is after the end date.
-  
 
 **Example**:
 
@@ -1740,8 +1418,8 @@ Retrieve a polars DataFrame for the specified signals within the given time wind
 from datetime import datetime
 
 from nortech import Nortech
-from nortech.core.values.signal import SignalInput, SignalInputDict
 from nortech.datatools.values.windowing import TimeWindow
+from nortech.metadata.values.signal import SignalInput, SignalInputDict
 
 # Initialize the Nortech client
 nortech = Nortech()
@@ -1793,18 +1471,19 @@ Client for interacting with the Nortech Derivers API.
 **Attributes**:
 
 - `nortech_api` _NortechAPI_ - The Nortech API client.
-  
 
 **Example**:
 
-  To define a deriver, you need to create a class that inherits from the Deriver class.
-  The class must have two inner classes: Inputs and Outputs.
-  The Inputs class must inherit from DeriverInputs and the Outputs class must inherit from DeriverOutputs.
-  The Inputs class must define the inputs of the deriver.
-  The Outputs class must define the outputs of the deriver.
-  The run method must be defined and return a bytewax stream.
-  
 ```python
+# To define a deriver, you need to create a class that inherits from the Deriver class.
+# The class must have two inner classes: Inputs and Outputs.
+# The Inputs class must inherit from DeriverInputs and the Outputs class must inherit from DeriverOutputs.
+# The Inputs class must define the inputs of the deriver.
+# The Outputs class must define the outputs of the deriver.
+# The run method must be defined and return a bytewax stream.
+
+from __future__ import annotations
+
 import bytewax.operators as op
 
 from nortech.derivers import Deriver, DeriverInput, DeriverInputs, DeriverOutput, DeriverOutputs
@@ -1851,6 +1530,7 @@ class MyDeriver(Deriver):
                 output_2=str(_input.input_2),
             ),
         )
+
 ```
 
 #### list
@@ -1871,17 +1551,20 @@ List derivers.
 **Returns**:
 
 - `PaginatedResponse[DeployedDeriver]` - Paginated response of derivers.
-  
 
 **Example**:
 
 ```python
+from nortech import Nortech
+from nortech.derivers import Deriver
+
+
 # Define Deriver
-class MyDeriver(Deriver):
-    ...
+class MyDeriver(Deriver): ...
 
 
 nortech = Nortech()
+
 derivers = nortech.derivers.list()
 print(derivers)
 # PaginatedResponse(
@@ -1895,6 +1578,7 @@ print(derivers)
 #         )
 #     ],
 # )
+
 ```
 
 #### get
@@ -1913,24 +1597,31 @@ Get a deriver.
 **Returns**:
 
 - `DeployedDeriver` - Deployed deriver.
-  
 
 **Example**:
 
 ```python
+from nortech import Nortech
+from nortech.derivers import Deriver
+
+
 # Define Deriver
-class MyDeriver(Deriver):
-    ...
+class MyDeriver(Deriver): ...
+
 
 nortech = Nortech()
+
+# Get deriver by class or class name
 derivers = nortech.derivers.get(MyDeriver)
+derivers = nortech.derivers.get("MyDeriver")
+
 print(derivers)
 # DeployedDeriver(
 #     deriver=MyDeriver,
 #     description="my-description",
 #     start_at="2025-01-01T12:00:00Z",
 #     inputs=[
-#         SignalOutputNoDevice(
+#         SignalOutput(
 #             id=1,
 #             name="input_1",
 #             description="input_1",
@@ -1958,7 +1649,7 @@ print(derivers)
 #         ),
 #     ],
 #     outputs=[
-#         SignalOutputNoDevice(
+#         SignalOutput(
 #             id=2,
 #             name="output_1",
 #             description="output_1",
@@ -1986,6 +1677,7 @@ print(derivers)
 #         ),
 #     ]
 # )
+
 ```
 
 #### create
@@ -2010,16 +1702,22 @@ Create a deriver.
 **Returns**:
 
 - `DeployedDeriver` - Deployed deriver.
-  
 
 **Example**:
 
 ```python
+from datetime import datetime, timezone
+
+from nortech import Nortech
+from nortech.derivers import Deriver
+
+
 # Define Deriver
-class MyDeriver(Deriver):
-    ...
+class MyDeriver(Deriver): ...
+
 
 nortech = Nortech()
+
 derivers = nortech.derivers.create(MyDeriver, start_at=datetime.now(timezone.utc), description="my-description")
 print(derivers)
 # DeployedDeriver(
@@ -2027,7 +1725,7 @@ print(derivers)
 #     description="my-description",
 #     start_at=None,
 #     inputs=[
-#         SignalOutputNoDevice(
+#         SignalOutput(
 #             id=1,
 #             name="input_1",
 #             description="input_1",
@@ -2055,7 +1753,7 @@ print(derivers)
 #         ),
 #     ],
 #     outputs=[
-#         SignalOutputNoDevice(
+#         SignalOutput(
 #             id=2,
 #             name="output_1",
 #             description="output_1",
@@ -2083,6 +1781,7 @@ print(derivers)
 #         ),
 #     ]
 # )
+
 ```
 
 #### update
@@ -2109,16 +1808,22 @@ Update a deriver.
 **Returns**:
 
 - `DeployedDeriver` - Deployed deriver.
-  
 
 **Example**:
 
 ```python
+from datetime import datetime, timezone
+
+from nortech import Nortech
+from nortech.derivers import Deriver
+
+
 # Define Deriver
-class MyDeriver(Deriver):
-    ...
+class MyDeriver(Deriver): ...
+
 
 nortech = Nortech()
+
 derivers = nortech.derivers.update(MyDeriver, start_at=datetime.now(timezone.utc), description="my-description")
 print(derivers)
 # DeployedDeriver(
@@ -2126,7 +1831,7 @@ print(derivers)
 #     description="my-description",
 #     start_at=None,
 #     inputs=[
-#         SignalOutputNoDevice(
+#         SignalOutput(
 #             id=1,
 #             name="input_1",
 #             description="input_1",
@@ -2154,7 +1859,7 @@ print(derivers)
 #         ),
 #     ],
 #     outputs=[
-#         SignalOutputNoDevice(
+#         SignalOutput(
 #             id=2,
 #             name="output_1",
 #             description="output_1",
@@ -2182,6 +1887,7 @@ print(derivers)
 #         ),
 #     ]
 # )
+
 ```
 
 #### run\_locally\_with\_df
@@ -2204,18 +1910,20 @@ Run a deriver locally on a DataFrame. The dataframe must have a timestamp index 
 **Returns**:
 
 - `DataFrame` - The processed DataFrame with derived signals.
-  
 
 **Example**:
 
 ```python
-from datetime import datetime, timezone
+from datetime import timezone
+
+import pandas as pd
 
 from nortech import Nortech
-from nortech.derivers import Deriver, TimeWindow
+from nortech.derivers import Deriver
 
-class MyDeriver(Deriver):
-    ...
+
+class MyDeriver(Deriver): ...
+
 
 nortech = Nortech()
 
@@ -2244,6 +1952,7 @@ print(result_df)
 # 2023-01-01 00:01:37+00:00          194.0
 # 2023-01-01 00:01:38+00:00          196.0
 # 2023-01-01 00:01:39+00:00          198.0
+
 ```
 
 #### run\_locally\_with\_source\_data
@@ -2266,18 +1975,20 @@ Run a deriver locally by fetching its inputs signal data for a given time window
 **Returns**:
 
 - `DataFrame` - The processed DataFrame with derived signals.
-  
 
 **Example**:
 
 ```python
 from datetime import datetime, timezone
 
+import pandas as pd
+
 from nortech import Nortech
 from nortech.derivers import Deriver, TimeWindow
 
-class MyDeriver(Deriver):
-    ...
+
+class MyDeriver(Deriver): ...
+
 
 nortech = Nortech()
 
@@ -2290,7 +2001,9 @@ df = pd.DataFrame(
 ).set_index("timestamp")
 
 # Run the deriver locally
-result_df = nortech.derivers.run_locally_with_source_data(MyDeriver, time_window=TimeWindow(start=datetime.now(timezone.utc), end=datetime.now(timezone.utc)))
+result_df = nortech.derivers.run_locally_with_source_data(
+    MyDeriver, time_window=TimeWindow(start=datetime.now(timezone.utc), end=datetime.now(timezone.utc))
+)
 
 print(result_df)
 #                            output_signal
@@ -2306,6 +2019,7 @@ print(result_df)
 # 2023-01-01 00:01:37+00:00          194.0
 # 2023-01-01 00:01:38+00:00          196.0
 # 2023-01-01 00:01:39+00:00          198.0
+
 ```
 
 
@@ -2561,67 +2275,6 @@ Detailed output model for a single unit.
 
 
 
-## metadata.values.device
-
-Module containing all schemas related with Devices.
-
-### DeviceInputDict
-
-Dictionary representation of Device input data.
-
-**Attributes**:
-
-- `workspace` _str_ - The name of the Workspace.
-- `asset` _str_ - The name of the Asset.
-- `division` _str_ - The name of the Division.
-- `device` _str_ - The name of the Device.
-
-### DeviceInput
-
-Pydantic model for Device input data.
-
-**Attributes**:
-
-- `workspace` _str_ - The name of the Workspace.
-- `asset` _str_ - The name of the Asset.
-- `division` _str_ - The name of the Division.
-- `device` _str_ - The name of the Device.
-
-### DeviceListOutput
-
-Output model for device list entries.
-
-**Attributes**:
-
-- `id` _int_ - Id of the Device.
-- `name` _str_ - Name of the Device.
-- `type` _str_ - The type of the Device.
-- `onboarded` _bool_ - Whether the Device is onboarded.
-
-### DeviceOutput
-
-Detailed output model for a single device.
-
-**Attributes**:
-
-- `id` _int_ - Id of the Device.
-- `name` _str_ - Name of the Device.
-- `type` _str_ - The type of the Device.
-- `onboarded` _bool_ - Whether the Device is onboarded.
-- `created_at` _datetime_ - Timestamp of when the Device was created.
-- `updated_at` _datetime_ - Timestamp of when the Device was last updated.
-- `workspace` - Metadata about the Workspace containing the Device.
-  - id (int): Id of the Workspace.
-  - name (str): Name of the Workspace.
-- `asset` - Metadata about the Asset containing the Device.
-  - id (int): Id of the Asset.
-  - name (str): Name of the Asset.
-- `division` - Metadata about the Division containing the Device.
-  - id (int): Id of the Division.
-  - name (str): Name of the Division.
-
-
-
 ## metadata.values.signal
 
 Module containing all schemas related with Signals.
@@ -2650,30 +2303,6 @@ Pydantic model for Signal input data.
 - `unit` _str_ - The name of the Unit.
 - `signal` _str_ - The name of the Signal.
 
-### SignalDeviceInputDict
-
-Dictionary representation of SignalDevice input data.
-
-**Attributes**:
-
-- `workspace` _str_ - The name of the Workspace.
-- `asset` _str_ - The name of the Asset.
-- `division` _str_ - The name of the Division.
-- `device` _str_ - The name of the Device.
-- `signal` _str_ - The name of the Signal.
-
-### SignalDeviceInput
-
-Pydantic model for SignalDevice input data.
-
-**Attributes**:
-
-- `workspace` _str_ - The name of the Workspace.
-- `asset` _str_ - The name of the Asset.
-- `division` _str_ - The name of the Division.
-- `device` _str_ - The name of the Device.
-- `signal` _str_ - The name of the Signal.
-
 ### SignalListOutput
 
 Output model for signal list entries.
@@ -2686,30 +2315,4 @@ Output model for signal list entries.
 - `data_type` _Literal["float", "boolean", "string", "json"]_ - The data type of the Signal.
 - `description` _str_ - A description of the Signal.
 - `long_description` _str_ - A long description of the Signal.
-
-### SignalOutput
-
-Detailed output model for a single signal.
-
-**Attributes**:
-
-- `id` _int_ - Id of the Signal.
-- `name` _str_ - Name of the Signal.
-- `created_at` _datetime_ - Timestamp of when the Signal was created.
-- `updated_at` _datetime_ - Timestamp of when the Signal was last updated.
-- `workspace` - Metadata about the Workspace containing the Signal.
-  - id (int): Id of the Workspace.
-  - name (str): Name of the Workspace.
-- `asset` - Metadata about the Asset containing the Signal.
-  - id (int): Id of the Asset.
-  - name (str): Name of the Asset.
-- `division` - Metadata about the Division containing the Signal.
-  - id (int): Id of the Division.
-  - name (str): Name of the Division.
-- `unit` - Metadata about the Unit containing the Signal.
-  - id (int): Id of the Unit.
-  - name (str): Name of the Unit.
-- `device` - Metadata about the Device containing the Signal.
-  - id (int): Id of the Device.
-  - name (str): Name of the Device.
 

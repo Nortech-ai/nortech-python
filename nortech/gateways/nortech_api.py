@@ -65,6 +65,7 @@ class NortechAPI(Session):
     ) -> Response:
         url_str = url.decode() if isinstance(url, bytes) else str(url)
         joined_url = urljoin(self.settings.URL, url_str)
+        print("requesting", joined_url, self.settings)
         return super().request(
             method,
             joined_url,
