@@ -1,3 +1,5 @@
+from typing import Literal
+
 import pytest
 from requests_mock import Mocker
 
@@ -15,7 +17,7 @@ from nortech.metadata.values.division import DivisionListOutput, DivisionOutput
 def test_list_workspace_asset_division_units_from_input(
     nortech: Nortech,
     unit_list_output: UnitListOutput,
-    paginated_unit_list_output: PaginatedResponse[UnitOutput],
+    paginated_unit_list_output: PaginatedResponse[UnitListOutput, Literal["id", "name"]],
     requests_mock: Mocker,
 ):
     requests_mock.get(
@@ -32,7 +34,7 @@ def test_list_workspace_asset_division_units_from_input(
 def test_list_workspace_asset_division_units_from_input_dict(
     nortech: Nortech,
     unit_list_output: UnitListOutput,
-    paginated_unit_list_output: PaginatedResponse[UnitOutput],
+    paginated_unit_list_output: PaginatedResponse[UnitListOutput, Literal["id", "name"]],
     requests_mock: Mocker,
 ):
     requests_mock.get(
@@ -50,7 +52,7 @@ def test_list_workspace_asset_division_units_from_output(
     nortech: Nortech,
     unit_list_output: UnitListOutput,
     division_output: DivisionOutput,
-    paginated_unit_list_output: PaginatedResponse[UnitOutput],
+    paginated_unit_list_output: PaginatedResponse[UnitListOutput, Literal["id", "name"]],
     requests_mock: Mocker,
 ):
     requests_mock.get(
@@ -66,7 +68,7 @@ def test_list_workspace_asset_division_units_from_list_output(
     nortech: Nortech,
     unit_list_output: UnitListOutput,
     division_list_output: DivisionListOutput,
-    paginated_unit_list_output: PaginatedResponse[UnitOutput],
+    paginated_unit_list_output: PaginatedResponse[UnitListOutput, Literal["id", "name"]],
     requests_mock: Mocker,
 ):
     requests_mock.get(
@@ -92,7 +94,7 @@ def test_list_workspace_asset_division_units_error(
 def test_get_workspace_asset_division_unit_with_input(
     nortech: Nortech,
     unit_output: UnitOutput,
-    requests_mock,
+    requests_mock: Mocker,
 ):
     requests_mock.get(
         f"{nortech.settings.URL}/api/v1/workspaces/test_workspace/assets/test_asset/divisions/test_division/units/test_unit",
@@ -113,7 +115,7 @@ def test_get_workspace_asset_division_unit_with_input(
 def test_get_workspace_asset_division_unit_with_input_dict(
     nortech: Nortech,
     unit_output: UnitOutput,
-    requests_mock,
+    requests_mock: Mocker,
 ):
     requests_mock.get(
         f"{nortech.settings.URL}/api/v1/workspaces/test_workspace/assets/test_asset/divisions/test_division/units/test_unit",
@@ -134,7 +136,7 @@ def test_get_workspace_asset_division_unit_with_input_dict(
 def test_get_workspace_asset_division_unit_with_output(
     nortech: Nortech,
     unit_output: UnitOutput,
-    requests_mock,
+    requests_mock: Mocker,
 ):
     requests_mock.get(
         f"{nortech.settings.URL}/api/v1/units/1",
@@ -149,7 +151,7 @@ def test_get_workspace_asset_division_unit_with_list_output(
     nortech: Nortech,
     unit_output: UnitOutput,
     unit_list_output: UnitListOutput,
-    requests_mock,
+    requests_mock: Mocker,
 ):
     requests_mock.get(f"{nortech.settings.URL}/api/v1/units/1", text=unit_output.model_dump_json(by_alias=True))
 
@@ -181,7 +183,7 @@ def test_get_workspace_asset_division_unit_error(
 def test_list_workspace_units(
     nortech: Nortech,
     unit_list_output: UnitListOutput,
-    paginated_unit_list_output: PaginatedResponse[UnitOutput],
+    paginated_unit_list_output: PaginatedResponse[UnitListOutput, Literal["id", "name"]],
     requests_mock: Mocker,
 ):
     requests_mock.get(
@@ -207,7 +209,7 @@ def test_list_workspace_units_error(
 def test_list_asset_units(
     nortech: Nortech,
     unit_list_output: UnitListOutput,
-    paginated_unit_list_output: PaginatedResponse[UnitOutput],
+    paginated_unit_list_output: PaginatedResponse[UnitListOutput, Literal["id", "name"]],
     requests_mock: Mocker,
 ):
     requests_mock.get(
@@ -233,7 +235,7 @@ def test_list_asset_units_error(
 def test_list_division_units(
     nortech: Nortech,
     unit_list_output: UnitListOutput,
-    paginated_unit_list_output: PaginatedResponse[UnitOutput],
+    paginated_unit_list_output: PaginatedResponse[UnitListOutput, Literal["id", "name"]],
     requests_mock: Mocker,
 ):
     requests_mock.get(
@@ -259,7 +261,7 @@ def test_list_division_units_error(
 def test_get_unit(
     nortech: Nortech,
     unit_output: UnitOutput,
-    requests_mock,
+    requests_mock: Mocker,
 ):
     requests_mock.get(
         f"{nortech.settings.URL}/api/v1/units/1",
@@ -272,7 +274,7 @@ def test_get_unit(
 
 def test_get_unit_error(
     nortech: Nortech,
-    requests_mock,
+    requests_mock: Mocker,
 ):
     requests_mock.get(f"{nortech.settings.URL}/api/v1/units/1", status_code=404)
 

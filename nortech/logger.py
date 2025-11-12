@@ -42,7 +42,7 @@ def get_logger(
 
     logger = structlog.stdlib.get_logger(nortech_sdk=True)
     logger.addHandler(handler)
-    logger.setLevel(logging.getLevelName(level))
+    logger.setLevel(getattr(logging, level))
     return logger
 
 

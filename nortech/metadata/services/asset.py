@@ -30,7 +30,7 @@ def list_workspace_assets(
     nortech_api: NortechAPI,
     workspace: WorkspaceInputDict | WorkspaceInput | WorkspaceOutput | WorkspaceListOutput | int | str,
     pagination_options: PaginationOptions[Literal["id", "name", "description"]] | None = None,
-):
+) -> PaginatedResponse[AssetListOutput, Literal["id", "name", "description"]]:
     workspace_input = parse_workspace_input(workspace)
     response = nortech_api.get(
         url=f"/api/v1/workspaces/{workspace_input}/assets",
@@ -38,7 +38,7 @@ def list_workspace_assets(
     )
     validate_response(response)
 
-    resp = PaginatedResponse[AssetListOutput].model_validate(
+    resp = PaginatedResponse[AssetListOutput, Literal["id", "name", "description"]].model_validate(
         {**response.json(), "pagination_options": pagination_options}
     )
 

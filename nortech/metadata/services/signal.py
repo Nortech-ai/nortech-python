@@ -6,13 +6,6 @@ from nortech.gateways.nortech_api import (
     NortechAPI,
     validate_response,
 )
-from nortech.metadata.services.device import (
-    DeviceInput,
-    DeviceInputDict,
-    DeviceListOutput,
-    DeviceOutput,
-    parse_device_input,
-)
 from nortech.metadata.services.unit import (
     UnitInput,
     UnitInputDict,
@@ -25,13 +18,10 @@ from nortech.metadata.values.pagination import (
     PaginationOptions,
 )
 from nortech.metadata.values.signal import (
-    SignalDeviceInput,
-    SignalDeviceInputDict,
     SignalInput,
     SignalInputDict,
     SignalListOutput,
     SignalOutput,
-    parse_signal_device_input,
     parse_signal_input,
 )
 
@@ -63,9 +53,9 @@ def list_workspace_asset_division_unit_signals(
     )
     validate_response(response)
 
-    resp = PaginatedResponse[SignalListOutput].model_validate(
-        {**response.json(), "pagination_options": pagination_options}
-    )
+    resp = PaginatedResponse[
+        SignalListOutput, Literal["id", "name", "physical_unit", "data_type", "description", "long_description"]
+    ].model_validate({**response.json(), "pagination_options": pagination_options})
 
     if nortech_api.ignore_pagination and resp.next and resp.next.token:
         next_resp = list_workspace_asset_division_unit_signals(nortech_api, unit, resp.next_pagination_options())
@@ -97,63 +87,6 @@ def get_workspace_asset_division_unit_signal(
     return SignalOutput.model_validate(response.json())
 
 
-def list_workspace_asset_division_device_signals(
-    nortech_api: NortechAPI,
-    device: DeviceInputDict | DeviceInput | DeviceOutput | DeviceListOutput,
-    pagination_options: PaginationOptions[
-        Literal[
-            "id",
-            "name",
-            "physical_unit",
-            "data_type",
-            "description",
-            "long_description",
-        ]
-    ]
-    | None = None,
-):
-    if isinstance(device, DeviceListOutput):
-        return list_device_signals(nortech_api, device.id, pagination_options)
-
-    device_input = parse_device_input(device)
-    response = nortech_api.get(
-        url=f"/api/v1/workspaces/{device_input.workspace}/assets/{device_input.asset}/divisions/{device_input.division}/devices/{device_input.device}/signals",
-        params=pagination_options.model_dump(exclude_none=True, by_alias=True) if pagination_options else None,
-    )
-    validate_response(response)
-
-    resp = PaginatedResponse[SignalListOutput].model_validate(
-        {**response.json(), "pagination_options": pagination_options}
-    )
-
-    if nortech_api.ignore_pagination and resp.next and resp.next.token:
-        next_resp = list_workspace_asset_division_device_signals(nortech_api, device, resp.next_pagination_options())
-        return resp.model_copy(
-            update={
-                "data": resp.data + next_resp.data,
-                "size": resp.size + next_resp.size,
-                "next": next_resp.next,
-            }
-        )
-
-    return resp
-
-
-def get_workspace_asset_division_device_signal(
-    nortech_api: NortechAPI,
-    signal: SignalDeviceInputDict | SignalDeviceInput | SignalOutput | SignalListOutput,
-):
-    if isinstance(signal, SignalListOutput):
-        return get_signal(nortech_api, signal.id)
-
-    signal_input = parse_signal_device_input(signal)
-    response = nortech_api.get(
-        url=f"/api/v1/workspaces/{signal_input.workspace}/assets/{signal_input.asset}/divisions/{signal_input.division}/devices/{signal_input.device}/signals/{signal_input.signal}",
-    )
-    validate_response(response)
-    return SignalOutput.model_validate(response.json())
-
-
 def list_workspace_signals(
     nortech_api: NortechAPI,
     workspace_id: int,
@@ -175,9 +108,9 @@ def list_workspace_signals(
     )
     validate_response(response)
 
-    resp = PaginatedResponse[SignalListOutput].model_validate(
-        {**response.json(), "pagination_options": pagination_options}
-    )
+    resp = PaginatedResponse[
+        SignalListOutput, Literal["id", "name", "physical_unit", "data_type", "description", "long_description"]
+    ].model_validate({**response.json(), "pagination_options": pagination_options})
 
     if nortech_api.ignore_pagination and resp.next and resp.next.token:
         next_resp = list_workspace_signals(nortech_api, workspace_id, resp.next_pagination_options())
@@ -206,16 +139,18 @@ def list_asset_signals(
         ]
     ]
     | None = None,
-):
+) -> PaginatedResponse[
+    SignalListOutput, Literal["id", "name", "physical_unit", "data_type", "description", "long_description"]
+]:
     response = nortech_api.get(
         url=f"/api/v1/assets/{asset_id}/signals",
         params=pagination_options.model_dump(exclude_none=True, by_alias=True) if pagination_options else None,
     )
     validate_response(response)
 
-    resp = PaginatedResponse[SignalListOutput].model_validate(
-        {**response.json(), "pagination_options": pagination_options}
-    )
+    resp = PaginatedResponse[
+        SignalListOutput, Literal["id", "name", "physical_unit", "data_type", "description", "long_description"]
+    ].model_validate({**response.json(), "pagination_options": pagination_options})
 
     if nortech_api.ignore_pagination and resp.next and resp.next.token:
         next_resp = list_asset_signals(nortech_api, asset_id, resp.next_pagination_options())
@@ -244,16 +179,18 @@ def list_division_signals(
         ]
     ]
     | None = None,
-):
+) -> PaginatedResponse[
+    SignalListOutput, Literal["id", "name", "physical_unit", "data_type", "description", "long_description"]
+]:
     response = nortech_api.get(
         url=f"/api/v1/divisions/{division_id}/signals",
         params=pagination_options.model_dump(exclude_none=True, by_alias=True) if pagination_options else None,
     )
     validate_response(response)
 
-    resp = PaginatedResponse[SignalListOutput].model_validate(
-        {**response.json(), "pagination_options": pagination_options}
-    )
+    resp = PaginatedResponse[
+        SignalListOutput, Literal["id", "name", "physical_unit", "data_type", "description", "long_description"]
+    ].model_validate({**response.json(), "pagination_options": pagination_options})
 
     if nortech_api.ignore_pagination and resp.next and resp.next.token:
         next_resp = list_division_signals(nortech_api, division_id, resp.next_pagination_options())
@@ -282,57 +219,21 @@ def list_unit_signals(
         ]
     ]
     | None = None,
-):
+) -> PaginatedResponse[
+    SignalListOutput, Literal["id", "name", "physical_unit", "data_type", "description", "long_description"]
+]:
     response = nortech_api.get(
         url=f"/api/v1/units/{unit_id}/signals",
         params=pagination_options.model_dump(exclude_none=True, by_alias=True) if pagination_options else None,
     )
     validate_response(response)
 
-    resp = PaginatedResponse[SignalListOutput].model_validate(
-        {**response.json(), "pagination_options": pagination_options}
-    )
+    resp = PaginatedResponse[
+        SignalListOutput, Literal["id", "name", "physical_unit", "data_type", "description", "long_description"]
+    ].model_validate({**response.json(), "pagination_options": pagination_options})
 
     if nortech_api.ignore_pagination and resp.next and resp.next.token:
         next_resp = list_unit_signals(nortech_api, unit_id, resp.next_pagination_options())
-        return resp.model_copy(
-            update={
-                "data": resp.data + next_resp.data,
-                "size": resp.size + next_resp.size,
-                "next": next_resp.next,
-            }
-        )
-
-    return resp
-
-
-def list_device_signals(
-    nortech_api: NortechAPI,
-    device_id: int,
-    pagination_options: PaginationOptions[
-        Literal[
-            "id",
-            "name",
-            "physical_unit",
-            "data_type",
-            "description",
-            "long_description",
-        ]
-    ]
-    | None = None,
-):
-    response = nortech_api.get(
-        url=f"/api/v1/devices/{device_id}/signals",
-        params=pagination_options.model_dump(exclude_none=True, by_alias=True) if pagination_options else None,
-    )
-    validate_response(response)
-
-    resp = PaginatedResponse[SignalListOutput].model_validate(
-        {**response.json(), "pagination_options": pagination_options}
-    )
-
-    if nortech_api.ignore_pagination and resp.next and resp.next.token:
-        next_resp = list_device_signals(nortech_api, device_id, resp.next_pagination_options())
         return resp.model_copy(
             update={
                 "data": resp.data + next_resp.data,

@@ -31,8 +31,8 @@ jobs:
 
       - name: Run linting
         run: |
-          uvx ruff format --check
-          uvx ruff check
+          uvx ruff format --check --exclude "docs/**"
+          uvx ruff check --exclude "docs/**"
 
       - name: Run tests
         run: |
@@ -45,7 +45,7 @@ jobs:
 
       - name: Run docs generation
         run: |
-          uv run python docs-render.py
+          uv run python docs/render.py
           if [ -n "$(git status --porcelain docs/index.md)" ]; then
             echo "Error: docs/index.md has uncommitted changes after running render.py"
             echo "Please run 'python render.py' locally and commit the changes"

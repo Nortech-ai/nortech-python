@@ -40,7 +40,6 @@ def data_signal_output_fixture() -> SignalOutput:
         asset=MetadataOutput(id=1, name="test_asset"),
         division=MetadataOutput(id=1, name="test_division"),
         unit=MetadataOutput(id=1, name="test_unit"),
-        device=MetadataOutput(id=1, name="test_device"),
         createdAt=datetime.now(),
         updatedAt=datetime.now(),
     )
@@ -59,7 +58,6 @@ def data_signal_output_id_1_fixture() -> SignalOutput:
         asset=MetadataOutput(id=1, name="test_asset"),
         division=MetadataOutput(id=1, name="test_division"),
         unit=MetadataOutput(id=1, name="test_unit"),
-        device=MetadataOutput(id=1, name="test_device"),
         createdAt=datetime.now(),
         updatedAt=datetime.now(),
     )
@@ -78,7 +76,6 @@ def data_signal_output_id_2_fixture() -> SignalOutput:
         asset=MetadataOutput(id=1, name="test_asset"),
         division=MetadataOutput(id=1, name="test_division"),
         unit=MetadataOutput(id=1, name="test_unit"),
-        device=MetadataOutput(id=1, name="test_device"),
         createdAt=datetime.now(),
         updatedAt=datetime.now(),
     )

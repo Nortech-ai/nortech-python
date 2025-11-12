@@ -86,14 +86,14 @@ def run_deriver_locally_with_df(
 ):
     validate_deriver(deriver)
 
-    if not isinstance(df.index, DatetimeIndex):
+    if not isinstance(df.index, DatetimeIndex):  # type: ignore
         raise ValueError("df must have a datetime index")
 
     df_timezone = df.index.tz
     df.index = df.index.tz_convert("UTC")
 
     def df_to_inputs(df: DataFrame):
-        for deriver_input in df.reset_index().to_dict("records"):
+        for deriver_input in df.reset_index().to_dict("records"):  # type: ignore
             input_with_none = {k: (None if isna(v) else v) for k, v in deriver_input.items()}
             yield deriver.Inputs.model_validate(input_with_none)
 
@@ -110,7 +110,7 @@ def run_deriver_locally_with_df(
 
     df_out = DataFrame([output.model_dump(by_alias=True) for output in output_list])
     if "timestamp" in df_out.columns:
-        df_out = df_out.set_index("timestamp").tz_convert(df_timezone)
+        df_out = df_out.set_index("timestamp").tz_convert(df_timezone)  # type: ignore
     return df_out
 
 

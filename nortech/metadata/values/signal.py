@@ -7,7 +7,6 @@ from typing import Literal, Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from nortech.metadata.values.device import DeviceInput, DeviceInputDict
 from nortech.metadata.values.unit import UnitInput, UnitInputDict
 
 from .common import MetadataOutput, MetadataTimestamps
@@ -51,7 +50,7 @@ class SignalInput(UnitInput):
     def hash(self) -> str:  # noqa: D102
         return hashlib.sha256(self.model_dump_json().encode()).hexdigest()
 
-    def model_dump_with_rename(self) -> dict:  # noqa: D102
+    def model_dump_with_rename(self) -> dict[str, str]:  # noqa: D102
         return {
             "rename": self.hash(),
             **self.model_dump(by_alias=True),
@@ -63,46 +62,6 @@ def parse_signal_input(signal_input: SignalInput | SignalInputDict) -> SignalInp
         return signal_input
     else:
         return SignalInput.model_validate(signal_input)
-
-
-class SignalDeviceInputDict(DeviceInputDict):
-    """
-    Dictionary representation of SignalDevice input data.
-
-    Attributes:
-        workspace (str): The name of the Workspace.
-        asset (str): The name of the Asset.
-        division (str): The name of the Division.
-        device (str): The name of the Device.
-        signal (str): The name of the Signal.
-
-    """
-
-    signal: str
-
-
-class SignalDeviceInput(DeviceInput):
-    """
-    Pydantic model for SignalDevice input data.
-
-    Attributes:
-        workspace (str): The name of the Workspace.
-        asset (str): The name of the Asset.
-        division (str): The name of the Division.
-        device (str): The name of the Device.
-        signal (str): The name of the Signal.
-
-    """
-
-    signal: str
-
-
-def parse_signal_device_input(  # noqa: D103
-    signal_device_input: SignalDeviceInput | SignalDeviceInputDict | SignalOutput,
-) -> SignalDeviceInput:
-    if isinstance(signal_device_input, SignalDeviceInput):
-        return signal_device_input
-    return SignalDeviceInput.model_validate(signal_device_input)
 
 
 class SignalSpecs(BaseModel):
@@ -134,7 +93,7 @@ class SignalListOutput(SignalSpecs):
     name: str
 
 
-class SignalOutputNoDevice(SignalListOutput, MetadataTimestamps):
+class SignalOutput(SignalListOutput, MetadataTimestamps):
     workspace: MetadataOutput
     asset: MetadataOutput
     division: MetadataOutput
@@ -148,36 +107,6 @@ class SignalOutputNoDevice(SignalListOutput, MetadataTimestamps):
             unit=self.unit.name,
             signal=self.name,
         )
-
-
-class SignalOutput(SignalOutputNoDevice):
-    """
-    Detailed output model for a single signal.
-
-    Attributes:
-        id (int): Id of the Signal.
-        name (str): Name of the Signal.
-        created_at (datetime): Timestamp of when the Signal was created.
-        updated_at (datetime): Timestamp of when the Signal was last updated.
-        workspace: Metadata about the Workspace containing the Signal.
-            - id (int): Id of the Workspace.
-            - name (str): Name of the Workspace.
-        asset: Metadata about the Asset containing the Signal.
-            - id (int): Id of the Asset.
-            - name (str): Name of the Asset.
-        division: Metadata about the Division containing the Signal.
-            - id (int): Id of the Division.
-            - name (str): Name of the Division.
-        unit: Metadata about the Unit containing the Signal.
-            - id (int): Id of the Unit.
-            - name (str): Name of the Unit.
-        device: Metadata about the Device containing the Signal.
-            - id (int): Id of the Device.
-            - name (str): Name of the Device.
-
-    """
-
-    device: MetadataOutput
 
 
 class CreateSignalInput(SignalInput, SignalSpecs):

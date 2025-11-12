@@ -22,14 +22,14 @@ from nortech.metadata.values.workspace import (
 def list_workspaces(
     nortech_api: NortechAPI,
     pagination_options: PaginationOptions[Literal["id", "name", "description"]] | None = None,
-) -> PaginatedResponse[WorkspaceListOutput]:
+) -> PaginatedResponse[WorkspaceListOutput, Literal["id", "name", "description"]]:
     response = nortech_api.get(
         url="/api/v1/workspaces",
         params=pagination_options.model_dump(exclude_none=True, by_alias=True) if pagination_options else None,
     )
     validate_response(response)
 
-    resp = PaginatedResponse[WorkspaceListOutput].model_validate(
+    resp = PaginatedResponse[WorkspaceListOutput, Literal["id", "name", "description"]].model_validate(
         {**response.json(), "pagination_options": pagination_options}
     )
 

@@ -30,7 +30,7 @@ def list_workspace_asset_divisions(
     nortech_api: NortechAPI,
     asset: int | AssetInputDict | AssetInput | AssetOutput | AssetListOutput,
     pagination_options: PaginationOptions[Literal["id", "name", "description"]] | None = None,
-):
+) -> PaginatedResponse[DivisionListOutput, Literal["id", "name", "description"]]:
     if isinstance(asset, int):
         return list_asset_divisions(nortech_api, asset, pagination_options)
     if isinstance(asset, AssetListOutput):
@@ -43,7 +43,7 @@ def list_workspace_asset_divisions(
     )
     validate_response(response)
 
-    resp = PaginatedResponse[DivisionListOutput].model_validate(
+    resp = PaginatedResponse[DivisionListOutput, Literal["id", "name", "description"]].model_validate(
         {**response.json(), "pagination_options": pagination_options}
     )
 
@@ -81,14 +81,14 @@ def list_workspace_divisions(
     nortech_api: NortechAPI,
     workspace_id: int,
     pagination_options: PaginationOptions[Literal["id", "name", "description"]] | None = None,
-):
+) -> PaginatedResponse[DivisionListOutput, Literal["id", "name", "description"]]:
     response = nortech_api.get(
         url=f"/api/v1/workspaces/{workspace_id}/divisions",
         params=pagination_options.model_dump(exclude_none=True, by_alias=True) if pagination_options else None,
     )
     validate_response(response)
 
-    resp = PaginatedResponse[DivisionListOutput].model_validate(
+    resp = PaginatedResponse[DivisionListOutput, Literal["id", "name", "description"]].model_validate(
         {**response.json(), "pagination_options": pagination_options}
     )
 
@@ -109,14 +109,14 @@ def list_asset_divisions(
     nortech_api: NortechAPI,
     asset_id: int,
     pagination_options: PaginationOptions[Literal["id", "name", "description"]] | None = None,
-):
+) -> PaginatedResponse[DivisionListOutput, Literal["id", "name", "description"]]:
     response = nortech_api.get(
         url=f"/api/v1/assets/{asset_id}/divisions",
         params=pagination_options.model_dump(exclude_none=True, by_alias=True) if pagination_options else None,
     )
     validate_response(response)
 
-    resp = PaginatedResponse[DivisionListOutput].model_validate(
+    resp = PaginatedResponse[DivisionListOutput, Literal["id", "name", "description"]].model_validate(
         {**response.json(), "pagination_options": pagination_options}
     )
 
